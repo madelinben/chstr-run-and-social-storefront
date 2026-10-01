@@ -30,7 +30,7 @@ Local: repo-root `.env.local` (copy from `.env.example` via `pnpm setup`). Never
 | PUBLIC_WHATSAPP_NUMBER | click-to-chat on `/contact` |
 | PUBLIC_INSTAGRAM_URL / PUBLIC_FACEBOOK_URL | social links |
 
-CI reads the first two from GitHub repository **variables** (not secrets), because the build calls the live Storefront API.
+CI does not use a real store: it builds against `scripts/mock-storefront.mjs` (`PUBLIC_SHOPIFY_STOREFRONT_URL`). Production and preview deploys build against the live Storefront API with the two vars above.
 
 ## Build variables (SEO)
 

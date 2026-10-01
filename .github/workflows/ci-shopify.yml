@@ -20,10 +20,8 @@ jobs:
       run:
         working-directory: chstr-run-and-social-shopify
     env:
-      # Placeholder values so the build compiles without host env. Mirror the app's .env.example.
-      # The build calls the live Storefront API, so these are repository variables (not secrets).
-      PUBLIC_SHOPIFY_STORE_DOMAIN: ${{ vars.PUBLIC_SHOPIFY_STORE_DOMAIN }}
-      PUBLIC_SHOPIFY_STOREFRONT_TOKEN: ${{ vars.PUBLIC_SHOPIFY_STOREFRONT_TOKEN }}
+      # CI builds against the repo's mock Storefront API, so it needs no store. Real store: verified on the preview deploy.
+      PUBLIC_SHOPIFY_STOREFRONT_URL: http://localhost:4400
       # Canonical origin for the SEO checks. Production builds also set SEO_STRICT=1.
       SITE_ORIGIN: ${{ vars.SITE_ORIGIN || 'http://localhost:4321' }}
     steps:
@@ -43,6 +41,8 @@ jobs:
         run: pnpm lint
       - name: Test
         run: pnpm test
+      - name: Start mock Storefront API
+        run: node scripts/mock-storefront.mjs &
       - name: Build
         run: pnpm build
       - name: Site quality (SEO, schema.org, budgets)
