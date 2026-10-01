@@ -1,0 +1,50 @@
+---
+import { nextStatuses } from '@/domain/order/order-transitions';
+import { formatPounds } from '@/utilities/format-pounds';
+import type { OrderView } from '@/data/Order/order-dto';
+
+interface Props {
+  orders: OrderView[];
+}
+const { orders } = Astro.props;
+const statusLabels = {
+  PAID_UNFULFILLED: 'Paid, to order from supplier',
+  ORDERED_FROM_SUPPLIER: 'Ordered from supplier',
+  READY_FOR_PICKUP: 'Ready for pickup',
+  FULFILLED: 'Collected',
+  REFUNDED: 'Refunded',
+} as const;
+const dateFormatter = new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/London' });
+---
+
+{orders.length === 0 ? (
+  <p>No orders yet. New paid orders appear here.</p>
+) : (
+  <ul class="flex flex-col gap-4">
+    {orders.map((order) => (
+      <li class="rounded-3xl border-4 border-border bg-card p-5">
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 class="text-xl">Order {order.id}</h2>
+          <p class="text-sm">{dateFormatter.format(new Date(order.createdAt))}</p>
+        </div>
+        <p class="mt-1 break-words">{order.customerEmail}{order.customerPhone ? ` · ${order.customerPhone}` : ''}</p>
+        <ul class="mt-3 list-disc pl-5">
+          {order.lines.map((line) => <li>{line.quantity} × {line.productSlug} ({line.size})</li>)}
+        </ul>
+        <p class="mt-3 font-bold tabular-nums">{formatPounds(order.totalPence)}</p>
+        <p class="mt-3 inline-block rounded-full border-4 border-border bg-accent px-3 py-1 font-bold">{statusLabels[order.status]}</p>
+        {nextStatuses(order.status).length > 0 && (
+          <form method="post" class="mt-4 flex flex-wrap items-center gap-2">
+            <input type="hidden" name="orderId" value={order.id} />
+            <label class="flex items-center gap-2 font-bold">Move to
+              <select name="status" class="min-h-10 rounded-full border-4 border-border bg-card px-3">
+                {nextStatuses(order.status).map((status) => <option value={status}>{statusLabels[status]}</option>)}
+              </select>
+            </label>
+            <button type="submit" class="min-h-10 rounded-full border-4 border-border bg-primary px-5 py-2 font-display font-extrabold uppercase text-primary-foreground">Update</button>
+          </form>
+        )}
+      </li>
+    ))}
+  </ul>
+)}

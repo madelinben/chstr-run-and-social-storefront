@@ -1,0 +1,20 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.tsx';
+import WaiverCallout from '@/features/waiver-sign/views/components/WaiverCallout.astro';
+import PageBanner from '@/features/site-shell/views/components/PageBanner.astro';
+import PanelDivider from '@/features/site-shell/views/components/PanelDivider.astro';
+---
+
+<PageLayout
+  title="Sign the Run Club Waiver"
+  description="New to CHSTR Run & Social? Every new runner signs the waiver once, online, before their first Monday session. It takes a couple of minutes on your phone."
+  breadcrumbs={[{ name: 'Waiver', path: '/waiver/' }]}
+>
+  <CartLauncher slot="actions" client:idle />
+  <PageBanner title="Waiver" kicker="Before your first run" tiles={['finishMedal', 'friendsRunning', 'wordFree']} />
+  <section class="mx-auto max-w-3xl px-6 py-16">
+    <WaiverCallout />
+  </section>
+  <PanelDivider />
+</PageLayout>

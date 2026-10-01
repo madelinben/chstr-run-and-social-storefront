@@ -1,0 +1,38 @@
+---
+import Logo from '@/features/site-shell/views/components/Logo.astro';
+
+const links = [
+  { href: '/faqs/', label: 'FAQs' },
+  { href: '/waiver/', label: 'Waiver' },
+  { href: '/merchandise/', label: 'Merchandise' },
+  { href: '/contact/', label: 'Contact' },
+];
+const socials = [
+  import.meta.env.PUBLIC_INSTAGRAM_URL && { label: 'Instagram', href: import.meta.env.PUBLIC_INSTAGRAM_URL },
+  import.meta.env.PUBLIC_FACEBOOK_URL && { label: 'Facebook', href: import.meta.env.PUBLIC_FACEBOOK_URL },
+].filter(Boolean);
+---
+
+<footer class="bg-foreground text-background">
+  <div class="mx-auto grid max-w-6xl gap-10 px-6 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
+    <div>
+      <div class="text-5xl text-card"><Logo /></div>
+      <p class="mt-4 font-display text-xl font-extrabold uppercase text-accent">Mondays 18:30 · The Architect · Always Free</p>
+      <p class="mt-2 max-w-sm text-sm">Running, football, netball and social nights in Chester.</p>
+    </div>
+    <nav aria-label="Footer">
+      <h2 class="mb-3 font-display text-sm font-bold uppercase tracking-[0.3em] text-accent">Explore</h2>
+      <ul class="flex flex-col gap-1">
+        {links.map((link) => <li><a href={link.href} class="inline-flex min-h-10 items-center underline-offset-4 hover:underline">{link.label}</a></li>)}
+      </ul>
+    </nav>
+    {socials.length > 0 && (
+      <div>
+        <h2 class="mb-3 font-display text-sm font-bold uppercase tracking-[0.3em] text-accent">Follow</h2>
+        <ul class="flex flex-col gap-1">
+          {socials.map((social) => <li><a href={social.href} rel="noopener" class="inline-flex min-h-10 items-center underline-offset-4 hover:underline">{social.label}</a></li>)}
+        </ul>
+      </div>
+    )}
+  </div>
+</footer>

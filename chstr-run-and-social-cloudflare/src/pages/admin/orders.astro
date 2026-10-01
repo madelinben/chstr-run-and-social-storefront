@@ -1,0 +1,37 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import OrderList from '@/features/order-manage/views/components/OrderList.astro';
+import { getOrdersServer } from '@/data/Order/get-orders-server';
+import { updateOrderStatus } from '@/data/Order/update-order-status';
+import { getServerEnvironment } from '@/services/environment/server-environment';
+
+export const prerender = false;
+
+const env = getServerEnvironment();
+let message = '';
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  try {
+    await updateOrderStatus(Number(form.get('orderId')), String(form.get('status')), env);
+    return Astro.redirect('/admin/orders', 303);
+  } catch (error) {
+    message = error instanceof Error ? error.message : 'The order could not be updated.';
+  }
+}
+
+const orders = await getOrdersServer(env);
+---
+
+<PageLayout title="Orders" description="Staff order list." noindex>
+  <section class="mx-auto max-w-3xl px-6 py-16">
+    <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+      <h1 class="text-4xl sm:text-6xl">Orders</h1>
+      <form method="post" action="/auth/logout" class="flex items-center gap-3">
+        <span class="text-sm">{Astro.locals.adminEmail}</span>
+        <button type="submit" class="min-h-10 rounded-full border-4 border-border px-4 font-bold">Sign Out</button>
+      </form>
+    </div>
+    {message && <p role="alert" class="mb-6 rounded-2xl bg-destructive/10 p-3">{message}</p>}
+    <OrderList orders={orders} />
+  </section>
+</PageLayout>

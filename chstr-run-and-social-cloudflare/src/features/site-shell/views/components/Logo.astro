@@ -1,0 +1,11 @@
+---
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<span translate="no" class={`inline-flex flex-col items-center leading-none ${className}`}>
+  <span class="font-display text-[1em] font-black tracking-tight">CHSTR<span class="text-accent">.</span></span>
+  <span class="mt-[0.15em] font-display text-[0.28em] font-bold tracking-[0.3em]">RUN &amp; SOCIAL</span>
+</span>

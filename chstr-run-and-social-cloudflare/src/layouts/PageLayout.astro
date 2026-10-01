@@ -1,0 +1,47 @@
+---
+import '@/styles/global.css';
+import SiteHeader from '@/features/site-shell/views/components/SiteHeader.astro';
+import SiteFooter from '@/features/site-shell/views/components/SiteFooter.astro';
+import PageSeo from '@/features/site-seo/views/components/PageSeo.astro';
+import montserratLatin from '@/assets/fonts/montserrat-latin-wght-normal.woff2?url';
+import interLatin from '@/assets/fonts/inter-latin-wght-normal.woff2?url';
+import type { Crumb, JsonLdNode } from '@/features/site-seo/utilities/schema-nodes';
+
+interface Props {
+  title: string;
+  absoluteTitle?: string;
+  description: string;
+  image?: string;
+  imageAlt?: string;
+  ogType?: 'website' | 'product';
+  breadcrumbs?: Crumb[];
+  pageType?: string;
+  schema?: JsonLdNode[];
+  noindex?: boolean;
+}
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <PageSeo {...Astro.props} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preload" as="font" type="font/woff2" href={montserratLatin} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={interLatin} crossorigin />
+    <script is:inline>
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('motion');
+    </script>
+  </head>
+  <body>
+    <SiteHeader><slot name="actions" slot="actions" /></SiteHeader>
+    <main id="main"><slot /></main>
+    <SiteFooter />
+    <script>
+      import { startScrollReveals } from '@/features/site-shell/utilities/scroll-reveal';
+      startScrollReveals();
+    </script>
+  </body>
+</html>

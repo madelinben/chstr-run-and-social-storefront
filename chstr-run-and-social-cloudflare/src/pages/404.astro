@@ -1,0 +1,14 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+---
+
+<PageLayout title="Page Not Found" description="That page does not exist. Head back to the CHSTR Run & Social home page or get in touch." noindex>
+  <section class="mx-auto max-w-3xl px-6 py-24">
+    <h1 class="text-4xl sm:text-6xl">Page not found</h1>
+    <p class="mt-4 max-w-prose">If you typed the address, check it. If you pasted it, copy the whole address. Still stuck? Head home or contact us.</p>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a href="/" class="min-h-10 rounded-full border-4 border-border bg-accent px-6 py-3 font-display font-extrabold uppercase">Home</a>
+      <a href="/contact/" class="min-h-10 rounded-full border-4 border-border bg-card px-6 py-3 font-display font-extrabold uppercase">Contact</a>
+    </div>
+  </section>
+</PageLayout>

@@ -1,0 +1,17 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.tsx';
+---
+
+<PageLayout title="Order Confirmed" description="Thanks for your CHSTR Run & Social order. Check your email for the receipt, then collect it at a Monday run." noindex>
+  <CartLauncher slot="actions" client:idle />
+  <section class="mx-auto max-w-3xl px-6 py-24">
+    <h1 class="text-4xl sm:text-6xl">Thank you</h1>
+    <p class="mt-4 max-w-prose">Your payment went through. We will order your items, then you can collect them at a Monday run. Check your email for the receipt.</p>
+    <a href="/" class="mt-8 inline-flex min-h-10 items-center rounded-full border-4 border-border bg-accent px-6 py-3 font-display font-extrabold uppercase">Back Home</a>
+  </section>
+  <script>
+    import { clearCart } from '@/stores/cart-store';
+    clearCart();
+  </script>
+</PageLayout>

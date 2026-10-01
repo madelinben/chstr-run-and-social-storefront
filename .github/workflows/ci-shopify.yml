@@ -1,0 +1,49 @@
+name: CI shopify
+
+on:
+  push:
+    branches: [main]
+    paths: ['chstr-run-and-social-shopify/**', '.github/workflows/ci-shopify.yml']
+  pull_request:
+    paths: ['chstr-run-and-social-shopify/**', '.github/workflows/ci-shopify.yml']
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: chstr-run-and-social-shopify
+    env:
+      # Placeholder values so the build compiles without host env. Mirror the app's .env.example.
+      # The build calls the live Storefront API, so these are repository variables (not secrets).
+      PUBLIC_SHOPIFY_STORE_DOMAIN: ${{ vars.PUBLIC_SHOPIFY_STORE_DOMAIN }}
+      PUBLIC_SHOPIFY_STOREFRONT_TOKEN: ${{ vars.PUBLIC_SHOPIFY_STOREFRONT_TOKEN }}
+      # Canonical origin for the SEO checks. Production builds also set SEO_STRICT=1.
+      SITE_ORIGIN: ${{ vars.SITE_ORIGIN || 'http://localhost:4321' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: chstr-run-and-social-shopify/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: chstr-run-and-social-shopify/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Lint
+        run: pnpm lint
+      - name: Test
+        run: pnpm test
+      - name: Build
+        run: pnpm build
+      - name: Site quality (SEO, schema.org, budgets)
+        run: pnpm check:site

@@ -1,0 +1,171 @@
+@import 'tailwindcss';
+
+/* Self-hosted, Latin subset, preloaded in PageLayout. No font CDN (performance.mdc). */
+@font-face {
+  font-family: 'Montserrat Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../assets/fonts/montserrat-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../assets/fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Brand palette sampled from the @chstr.runclub profile picture: green-black ink, white, lime dot.
+   Lime is an estimate (the 100px JPEG blurs the dot). Replace values here only, from the original logo. */
+:root {
+  --background: #f7faea;
+  --foreground: #0b1715;
+  --card: #ffffff;
+  --primary: #0b1715;
+  --primary-foreground: #ffffff;
+  --accent: #c5d84a;
+  --accent-foreground: #0b1715;
+  --secondary: #e4efa8;
+  --secondary-foreground: #0b1715;
+  --muted: #edf2d2;
+  --muted-foreground: #46544f;
+  --border: #0b1715;
+  --ring: #3f6212;
+  --destructive: #c4162a;
+  --destructive-foreground: #ffffff;
+  --success: #17804a;
+  --success-foreground: #ffffff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --font-display: 'Montserrat Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  @apply antialiased scroll-smooth;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  @apply bg-background text-foreground font-sans;
+}
+
+/* Slide-in reveals start a few px off-screen; clip (not hidden) so the sticky header keeps working. */
+main {
+  overflow-x: clip;
+}
+
+h1,
+h2,
+h3 {
+  @apply font-display font-extrabold uppercase tracking-tight text-balance;
+}
+
+p {
+  @apply text-pretty;
+}
+
+:focus-visible {
+  @apply outline-3 outline-offset-2 outline-ring;
+}
+
+/* Scroll reveals: hidden state only applies when motion is allowed and JS has marked <html>. */
+.motion [data-reveal] {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.6s cubic-bezier(0.2, 0, 0, 1) var(--reveal-delay, 0ms), transform 0.6s cubic-bezier(0.2, 0, 0, 1) var(--reveal-delay, 0ms);
+}
+.motion [data-reveal].revealed {
+  opacity: 1;
+  transform: none;
+}
+.motion [data-bar] {
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.7s cubic-bezier(0.2, 0, 0, 1);
+}
+.motion [data-panel-bars].revealed [data-bar] {
+  transform: none;
+}
+.motion [data-panel-bars].revealed [data-bar]:nth-child(2) { transition-delay: 80ms; }
+.motion [data-panel-bars].revealed [data-bar]:nth-child(3) { transition-delay: 160ms; }
+.motion [data-panel-bars].revealed [data-bar]:nth-child(4) { transition-delay: 240ms; }
+.motion [data-panel-bars].revealed [data-bar]:nth-child(5) { transition-delay: 320ms; }
+.motion [data-panel-bars].revealed [data-bar]:nth-child(6) { transition-delay: 400ms; }
+.motion [data-panel-bars].revealed [data-bar]:nth-child(7) { transition-delay: 480ms; }
+.motion [data-panel-bars].revealed [data-bar]:nth-child(8) { transition-delay: 560ms; }
+
+/* ---- Motion and decoration (CSS only; no animation library on public pages) ---- */
+.motion [data-reveal='left'] { transform: translateX(-28px); }
+.motion [data-reveal='right'] { transform: translateX(28px); }
+.motion [data-reveal='scale'] { transform: scale(0.92); }
+
+.tilt { transition: transform 0.35s cubic-bezier(0.2, 0, 0, 1); }
+@media (hover: hover) {
+  .tilt:hover { transform: translateY(-6px) rotate(-1deg); }
+}
+
+.bubble-float {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.85) 0 8%, var(--accent) 9% 100%);
+  border: 4px solid var(--border);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes col-drift {
+    to { transform: translate3d(0, -50%, 0); }
+  }
+  .hero-col {
+    animation: col-drift var(--drift, 60s) linear infinite;
+    animation-direction: var(--dir, normal);
+    will-change: transform;
+  }
+  @keyframes tile-in {
+    from { opacity: 0; transform: scale(0.8) rotate(var(--r, -3deg)); }
+  }
+  .hero-tile {
+    animation: tile-in 0.7s cubic-bezier(0.2, 0, 0, 1) both;
+    animation-delay: calc(var(--i, 0) * 45ms);
+  }
+  @keyframes logo-pop {
+    0% { opacity: 0; transform: scale(0.55) rotate(-8deg); }
+    60% { opacity: 1; transform: scale(1.06) rotate(1.5deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+  .logo-pop { animation: logo-pop 0.9s cubic-bezier(0.2, 0, 0, 1) 0.15s both; }
+  @keyframes hero-rise {
+    from { opacity: 0; transform: translateY(18px); }
+  }
+  .hero-rise { animation: hero-rise 0.7s cubic-bezier(0.2, 0, 0, 1) both; animation-delay: calc(0.3s + var(--i, 0) * 90ms); }
+  @keyframes marquee {
+    to { transform: translateX(-50%); }
+  }
+  .marquee-track { animation: marquee 38s linear infinite; animation-direction: var(--dir, normal); }
+  @keyframes bubble-float {
+    from { transform: translateY(0); }
+    to { transform: translateY(-18px); }
+  }
+  .bubble-float { animation: bubble-float 5s ease-in-out infinite alternate; animation-delay: var(--d, 0s); }
+}

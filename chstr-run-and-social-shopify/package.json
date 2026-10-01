@@ -1,0 +1,62 @@
+{
+  "name": "chstr-run-and-social-shopify",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.2",
+  "scripts": {
+    "setup": "pnpm install && node -e \"const f=require('fs');if(!f.existsSync('.env.local'))f.copyFileSync('.env.example','.env.local')\" && pnpm setup:hooks",
+    "setup:hooks": "node scripts/setup-git-hooks.mjs",
+    "postinstall": "node scripts/setup-git-hooks.mjs",
+    "install:clean": "rm -rf node_modules .astro dist && pnpm install",
+    "dev": "astro dev",
+    "build": "astro build",
+    "start": "astro preview",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "astro check",
+    "check:entry-files": "node scripts/check-entry-files.mjs",
+    "check": "pnpm check:entry-files && pnpm lint:fix && pnpm lint && pnpm typecheck",
+    "pipeline:branch-base": "git fetch origin main --quiet && git merge-base --is-ancestor origin/main HEAD",
+    "pipeline": "pnpm pipeline:branch-base && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm check:site && pnpm test:e2e",
+    "predeploy": "pnpm pipeline",
+    "check:site": "node scripts/check-site-quality.mjs"
+  },
+  "dependencies": {
+    "@astrojs/react": "^7.0.0",
+    "@astrojs/sitemap": "^3.7.4",
+    "@nanostores/react": "^2.0.1",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.3.5",
+    "nanostores": "^1.5.4",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "sharp": "^0.35.5",
+    "tailwind-merge": "^3.7.0",
+    "tailwind-variants": "^3.3.1",
+    "tailwindcss": "^4.3.3",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^10.11.0",
+    "eslint-plugin-astro": "^3.2.1",
+    "eslint-plugin-import": "^2.32.0",
+    "node-html-parser": "^9.0.4",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.0",
+    "vitest": "^5.0.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
+  }
+}

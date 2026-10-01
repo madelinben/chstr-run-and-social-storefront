@@ -1,0 +1,22 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.tsx';
+import ContactLinks from '@/features/contact-hub/views/components/ContactLinks.astro';
+import PageBanner from '@/features/site-shell/views/components/PageBanner.astro';
+import PanelDivider from '@/features/site-shell/views/components/PanelDivider.astro';
+---
+
+<PageLayout
+  title="Contact the Run Club"
+  description="Get in touch with CHSTR Run & Social by email, WhatsApp, Instagram or Facebook, including questions about merchandise orders and collection."
+  pageType="ContactPage"
+  breadcrumbs={[{ name: 'Contact', path: '/contact/' }]}
+>
+  <CartLauncher slot="actions" client:idle />
+  <PageBanner title="Contact" kicker="Say hello" tiles={['speechBubbles', 'smileyCrowd', 'chesterRoute']} />
+  <section class="mx-auto max-w-3xl px-6 py-16">
+    <p class="mb-8 max-w-prose">Questions about a session, or about a merchandise order? Pick whichever way suits you.</p>
+    <ContactLinks />
+  </section>
+  <PanelDivider />
+</PageLayout>

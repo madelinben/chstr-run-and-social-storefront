@@ -1,0 +1,25 @@
+---
+const email = import.meta.env.PUBLIC_CONTACT_EMAIL;
+const whatsappNumber = import.meta.env.PUBLIC_WHATSAPP_NUMBER;
+const links = [
+  email && { label: 'Email', detail: email, href: `mailto:${email}`, color: 'bg-accent' },
+  whatsappNumber && { label: 'WhatsApp', detail: 'Message us', href: `https://wa.me/${whatsappNumber}`, color: 'bg-success text-success-foreground' },
+  import.meta.env.PUBLIC_INSTAGRAM_URL && { label: 'Instagram', detail: 'Follow along', href: import.meta.env.PUBLIC_INSTAGRAM_URL, color: 'bg-primary text-primary-foreground' },
+  import.meta.env.PUBLIC_FACEBOOK_URL && { label: 'Facebook', detail: 'Join the group', href: import.meta.env.PUBLIC_FACEBOOK_URL, color: 'bg-secondary' },
+].filter((link) => link !== undefined && link !== '');
+---
+
+{links.length === 0 ? (
+  <p>Contact details are coming soon. Find us at The Architect on Monday at 18:30.</p>
+) : (
+  <ul class="grid gap-4 sm:grid-cols-2">
+    {links.map((link) => (
+      <li data-reveal>
+        <a href={link.href} rel="noopener" class={`${link.color} flex min-h-10 flex-col rounded-3xl border-4 border-border p-6 transition-transform active:scale-[0.96]`}>
+          <span class="font-display text-2xl font-bold">{link.label}</span>
+          <span class="break-words">{link.detail}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+)}

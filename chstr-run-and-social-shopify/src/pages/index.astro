@@ -1,0 +1,47 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import HeroCollage from '@/features/session-overview/views/components/HeroCollage.astro';
+import MondayPlan from '@/features/session-overview/views/components/MondayPlan.astro';
+import ActivitiesSection from '@/features/session-overview/views/components/ActivitiesSection.astro';
+import GalleryMosaic from '@/features/session-overview/views/components/GalleryMosaic.astro';
+import TickerBand from '@/features/site-shell/views/components/TickerBand.astro';
+import PanelDivider from '@/features/site-shell/views/components/PanelDivider.astro';
+import MerchStrip from '@/features/product-browse/views/components/MerchStrip.astro';
+import FaqTeaser from '@/features/faq-browse/views/components/FaqTeaser.astro';
+import WaiverCallout from '@/features/waiver-sign/views/components/WaiverCallout.astro';
+import SocialBand from '@/features/contact-hub/views/components/SocialBand.astro';
+import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.tsx';
+import { getProductsServer } from '@/data/Product/get-products-server';
+import { formatMoney } from '@/utilities/format-money';
+import { shopifyImageUrl } from '@/utilities/shopify-image-url';
+import { sessionEventNode } from '@/features/site-seo/utilities/schema-nodes';
+
+const eventImage = new URL('/og-default.png', Astro.site).href;
+const products = (await getProductsServer()).map((product) => ({
+  href: `/merchandise/${product.handle}/`,
+  name: product.title,
+  price: formatMoney(product.variants.nodes[0].price.amount),
+  image: shopifyImageUrl(product.featuredImage?.url ?? '/og-default.png', 640, 640),
+}));
+---
+
+<PageLayout
+  title="Home"
+  absoluteTitle="CHSTR Run & Social: Free Monday Run Club in Chester"
+  description="Join CHSTR Run & Social every Monday at 18:30 at The Architect, Chester. A free, friendly run club with football, netball and social nights. All paces welcome."
+  schema={[sessionEventNode({ origin: Astro.site!.origin, now: new Date(), image: eventImage })]}
+>
+  <CartLauncher slot="actions" client:idle />
+  <HeroCollage />
+  <TickerBand words={['Run', 'Chat', 'Football', 'Netball', 'Social', 'Free']} />
+  <MondayPlan />
+  <PanelDivider />
+  <ActivitiesSection />
+  <TickerBand words={['Mondays', '18:30', 'The Architect', 'Chester', 'Always free']} tone="ink" reverse />
+  <GalleryMosaic />
+  <MerchStrip products={products} />
+  <PanelDivider />
+  <FaqTeaser />
+  <section class="mx-auto max-w-6xl px-6 pb-20"><WaiverCallout /></section>
+  <SocialBand />
+</PageLayout>

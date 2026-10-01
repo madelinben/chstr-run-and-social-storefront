@@ -1,0 +1,67 @@
+---
+import { buildTitle } from '@/features/site-seo/utilities/meta-text';
+import {
+  breadcrumbNode,
+  organizationNode,
+  SITE_NAME,
+  webPageNode,
+  websiteNode,
+  type Crumb,
+  type JsonLdNode,
+} from '@/features/site-seo/utilities/schema-nodes';
+
+interface Props {
+  title: string;
+  absoluteTitle?: string;
+  description: string;
+  image?: string;
+  imageAlt?: string;
+  ogType?: 'website' | 'product';
+  breadcrumbs?: Crumb[];
+  pageType?: string;
+  schema?: JsonLdNode[];
+  noindex?: boolean;
+}
+
+const { title, absoluteTitle, description, image, imageAlt, ogType = 'website', breadcrumbs = [], pageType, schema = [], noindex = false } = Astro.props;
+
+const site = Astro.site;
+if (!site) throw new Error('`site` is missing in astro.config.mjs (set SITE_ORIGIN).');
+const origin = site.origin;
+
+// One canonical form: directory pages end in a slash, files keep their extension.
+const pathname = /\.[a-z0-9]+$/i.test(Astro.url.pathname) || Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const canonical = new URL(pathname, site).href;
+
+const fullTitle = buildTitle(title, absoluteTitle);
+// Crawlers do not render SVG share images, so those fall back to the default card.
+const rawImage = image && !image.endsWith('.svg') ? image : '/og-default.png';
+const ogImage = new URL(rawImage, site).href;
+const ogImageAlt = image && !image.endsWith('.svg') && imageAlt ? imageAlt : `${SITE_NAME}: a free run and social club in Chester`;
+
+const crumbs: Crumb[] = breadcrumbs.length > 0 ? [{ name: 'Home', path: '/' }, ...breadcrumbs] : [];
+const sameAs = [import.meta.env.PUBLIC_INSTAGRAM_URL, import.meta.env.PUBLIC_FACEBOOK_URL].filter((url): url is string => Boolean(url));
+const graph: JsonLdNode[] = [
+  organizationNode({ origin, sameAs, email: import.meta.env.PUBLIC_CONTACT_EMAIL, whatsapp: import.meta.env.PUBLIC_WHATSAPP_NUMBER }),
+  websiteNode(origin),
+  webPageNode({ origin, url: canonical, name: fullTitle, description, type: pageType, image: ogImage, hasBreadcrumb: crumbs.length > 0 }),
+  ...(crumbs.length > 0 ? [breadcrumbNode(origin, canonical, crumbs)] : []),
+  ...schema,
+];
+const jsonLd = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replaceAll('<', '\\u003c');
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large'} />
+<link rel="canonical" href={canonical} />
+<meta property="og:site_name" content={SITE_NAME} />
+<meta property="og:locale" content="en_GB" />
+<meta property="og:type" content={ogType} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:alt" content={ogImageAlt} />
+<meta name="twitter:card" content="summary_large_image" />
+<script type="application/ld+json" set:html={jsonLd} />

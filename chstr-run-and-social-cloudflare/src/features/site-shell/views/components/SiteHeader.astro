@@ -1,0 +1,29 @@
+---
+import Logo from '@/features/site-shell/views/components/Logo.astro';
+
+const links = [
+  { href: '/', label: 'Home' },
+  { href: '/faqs/', label: 'FAQs' },
+  { href: '/waiver/', label: 'Waiver' },
+  { href: '/merchandise/', label: 'Merchandise' },
+  { href: '/contact/', label: 'Contact' },
+];
+const current = Astro.url.pathname;
+---
+
+<header class="sticky top-0 z-40 border-b-4 border-border bg-background">
+  <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:bg-accent focus:p-2">Skip To Content</a>
+  <div class="mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 px-4 py-2 sm:px-6 md:flex md:justify-between">
+    <a href="/" class="shrink-0 text-3xl" aria-label="CHSTR Run &amp; Social home"><Logo /></a>
+    <nav aria-label="Main" class="order-3 col-span-2 flex items-center gap-1 overflow-x-auto [scrollbar-width:none] md:order-none md:overflow-visible">
+      {links.map((link) => (
+        <a
+          href={link.href}
+          aria-current={current === link.href || (link.href !== "/" && current.startsWith(link.href)) ? "page" : undefined}
+          class="min-h-10 shrink-0 whitespace-nowrap rounded-full px-3 py-2 font-display sm:px-4 text-base font-bold uppercase tracking-wide aria-[current=page]:bg-accent hover:bg-muted"
+        >{link.label}</a>
+      ))}
+    </nav>
+    <div class="flex items-center justify-end gap-2"><slot name="actions" /></div>
+  </div>
+</header>

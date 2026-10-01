@@ -1,0 +1,90 @@
+---
+import { Image } from 'astro:assets';
+import Logo from '@/features/site-shell/views/components/Logo.astro';
+import { heroColumns, tiles } from '@/data/Gallery/gallery-tiles';
+import { sessionFacts } from '@/features/session-overview/config';
+
+// Direction and speed per column so the mosaic never moves in lockstep.
+const drift = [
+  { seconds: 70, reverse: false },
+  { seconds: 55, reverse: true },
+  { seconds: 85, reverse: false },
+  { seconds: 62, reverse: true },
+  { seconds: 75, reverse: false },
+  { seconds: 58, reverse: true },
+];
+const tilts = ['-3deg', '2deg', '-2deg', '3deg'];
+---
+
+<section class="relative isolate flex min-h-[100svh] items-center justify-center overflow-hidden border-b-4 border-border bg-foreground">
+  <!-- Collage: columns drift in opposite directions. Each column holds its tiles twice for a seamless loop. -->
+  <div aria-hidden="true" class="absolute inset-0 -z-10 grid grid-cols-4 gap-2 px-2 md:grid-cols-6">
+    {heroColumns.map((column, columnIndex) => (
+      <div class={`overflow-hidden ${columnIndex > 3 ? 'hidden md:block' : ''}`}>
+        <div class="hero-col flex flex-col gap-2" style={`--drift:${drift[columnIndex].seconds}s;--dir:${drift[columnIndex].reverse ? 'reverse' : 'normal'}`}>
+          {[0, 1].flatMap((copy) =>
+            column.map((id, tileIndex) => {
+              const tile = tiles[id];
+              const first = columnIndex === 0 && tileIndex === 0 && copy === 0;
+              return (
+                <div
+                  class="hero-tile overflow-hidden rounded-2xl border-4 border-border"
+                  style={`aspect-ratio:${tile.image.width}/${tile.image.height};--i:${columnIndex * 4 + tileIndex};--r:${tilts[tileIndex % 4]}`}
+                >
+                  <Image
+                    src={tile.image}
+                    alt=""
+                    width={360}
+                    class="size-full object-cover"
+                    loading={first ? 'eager' : 'lazy'}
+                    fetchpriority={first ? 'high' : 'auto'}
+                    decoding={first ? 'sync' : 'async'}
+                  />
+                </div>
+              );
+            }),
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Scrim keeps the centre clean without hiding the mosaic at the edges. -->
+  <div aria-hidden="true" class="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(11,23,21,0.9)_0%,rgba(11,23,21,0.62)_38%,rgba(11,23,21,0.1)_75%)]"></div>
+
+  <!-- Floating bubbles around the logo -->
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10 hidden md:block">
+    <span class="bubble-float left-[18%] top-[22%] size-16" style="--d:0s"></span>
+    <span class="bubble-float right-[20%] top-[18%] size-10" style="--d:-2s"></span>
+    <span class="bubble-float bottom-[24%] left-[24%] size-10" style="--d:-4s"></span>
+    <span class="bubble-float bottom-[20%] right-[18%] size-20" style="--d:-1s"></span>
+  </div>
+
+  <div class="mx-auto flex w-full max-w-3xl flex-col items-center gap-6 px-6 py-24 text-center">
+    <div class="logo-pop rounded-[2.5rem] border-4 border-border bg-card px-10 py-6 text-6xl shadow-[0_10px_0_rgba(0,0,0,0.4)] sm:px-14 sm:py-8 sm:text-8xl" role="img" aria-label="CHSTR Run &amp; Social">
+      <Logo />
+    </div>
+    <h1 class="hero-rise rounded-3xl border-4 border-border bg-accent px-6 py-3 text-3xl text-accent-foreground shadow-[0_8px_0_rgba(0,0,0,0.4)] sm:text-5xl" style="--i:3">
+      Mondays, 18:30, The Architect. Always free.
+    </h1>
+    <p class="hero-rise max-w-xl rounded-2xl bg-foreground/80 px-5 py-3 text-lg font-semibold text-background sm:text-xl" style="--i:4">
+      A free, friendly run club in Chester with football, netball and social nights. All paces welcome.
+    </p>
+    <dl class="hero-rise grid w-full max-w-2xl gap-3 sm:grid-cols-3" style="--i:5">
+      {sessionFacts.map((fact) => (
+        <div class="rounded-2xl border-4 border-border bg-card p-3">
+          <dt class="text-xs font-bold uppercase tracking-widest text-muted-foreground">{fact.label}</dt>
+          <dd class="font-display text-lg font-bold">{fact.value}</dd>
+        </div>
+      ))}
+    </dl>
+    <div class="hero-rise flex flex-wrap items-center justify-center gap-3" style="--i:6">
+      <a href="/waiver/" class="min-h-10 rounded-full border-4 border-border bg-accent px-8 py-3 font-display text-lg font-extrabold uppercase text-accent-foreground shadow-[0_6px_0_rgba(0,0,0,0.4)] transition-transform hover:-translate-y-0.5 active:scale-[0.96]">
+        Sign the waiver
+      </a>
+      <a href="/merchandise/" class="min-h-10 rounded-full border-4 border-border bg-card px-8 py-3 font-display text-lg font-extrabold uppercase shadow-[0_6px_0_rgba(0,0,0,0.4)] transition-transform hover:-translate-y-0.5 active:scale-[0.96]">
+        Shop the merch
+      </a>
+    </div>
+  </div>
+</section>

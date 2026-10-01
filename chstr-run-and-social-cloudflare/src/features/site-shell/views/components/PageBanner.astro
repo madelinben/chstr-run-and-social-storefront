@@ -1,0 +1,28 @@
+---
+import { Image } from 'astro:assets';
+import { tiles, type TileId } from '@/data/Gallery/gallery-tiles';
+
+interface Props {
+  title: string;
+  kicker: string;
+  tiles: TileId[];
+}
+const { title, kicker, tiles: tileIds } = Astro.props;
+const rotations = ['-rotate-6', 'rotate-3', '-rotate-2'];
+---
+
+<section class="relative overflow-hidden border-b-4 border-border bg-foreground text-background">
+  <div class="mx-auto grid max-w-6xl items-center gap-8 px-6 py-14 md:grid-cols-[1fr_auto]">
+    <div>
+      <p class="hero-rise font-display text-sm font-bold uppercase tracking-[0.3em] text-accent" style="--i:0">{kicker}</p>
+      <h1 class="hero-rise mt-2 text-5xl sm:text-7xl" style="--i:1">{title}</h1>
+    </div>
+    <ul aria-hidden="true" class="hidden gap-3 md:flex">
+      {tileIds.map((id, index) => (
+        <li class={`hero-tile ${rotations[index % 3]} w-32 overflow-hidden rounded-2xl border-4 border-card lg:w-40`} style={`--i:${index + 2}`}>
+          <Image src={tiles[id].image} alt="" widths={[160, 320]} sizes="160px" class="aspect-square w-full object-cover" loading="lazy" decoding="async" />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,42 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.tsx';
+import AddToCartForm from '@/features/product-browse/views/components/AddToCartForm.tsx';
+import { getProductsServer } from '@/data/Product/get-products-server';
+import { productNode } from '@/features/site-seo/utilities/schema-nodes';
+import { productMetaDescription } from '@/features/site-seo/utilities/meta-text';
+import { formatPounds } from '@/utilities/format-pounds';
+
+export async function getStaticPaths() {
+  const products = await getProductsServer();
+  return products.map((product) => ({ params: { slug: product.slug }, props: { product } }));
+}
+
+const { product } = Astro.props;
+const url = new URL(`/merchandise/${product.slug}/`, Astro.site).href;
+const images = product.images.map((path) => new URL(path, Astro.site).href);
+const price = (product.pricePence / 100).toFixed(2);
+---
+
+<PageLayout
+  title={product.name}
+  description={productMetaDescription(product.name, formatPounds(product.pricePence), product.description)}
+  ogType="product"
+  image={product.images[0]}
+  imageAlt={product.name}
+  breadcrumbs={[{ name: 'Merchandise', path: '/merchandise/' }, { name: product.name, path: `/merchandise/${product.slug}/` }]}
+  schema={[productNode({ origin: Astro.site!.origin, url, name: product.name, description: product.description, images, sku: product.slug, offers: [{ price, inStock: true }] })]}
+>
+  <CartLauncher slot="actions" client:idle />
+  <section class="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-2">
+    <img src={product.images[0]} alt={product.name} width="900" height="900" fetchpriority="high" decoding="sync" class="aspect-square w-full rounded-3xl border-4 border-border object-cover" />
+    <div>
+      <a href="/merchandise/" class="font-bold underline">← All merchandise</a>
+      <h1 class="mt-4 text-4xl sm:text-5xl">{product.name}</h1>
+      <p class="mt-2 font-display text-2xl font-bold tabular-nums">{formatPounds(product.pricePence)}</p>
+      <p class="mt-6 max-w-prose whitespace-pre-line">{product.description}</p>
+      <AddToCartForm client:visible productSlug={product.slug} name={product.name} unitPricePence={product.pricePence} sizes={product.sizes} />
+      <p class="mt-6 text-sm text-muted-foreground">Collect your order at a Monday run. No delivery.</p>
+    </div>
+  </section>
+</PageLayout>

@@ -1,0 +1,56 @@
+---
+description: Remove deprecated code; keep project clean; no ID aliases
+alwaysApply: true
+---
+
+# No deprecated — keep clean
+
+Delete dead / deprecated / superseded paths in the same change that replaces them. Do not leave shims, dual APIs, or “remove later” leftovers.
+
+## Remove
+
+- `@deprecated` symbols, unused exports, orphan files
+- Legacy routes once redirects proven (or delete redirect when callers gone)
+- Commented-out code, unused deps, unused env keys / docs for removed features
+- Compatibility wrappers after one call-site cutover
+- **ID / name alias maps** (`Record<OldId, NewId>`, `canonicalX(id)` that rewrites, “also accept foo”)
+
+## Forbidden
+
+- New `@deprecated` without same-PR deletion plan
+- Keeping old + new “just in case”
+- `// TODO: remove` without ticket + near-term delete
+- Barrel re-exports of removed modules
+- Alias tables like:
+
+```ts
+// FORBIDDEN
+const PRODUCT_HANDLE_ALIASES = { 'old-hoodie': 'club-hoodie' };
+function canonicalProductHandle(handle: string) {
+  return PRODUCT_HANDLE_ALIASES[handle] ?? handle;
+}
+```
+
+- Accepting legacy strings from Shopify / URLs and silently rewriting to current ids
+- Dual keys for the same product
+
+## One source of truth
+
+- Product handles and route paths appear **once** — the Shopify record / const
+- Unknown handle → **fail loud** (throw / 404 page), never remap
+
+## When touching code
+
+1. Grep callers of old symbol / route / env / id string
+2. Cut every caller to the current id
+3. Delete alias map / shim / dual key
+4. Drop docs / STRUCTURE / CONFIG lines that teach the old id
+
+Prefer delete over comment. Prefer one API over soft migration layers.
+
+## Greenfield — no backward compatibility
+
+- No runtime acceptance of old URL or query params. Unknown params are ignored; old names are not forwarded.
+- No soft-migration of old Shopify data in read paths.
+- No “legacy” GraphQL documents. Delete the old one in the same change.
+- Fail loud on unknown handles and malformed Storefront responses.

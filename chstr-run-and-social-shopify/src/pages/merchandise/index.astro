@@ -1,0 +1,32 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.tsx';
+import ProductCard from '@/features/product-browse/views/components/ProductCard.astro';
+import PageBanner from '@/features/site-shell/views/components/PageBanner.astro';
+import PanelDivider from '@/features/site-shell/views/components/PanelDivider.astro';
+import { getProductsServer } from '@/data/Product/get-products-server';
+import { itemListNode } from '@/features/site-seo/utilities/schema-nodes';
+import { shopifyImageUrl } from '@/utilities/shopify-image-url';
+
+const products = await getProductsServer();
+const url = new URL('/merchandise/', Astro.site).href;
+const absolute = (path: string) => new URL(path, Astro.site).href;
+---
+
+<PageLayout
+  title="Club Merchandise"
+  description="CHSTR Run & Social club merchandise. Pay online, then collect your order at the next Monday run. No delivery and no account needed."
+  pageType="CollectionPage"
+  breadcrumbs={[{ name: 'Merchandise', path: '/merchandise/' }]}
+  schema={[itemListNode(url, products.map((product) => ({ url: absolute(`/merchandise/${product.handle}/`), name: product.title, image: absolute(shopifyImageUrl(product.featuredImage?.url ?? '/og-default.png', 800, 800)) })))]}
+>
+  <CartLauncher slot="actions" client:idle />
+  <PageBanner title="Merchandise" kicker="Wear the crew" tiles={['trainersLaces', 'bubbleCluster', 'wordMondays']} />
+  <section class="mx-auto max-w-6xl px-6 py-16">
+    <p class="mb-8 max-w-prose">Pay online, then collect at the next Monday run. No delivery, no account needed.</p>
+    <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {products.map((product, index) => <ProductCard product={product} eager={index === 0} />)}
+    </ul>
+  </section>
+  <PanelDivider />
+</PageLayout>

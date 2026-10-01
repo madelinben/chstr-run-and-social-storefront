@@ -1,0 +1,29 @@
+---
+description: Layer law — pages and features compose data; data calls services; services call nothing above them
+alwaysApply: true
+---
+
+# Layers
+
+Pages + features compose. Services never import data or features. Only `services/shopify` talks to Shopify. No `workflows/` folder.
+
+```
+page / feature    → data, services, stores
+data              → dto, services
+dto               → (pure)
+services          → utilities
+stores            → utilities
+```
+
+| Layer | Owns |
+|-------|------|
+| `src/pages/` | Routes (thin), static |
+| `src/features/` | Visitor jobs, UI |
+| `src/data/<Entity>/` | `get*Server` / `get*Client`, Shopify node → view-model transform (`dto`) |
+| `src/services/shopify/` | Storefront API client + GraphQL documents. Only place that calls Shopify |
+| `src/stores/` | Client stores (cart id) |
+| `src/utilities/` | Pure helpers |
+
+No `domain/` yet: Shopify owns every business rule (pricing, stock, order lifecycle). Add `src/domain/<entity>/` only when this repo grows a rule of its own.
+
+See `docs/ARCHITECTURE.md`.

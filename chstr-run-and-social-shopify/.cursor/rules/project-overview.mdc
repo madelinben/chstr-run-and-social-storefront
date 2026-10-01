@@ -1,0 +1,53 @@
+---
+description: Project objective, import law, on-demand rule table
+alwaysApply: true
+---
+
+# chstr-run-and-social-shopify
+
+Website for CHSTR Run & Social, a free, inclusive run and social club in Chester (Mondays 18:30, The Architect; running, football, netball, social nights). Visitors are new and existing runners. Every page earns its place by answering *when, where, free* fast, getting a new runner to the waiver, or selling merch with the least friction. Playful bubble/cartoon look, scroll-revealed vertical panels. Lowest possible running cost.
+
+## Workspaces & import law
+
+- **App root (this folder)** — product: `src/pages/`, `src/features/`, `src/data/`, `src/services/shopify/`, `src/stores/`, `src/content/`, `src/utilities/`
+- No shared packages, no `packages/*` (single standalone app)
+- Shopify is the commerce backend, outside this repo. No server code here
+
+Layer boundaries + `import/no-cycle` in the lint config (`layers.mdc`):
+
+```
+page / feature → data, services, stores
+data → dto, services
+services → utilities (NOT data)
+```
+
+Feature folder (`src/features/<entity>-<objective>/`, noun-first: `product-browse` not `browse-products`): `models/ views/components/ hooks/ api/ utilities/ types/ tests/ config.ts`. Omit empty dirs. Business rules live in Shopify.
+
+Canonical nouns: order, product, cart, session, waiver. Glossary: `docs/CONTEXT.md`.
+
+## Merchandise (KISS)
+
+No user accounts. Products and cart via the Shopify Storefront API (`src/services/shopify/`); the browser stores only the cart id. Checkout is Shopify-hosted. Orders, payments, stock and staff notifications are Shopify’s (`docs/environment/shopify.md`).
+
+## Always-on web rules
+
+`seo.mdc` (metadata, Open Graph, schema.org) and `performance.mdc` (Core Web Vitals, bundle budgets) apply to every page and are enforced by `pnpm check:site` after `pnpm build`.
+
+## On-demand rules (read before touching matching paths)
+
+| File | Scope |
+|---|---|
+| `theme.mdc` | styles, tokens, motion |
+| `copy.mdc` | UI text |
+| `accessibility.mdc` | components, pages |
+| `interaction.mdc` | components, pages |
+| `error-pages.mdc` | 404 / 500 pages |
+| `testing.mdc` | tests, e2e |
+| `generated.mdc` | `generated/**` |
+
+## Gates before merge
+
+- `pnpm check` green on every push (pre-push hook + CI + host build)
+- `pnpm predeploy` green before merge
+- Sub-plan checkbox synced (if using the master/sub-plan SDLC flow)
+- After push: PR body filled from `.github/pull_request_template.md`

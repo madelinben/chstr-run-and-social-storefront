@@ -1,0 +1,16 @@
+---
+const waiverUrl = import.meta.env.PUBLIC_WAIVER_URL;
+---
+
+<div data-reveal class="relative overflow-hidden rounded-[2.5rem] border-4 border-border bg-accent p-8 sm:p-12">
+  <span aria-hidden="true" class="bubble-float -right-8 -top-8 size-40 opacity-60" style="--d:-1s"></span>
+  <h2 class="text-4xl text-accent-foreground sm:text-6xl">Before Your First Run</h2>
+  <p class="mt-3 max-w-prose text-lg text-accent-foreground">Every new runner signs the waiver once. It takes a couple of minutes on your phone, then you are good to go.</p>
+  {waiverUrl ? (
+    <a href={waiverUrl} rel="noopener" class="mt-8 inline-flex min-h-10 items-center rounded-full border-4 border-border bg-card px-8 py-3 font-display text-lg font-extrabold uppercase shadow-[0_6px_0_rgba(0,0,0,0.4)] transition-transform hover:-translate-y-0.5 active:scale-[0.96]">
+      Open the waiver
+    </a>
+  ) : (
+    <p class="mt-6">The waiver link is not available right now. <a class="underline" href="/contact/">Contact us</a> and we will send it.</p>
+  )}
+</div>

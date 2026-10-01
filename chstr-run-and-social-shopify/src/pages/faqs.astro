@@ -1,0 +1,26 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.tsx';
+import FaqAccordion from '@/features/faq-browse/views/components/FaqAccordion.astro';
+import { getFaqsServer } from '@/data/Faq/get-faqs-server';
+import { faqPageNode } from '@/features/site-seo/utilities/schema-nodes';
+import PageBanner from '@/features/site-shell/views/components/PageBanner.astro';
+import PanelDivider from '@/features/site-shell/views/components/PanelDivider.astro';
+
+const faqs = await getFaqsServer();
+const url = new URL('/faqs/', Astro.site).href;
+---
+
+<PageLayout
+  title="Run Club FAQs"
+  description="Answers to common questions about CHSTR Run & Social: when and where we meet, what to expect on your first run, the waiver, and how it all works."
+  breadcrumbs={[{ name: 'FAQs', path: '/faqs/' }]}
+  schema={faqs.length > 0 ? [faqPageNode(url, faqs)] : []}
+>
+  <CartLauncher slot="actions" client:idle />
+  <PageBanner title="FAQs" kicker="Good to know" tiles={['speechBubbles', 'bagDrop', 'stopwatch']} />
+  <section class="mx-auto max-w-3xl px-6 py-16">
+    <FaqAccordion />
+  </section>
+  <PanelDivider />
+</PageLayout>
