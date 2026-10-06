@@ -21,7 +21,7 @@ const products = (await getProductsServer()).map((product) => ({
   href: `/merchandise/${product.handle}/`,
   name: product.title,
   price: formatMoney(product.variants.nodes[0].price.amount),
-  image: shopifyImageUrl(product.featuredImage?.url ?? '/og-default.png', 640, 640),
+  image: shopifyImageUrl(product.featuredImage?.url ?? '/og-default.png', 640, 480),
 }));
 ---
 
@@ -39,7 +39,7 @@ const products = (await getProductsServer()).map((product) => ({
   <ActivitiesSection />
   <TickerBand words={['Mondays', '18:30', 'The Architect', 'Chester', 'Always free']} tone="ink" reverse />
   <GalleryMosaic />
-  <MerchStrip products={products} />
+  <MerchStrip products={products} aspect="photo" />
   <PanelDivider />
   <FaqTeaser />
   <section class="mx-auto max-w-6xl px-6 pb-20"><WaiverCallout /></section>

@@ -9,7 +9,8 @@ const productSchema = z.object({
   title: z.string(),
   description: z.string(),
   featuredImage: z.nullable(z.object({ url: z.string(), altText: z.nullable(z.string()) })),
-  images: z.object({ nodes: z.array(z.object({ url: z.string(), altText: z.nullable(z.string()) })) }),
+  options: z.array(z.object({ name: z.string() })),
+  images: z.object({ nodes: z.array(z.object({ url: z.string(), altText: z.nullable(z.string()), width: z.nullable(z.int()), height: z.nullable(z.int()) })) }),
   variants: z.object({
     nodes: z.array(
       z.object({
@@ -26,8 +27,9 @@ export type ShopifyProduct = z.infer<typeof productSchema>;
 
 const PRODUCT_FIELDS = `
   id handle title description
+  options { name }
   featuredImage { url altText }
-  images(first: 6) { nodes { url altText } }
+  images(first: 6) { nodes { url altText width height } }
   variants(first: 50) { nodes { id title availableForSale price { amount currencyCode } } }
 `;
 

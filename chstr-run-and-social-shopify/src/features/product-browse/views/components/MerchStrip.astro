@@ -7,8 +7,11 @@ interface Product {
 }
 interface Props {
   products: Product[];
+  /** `photo` is 4:3 (landscape product photos); `square` is 1:1. */
+  aspect?: 'square' | 'photo';
 }
-const { products } = Astro.props;
+const { products, aspect = 'square' } = Astro.props;
+const height = aspect === 'photo' ? 480 : 640;
 ---
 
 {products.length > 0 && (
@@ -21,7 +24,7 @@ const { products } = Astro.props;
       {products.slice(0, 3).map((product, index) => (
         <li data-reveal="scale" style={`--reveal-delay:${index * 90}ms`}>
           <a href={product.href} class="tilt group block overflow-hidden rounded-3xl border-4 border-border bg-card">
-            <img src={product.image} alt="" width="640" height="640" loading="lazy" decoding="async" class="aspect-square w-full border-b-4 border-border object-cover transition-transform duration-500 group-hover:scale-105" />
+            <img src={product.image} alt="" width="640" height={height} loading="lazy" decoding="async" class={`${aspect === 'photo' ? 'aspect-[4/3]' : 'aspect-square'} w-full border-b-4 border-border object-cover transition-transform duration-500 group-hover:scale-105`} />
             <span class="flex items-baseline justify-between gap-3 p-5">
               <span class="font-display text-xl font-extrabold uppercase">{product.name}</span>
               <span class="font-display text-xl font-bold tabular-nums">{product.price}</span>

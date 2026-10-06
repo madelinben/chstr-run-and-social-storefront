@@ -1,6 +1,7 @@
 ---
 import AddToCartForm from '@/features/product-browse/views/components/AddToCartForm.tsx';
 import { formatMoney } from '@/utilities/format-money';
+import { optionLabel } from '@/data/Product/sellable-products';
 import { shopifyImageUrl, shopifySrcSet } from '@/utilities/shopify-image-url';
 import type { ShopifyProduct } from '@/services/shopify/products';
 
@@ -18,22 +19,22 @@ const sizes = '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw';
   <a href={`/merchandise/${product.handle}/`} class="block" tabindex="-1" aria-hidden="true">
     {image && (
       <img
-        src={shopifyImageUrl(image.url, 640, 640)}
-        srcset={shopifySrcSet(image.url, [320, 640, 960], true) || undefined}
+        src={shopifyImageUrl(image.url, 640, 480)}
+        srcset={shopifySrcSet(image.url, [320, 640, 960], 4 / 3) || undefined}
         sizes={sizes}
         alt=""
         width="640"
-        height="640"
+        height="480"
         loading={eager ? 'eager' : 'lazy'}
         fetchpriority={eager ? 'high' : 'auto'}
         decoding={eager ? 'sync' : 'async'}
-        class="aspect-square w-full border-b-4 border-border object-cover"
+        class="aspect-[4/3] w-full border-b-4 border-border object-cover"
       />
     )}
   </a>
   <div class="p-5">
     <h2 class="text-2xl"><a href={`/merchandise/${product.handle}/`}>{product.title}</a></h2>
     <p class="mt-1 font-display text-xl font-bold tabular-nums">{formatMoney(from)}</p>
-    <AddToCartForm client:visible name={product.title} variants={product.variants.nodes} />
+    <AddToCartForm client:visible name={product.title} optionLabel={optionLabel(product)} variants={product.variants.nodes} />
   </div>
 </li>

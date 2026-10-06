@@ -4,6 +4,7 @@ import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.t
 import AddToCartForm from '@/features/product-browse/views/components/AddToCartForm.tsx';
 import { getProductsServer } from '@/data/Product/get-products-server';
 import { productNode } from '@/features/site-seo/utilities/schema-nodes';
+import { optionLabel } from '@/data/Product/sellable-products';
 import { productMetaDescription } from '@/features/site-seo/utilities/meta-text';
 import { formatMoney } from '@/utilities/format-money';
 import { shopifyImageUrl, shopifySrcSet } from '@/utilities/shopify-image-url';
@@ -43,30 +44,18 @@ const price = product.variants.nodes[0].price.amount;
   <CartLauncher slot="actions" client:idle />
   <section class="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-2">
     <div class="flex flex-col gap-4">
-      {lead && (
+      {[lead, ...rest].filter((image) => image !== undefined).map((image, index) => (
         <img
-          src={shopifyImageUrl(lead.url, 900, 900)}
-          srcset={shopifySrcSet(lead.url, [450, 900, 1350], true) || undefined}
-          sizes="(min-width: 768px) 50vw, 100vw"
-          alt={lead.altText ?? product.title}
-          width="900"
-          height="900"
-          fetchpriority="high"
-          decoding="sync"
-          class="aspect-square w-full rounded-3xl border-4 border-border object-cover"
-        />
-      )}
-      {rest.map((image) => (
-        <img
-          src={shopifyImageUrl(image.url, 900, 900)}
-          srcset={shopifySrcSet(image.url, [450, 900, 1350], true) || undefined}
+          src={shopifyImageUrl(image.url, 960)}
+          srcset={shopifySrcSet(image.url, [480, 960, 1440]) || undefined}
           sizes="(min-width: 768px) 50vw, 100vw"
           alt={image.altText ?? product.title}
-          width="900"
-          height="900"
-          loading="lazy"
-          decoding="async"
-          class="aspect-square w-full rounded-3xl border-4 border-border object-cover"
+          width={image.width ?? 1600}
+          height={image.height ?? 900}
+          loading={index === 0 ? undefined : 'lazy'}
+          fetchpriority={index === 0 ? 'high' : undefined}
+          decoding={index === 0 ? 'sync' : 'async'}
+          class="h-auto w-full rounded-3xl border-4 border-border bg-card"
         />
       ))}
     </div>
@@ -75,7 +64,7 @@ const price = product.variants.nodes[0].price.amount;
       <h1 class="mt-4 text-4xl sm:text-5xl">{product.title}</h1>
       <p class="mt-2 font-display text-2xl font-bold tabular-nums">{formatMoney(price)}</p>
       <p class="mt-6 max-w-prose whitespace-pre-line">{description || `Collect the ${product.title} at a Monday run.`}</p>
-      <AddToCartForm client:visible name={product.title} variants={product.variants.nodes} />
+      <AddToCartForm client:visible name={product.title} optionLabel={optionLabel(product)} variants={product.variants.nodes} />
       <p class="mt-6 text-sm text-muted-foreground">Collect your order at a Monday run. No delivery.</p>
     </div>
   </section>

@@ -27,7 +27,7 @@ export default defineConfig(
       ],
     },
   },
-  { files: ['scripts/**', 'astro.config.mjs'], languageOptions: { globals: { console: 'readonly', process: 'readonly', URL: 'readonly', Buffer: 'readonly' } } },
+  { files: ['scripts/**', 'astro.config.mjs'], languageOptions: { globals: { console: 'readonly', process: 'readonly', URL: 'readonly', Buffer: 'readonly', fetch: 'readonly' } } },
   // services → utilities only (layers.mdc)
   layerBoundary('services', ['data', 'features', 'pages', 'stores']),
   layerBoundary('data', ['features', 'pages', 'stores']),

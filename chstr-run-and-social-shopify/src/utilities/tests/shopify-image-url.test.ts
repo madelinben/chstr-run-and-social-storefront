@@ -22,11 +22,12 @@ describe('shopifyImageUrl', () => {
 });
 
 describe('shopifySrcSet', () => {
-  it('lists each width, square when asked', () => {
-    const set = shopifySrcSet(cdn, [400, 800], true);
+  it('lists each width, cropped to the aspect when asked', () => {
+    const set = shopifySrcSet(cdn, [400, 800], 1);
     expect(set.split(', ')).toHaveLength(2);
     expect(set).toContain('800w');
     expect(set).toContain('height=800');
+    expect(shopifySrcSet(cdn, [400], 4 / 3)).toContain('height=300');
   });
 
   it('is empty for non-Shopify URLs', () => {

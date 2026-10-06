@@ -12,8 +12,8 @@ export function shopifyImageUrl(url: string, width: number, height?: number): st
   return sized.toString();
 }
 
-/** `srcset` value over the given widths; square crop when `square` is set. Empty for non-Shopify URLs. */
-export function shopifySrcSet(url: string, widths: readonly number[], square = false): string {
+/** `srcset` over the given widths. With `aspect` (width / height, e.g. 1 or 4 / 3) each size is cropped to that shape. Empty for non-Shopify URLs. */
+export function shopifySrcSet(url: string, widths: readonly number[], aspect?: number): string {
   if (!url.startsWith(SHOPIFY_CDN)) return '';
-  return widths.map((width) => `${shopifyImageUrl(url, width, square ? width : undefined)} ${width}w`).join(', ');
+  return widths.map((width) => `${shopifyImageUrl(url, width, aspect ? Math.round(width / aspect) : undefined)} ${width}w`).join(', ');
 }

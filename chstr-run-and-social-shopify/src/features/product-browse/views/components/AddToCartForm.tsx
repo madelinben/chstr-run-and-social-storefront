@@ -9,15 +9,17 @@ interface Variant {
 
 interface Props {
   name: string;
+  /** What the options are called in this store, e.g. "Colour". */
+  optionLabel: string;
   variants: Variant[];
 }
 
-export default function AddToCartForm({ name, variants }: Props) {
+export default function AddToCartForm({ name, optionLabel, variants }: Props) {
   const firstAvailable = variants.find((variant) => variant.availableForSale) ?? variants[0];
   const [variantId, setVariantId] = useState(firstAvailable.id);
   const [added, setAdded] = useState(false);
   const selected = variants.find((variant) => variant.id === variantId) ?? firstAvailable;
-  const hasSizes = variants.length > 1 || selected.title !== 'Default Title';
+  const hasChoice = variants.length > 1;
 
   async function add() {
     await addToCart(selected.id);
@@ -26,9 +28,9 @@ export default function AddToCartForm({ name, variants }: Props) {
 
   return (
     <div className="mt-4 flex flex-wrap items-center gap-3">
-      {hasSizes && (
+      {hasChoice && (
         <label className="flex items-center gap-2 font-bold">
-          Size
+          {optionLabel}
           <select value={variantId} onChange={(event) => { setVariantId(event.target.value); setAdded(false); }} className="min-h-10 rounded-full border-4 border-border bg-card px-3">
             {variants.map((variant) => (
               <option key={variant.id} value={variant.id} disabled={!variant.availableForSale}>

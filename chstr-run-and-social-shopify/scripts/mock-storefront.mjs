@@ -3,16 +3,16 @@
 import { createServer } from 'node:http';
 
 const money = (amount) => ({ amount, currencyCode: 'GBP' });
-const image = (name) => ({ url: `/images/products/${name}.webp`, altText: name });
+const image = (name) => ({ url: `/images/products/${name}.webp`, altText: name, width: 800, height: 800 });
 const variant = (id, title, amount, availableForSale = true) => ({ id: `gid://shopify/ProductVariant/${id}`, title, availableForSale, price: money(amount) });
 const products = [
   {
-    id: 'gid://shopify/Product/1', handle: 'club-tee', title: 'Club Tee', description: 'Soft cotton club tee with the bubble logo.',
+    id: 'gid://shopify/Product/1', handle: 'club-tee', title: 'Club Tee', options: [{ name: 'Size' }], description: 'Soft cotton club tee with the bubble logo.',
     featuredImage: image('club-tee'), images: { nodes: [image('club-tee'), image('club-tee')] },
     variants: { nodes: [variant(11, 'S', '20.0'), variant(12, 'M', '20.0'), variant(13, 'L', '20.0', false)] },
   },
   {
-    id: 'gid://shopify/Product/2', handle: 'run-cap', title: 'Run Cap', description: 'Lightweight running cap.',
+    id: 'gid://shopify/Product/2', handle: 'run-cap', title: 'Run Cap', options: [{ name: 'Title' }], description: 'Lightweight running cap.',
     featuredImage: image('run-cap'), images: { nodes: [image('run-cap')] },
     variants: { nodes: [variant(21, 'Default Title', '15.0')] },
   },

@@ -4,10 +4,16 @@ Shopify is the product CMS, checkout, payments, order database and staff order U
 
 ## Setup
 
-1. Create the store (Starter plan is the cost target — verify current plan limits and that Storefront API access is available on it).
-2. Add products with variants named by size; publish them to the **Headless** / Storefront API sales channel.
-3. Create a Storefront API app (Settings → Apps → Develop apps) with scopes `unauthenticated_read_product_listings`, `unauthenticated_read_product_inventory`, `unauthenticated_write_checkouts`, `unauthenticated_read_checkouts`. Use its **public** access token.
-4. Enable local pickup for the Chester pickup location; customise the “ready for pickup” notification.
+The Headless sales channel is not on every plan, so this project uses a **Dev Dashboard app** to get the Storefront token.
+
+1. Create the store. Starter/Basic is the cost target; verify current plan limits.
+2. Add products with variants named by size, a description, photos and a price.
+3. Dev Dashboard → create an app (e.g. "CHSTR Storefront"). In its version's **Scopes** add, comma-separated with no spaces or full stop: `unauthenticated_read_product_listings,unauthenticated_read_product_inventory,unauthenticated_write_checkouts,unauthenticated_read_checkouts`. Release the version and **install the app on the store**.
+4. Make the products available to the app: on each product, under Sales channels and markets, tick the app's channel (it appears once the app has Storefront scopes).
+5. Create `.env.admin` next to `package.json` (gitignored, never committed or pasted anywhere) with `SHOPIFY_STORE_DOMAIN`, `SHOPIFY_CLIENT_ID`, `SHOPIFY_CLIENT_SECRET`, then run `node scripts/create-storefront-token.mjs`. It exchanges the client credentials for a short-lived Admin API token, mints (or reuses) a **public** Storefront token titled "CHSTR website", and prints only the domain and public token. Put those in `.env.local` as `PUBLIC_SHOPIFY_STORE_DOMAIN` and `PUBLIC_SHOPIFY_STOREFRONT_TOKEN`.
+6. Enable local pickup for the Chester location; customise the "ready for pickup" notification.
+
+The client secret and any Admin token stay on your machine. Only the public Storefront token ever ships to the browser. The same app can later subscribe to product webhooks to trigger rebuilds.
 
 ## How the site uses it
 
