@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { addToCart } from '@/stores/cart-store';
+import { formatMoney } from '@/utilities/format-money';
 
 interface Variant {
   id: string;
   title: string;
   availableForSale: boolean;
+  /** Decimal string, e.g. "22.0". */
+  price: string;
 }
 
 interface Props {
@@ -12,9 +15,11 @@ interface Props {
   /** What the options are called in this store, e.g. "Colour". */
   optionLabel: string;
   variants: Variant[];
+  /** Each choice shows its own price when sizes or colours are priced differently. */
+  showVariantPrices?: boolean;
 }
 
-export default function AddToCartForm({ name, optionLabel, variants }: Props) {
+export default function AddToCartForm({ name, optionLabel, variants, showVariantPrices = false }: Props) {
   const firstAvailable = variants.find((variant) => variant.availableForSale) ?? variants[0];
   const [variantId, setVariantId] = useState(firstAvailable.id);
   const [added, setAdded] = useState(false);
@@ -34,7 +39,7 @@ export default function AddToCartForm({ name, optionLabel, variants }: Props) {
           <select value={variantId} onChange={(event) => { setVariantId(event.target.value); setAdded(false); }} className="min-h-10 rounded-full border-4 border-border bg-card px-3">
             {variants.map((variant) => (
               <option key={variant.id} value={variant.id} disabled={!variant.availableForSale}>
-                {variant.title}{variant.availableForSale ? '' : ' (sold out)'}
+                {variant.title}{showVariantPrices ? ` – ${formatMoney(variant.price)}` : ''}{variant.availableForSale ? '' : ' (sold out)'}
               </option>
             ))}
           </select>

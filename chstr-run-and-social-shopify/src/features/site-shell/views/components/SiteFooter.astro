@@ -1,11 +1,12 @@
 ---
+import { withBase } from '@/utilities/with-base';
 import Logo from '@/features/site-shell/views/components/Logo.astro';
 
 const links = [
-  { href: '/faqs/', label: 'FAQs' },
-  { href: '/waiver/', label: 'Waiver' },
-  { href: '/merchandise/', label: 'Merchandise' },
-  { href: '/contact/', label: 'Contact' },
+  { href: withBase('/faqs/'), label: 'FAQs' },
+  { href: withBase('/waiver/'), label: 'Waiver' },
+  { href: withBase('/merchandise/'), label: 'Merchandise' },
+  { href: withBase('/contact/'), label: 'Contact' },
 ];
 const socials = [
   import.meta.env.PUBLIC_INSTAGRAM_URL && { label: 'Instagram', href: import.meta.env.PUBLIC_INSTAGRAM_URL },

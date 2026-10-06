@@ -1,4 +1,5 @@
 ---
+import { withBase } from '@/utilities/with-base';
 const waiverUrl = import.meta.env.PUBLIC_WAIVER_URL;
 ---
 
@@ -11,6 +12,6 @@ const waiverUrl = import.meta.env.PUBLIC_WAIVER_URL;
       Open the waiver
     </a>
   ) : (
-    <p class="mt-6">The waiver link is not available right now. <a class="underline" href="/contact/">Contact us</a> and we will send it.</p>
+    <p class="mt-6">The waiver link is not available right now. <a class="underline" href={withBase('/contact/')}>Contact us</a> and we will send it.</p>
   )}
 </div>

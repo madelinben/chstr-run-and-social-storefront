@@ -1,4 +1,5 @@
 ---
+import { withBase } from '@/utilities/with-base';
 import '@/styles/global.css';
 import SiteHeader from '@/features/site-shell/views/components/SiteHeader.astro';
 import SiteFooter from '@/features/site-shell/views/components/SiteFooter.astro';
@@ -27,8 +28,8 @@ interface Props {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <PageSeo {...Astro.props} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+    <link rel="apple-touch-icon" href={withBase('/apple-touch-icon.png')} />
     <link rel="preload" as="font" type="font/woff2" href={montserratLatin} crossorigin />
     <link rel="preload" as="font" type="font/woff2" href={interLatin} crossorigin />
     <script is:inline>

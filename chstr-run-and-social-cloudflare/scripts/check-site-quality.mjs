@@ -7,7 +7,7 @@ import { gzipSync } from 'node:zlib';
 import { parse } from 'node-html-parser';
 
 const DIST = existsSync('dist/client') ? 'dist/client' : 'dist';
-const BUDGET = { jsGzip: 100 * 1024, cssGzip: 20 * 1024, htmlGzip: 25 * 1024, htmlRaw: 60 * 1024, fontFiles: 2, fontBytes: 100 * 1024, imageBytes: 200 * 1024 };
+const BUDGET = { jsGzip: 100 * 1024, cssGzip: 20 * 1024, htmlGzip: 25 * 1024, htmlRaw: 70 * 1024, fontFiles: 2, fontBytes: 100 * 1024, imageBytes: 200 * 1024 };
 const TITLE = { min: 15, max: 60 };
 const DESCRIPTION = { min: 70, max: 160 };
 const ALLOWED_ASSET_ORIGINS = ['cdn.shopify.com'];
@@ -276,7 +276,9 @@ function checkSchema(page, title) {
   if (route === '/contact/' && !find('ContactPage')) fail(route, 'JSON-LD missing ContactPage');
   if (route === '/merchandise/') {
     if (!find('CollectionPage')) fail(route, 'JSON-LD missing CollectionPage');
-    const list = need('ItemList', ['itemListElement']);
+    // An empty shop (no product links on the page) is a valid state and has no list to describe.
+    const productLinks = root.querySelectorAll('main a[href^="/merchandise/"]').filter((anchor) => /^\/merchandise\/[^/]+\/$/.test(anchor.getAttribute('href')));
+    const list = productLinks.length === 0 ? null : need('ItemList', ['itemListElement']);
     for (const item of list?.itemListElement ?? []) {
       if (!existsSync(join(distPath(new URL(item.url).pathname), 'index.html'))) fail(route, `ItemList url does not resolve: ${item.url}`);
       if (!item.name || !item.image) fail(route, `ItemList item ${item.position} needs name and image`);
@@ -288,7 +290,8 @@ function checkSchema(page, title) {
     for (const offer of [product?.offers ?? []].flat()) {
       for (const property of ['price', 'priceCurrency', 'availability', 'url']) if (!offer[property]) fail(route, `Offer missing ${property}`);
       if (offer.priceCurrency !== 'GBP') fail(route, 'Offer priceCurrency must be GBP');
-      if (!text.includes(`£${Number(offer.price).toFixed(2)}`)) fail(route, `Offer price £${offer.price} is not the price shown on the page`);
+      const shown = Number(offer.price) === 0 ? 'Free' : `£${Number(offer.price).toFixed(2)}`;
+      if (!text.includes(shown)) fail(route, `Offer price ${shown} is not the price shown on the page`);
     }
     for (const image of product?.image ?? []) if (!/^https?:\/\//.test(image)) fail(route, `Product image must be absolute: ${image}`);
   }

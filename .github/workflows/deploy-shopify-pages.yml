@@ -1,0 +1,82 @@
+name: Deploy Shopify site to GitHub Pages
+
+# Prototype hosting for customer review. The site is built against the live Shopify store and published as a
+# noindex preview. Safe to merge before Pages is enabled: the deploy steps skip until it is.
+on:
+  push:
+    branches: [main]
+    paths: ['chstr-run-and-social-shopify/**', '.github/workflows/deploy-shopify-pages.yml']
+  schedule:
+    - cron: '30 4 * * 1' # Mondays: refresh the next-session date in the schema
+  repository_dispatch:
+    types: [shopify-products-changed] # a Shopify webhook can trigger a rebuild when products change
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      pages_enabled: ${{ steps.pages.outputs.enabled }}
+    defaults:
+      run:
+        working-directory: chstr-run-and-social-shopify
+    env:
+      # All of these are public values (the Storefront token ships to the browser by design), so they are repo variables, not secrets.
+      PUBLIC_SHOPIFY_STORE_DOMAIN: ${{ vars.PUBLIC_SHOPIFY_STORE_DOMAIN }}
+      PUBLIC_SHOPIFY_STOREFRONT_TOKEN: ${{ vars.PUBLIC_SHOPIFY_STOREFRONT_TOKEN }}
+      PUBLIC_WAIVER_URL: ${{ vars.PUBLIC_WAIVER_URL }}
+      PUBLIC_INSTAGRAM_URL: ${{ vars.PUBLIC_INSTAGRAM_URL }}
+      PUBLIC_FACEBOOK_URL: ${{ vars.PUBLIC_FACEBOOK_URL }}
+      PUBLIC_WHATSAPP_NUMBER: ${{ vars.PUBLIC_WHATSAPP_NUMBER }}
+      PUBLIC_CONTACT_EMAIL: ${{ vars.PUBLIC_CONTACT_EMAIL }}
+      # Project sites are served from /<repo>/ on <owner>.github.io.
+      SITE_ORIGIN: https://${{ github.repository_owner }}.github.io
+      BASE_PATH: /${{ github.event.repository.name }}
+      # Keep the preview out of search engines until the real domain launches.
+      PUBLIC_SITE_NOINDEX: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: chstr-run-and-social-shopify/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: chstr-run-and-social-shopify/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Build against the live store
+        run: pnpm build
+      - name: Site quality (SEO, schema.org, budgets)
+        run: pnpm check:site
+      - name: Is GitHub Pages enabled for this repo?
+        id: pages
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/$GITHUB_REPOSITORY/pages" >/dev/null 2>&1; then echo "enabled=true" >> "$GITHUB_OUTPUT"; else echo "enabled=false" >> "$GITHUB_OUTPUT"; echo "::warning::GitHub Pages is not enabled yet; built and checked, skipping deploy."; fi
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.pages.outputs.enabled == 'true'
+        with:
+          path: chstr-run-and-social-shopify/dist
+
+  deploy:
+    needs: build
+    if: needs.build.outputs.pages_enabled == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useStore } from '@nanostores/react';
 import { cart, cartError, changeLine, hydrateCart } from '@/stores/cart-store';
 import { formatMoney } from '@/utilities/format-money';
+import { withBase } from '@/utilities/with-base';
 
 export default function CartLauncher() {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -32,7 +33,7 @@ export default function CartLauncher() {
         </div>
         {error && <p role="alert" className="mt-4 rounded-2xl bg-destructive/10 p-3">{error}</p>}
         {!current || lines.length === 0 ? (
-          <p className="mt-6">Your cart is empty. <a className="underline" href="/merchandise/">Browse the merchandise</a>.</p>
+          <p className="mt-6">Your cart is empty. <a className="underline" href={withBase('/merchandise/')}>Browse the merchandise</a>.</p>
         ) : (
           <>
             <ul className="mt-6 flex flex-col gap-4">

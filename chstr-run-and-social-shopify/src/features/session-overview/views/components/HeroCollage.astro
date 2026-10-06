@@ -1,4 +1,5 @@
 ---
+import { withBase } from '@/utilities/with-base';
 import { Image } from 'astro:assets';
 import Logo from '@/features/site-shell/views/components/Logo.astro';
 import { heroColumns, tiles } from '@/data/Gallery/gallery-tiles';
@@ -79,10 +80,10 @@ const tilts = ['-3deg', '2deg', '-2deg', '3deg'];
       ))}
     </dl>
     <div class="hero-rise flex flex-wrap items-center justify-center gap-3" style="--i:6">
-      <a href="/waiver/" class="min-h-10 rounded-full border-4 border-border bg-accent px-8 py-3 font-display text-lg font-extrabold uppercase text-accent-foreground shadow-[0_6px_0_rgba(0,0,0,0.4)] transition-transform hover:-translate-y-0.5 active:scale-[0.96]">
+      <a href={withBase('/waiver/')} class="min-h-10 rounded-full border-4 border-border bg-accent px-8 py-3 font-display text-lg font-extrabold uppercase text-accent-foreground shadow-[0_6px_0_rgba(0,0,0,0.4)] transition-transform hover:-translate-y-0.5 active:scale-[0.96]">
         Sign the waiver
       </a>
-      <a href="/merchandise/" class="min-h-10 rounded-full border-4 border-border bg-card px-8 py-3 font-display text-lg font-extrabold uppercase shadow-[0_6px_0_rgba(0,0,0,0.4)] transition-transform hover:-translate-y-0.5 active:scale-[0.96]">
+      <a href={withBase('/merchandise/')} class="min-h-10 rounded-full border-4 border-border bg-card px-8 py-3 font-display text-lg font-extrabold uppercase shadow-[0_6px_0_rgba(0,0,0,0.4)] transition-transform hover:-translate-y-0.5 active:scale-[0.96]">
         Shop the merch
       </a>
     </div>

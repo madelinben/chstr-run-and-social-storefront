@@ -37,6 +37,8 @@ CI does not use a real store: it builds against `scripts/mock-storefront.mjs` (`
 | Var | Purpose |
 |---|---|
 | SITE_ORIGIN | Production origin (`https://www.<domain>`): canonical URLs, OG tags, sitemap. Default `http://localhost:4321` |
+| BASE_PATH | Sub-path hosting (GitHub Pages: `/<repo>`). Unset at a domain root. All internal URLs use `withBase` |
+| PUBLIC_SITE_NOINDEX | `1` for prototype previews: noindex everywhere, robots Disallow, no sitemap |
 | SEO_STRICT | `1` in production builds: fails if `SITE_ORIGIN` is localhost or a placeholder (`seo.mdc`) |
 
 ## Runtime config

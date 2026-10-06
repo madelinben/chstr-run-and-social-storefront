@@ -13,7 +13,8 @@ export interface Crumb {
 
 export const SITE_NAME = 'CHSTR Run & Social';
 
-const at = (origin: string, path: string) => new URL(path, origin).href;
+/** `origin` is the site root URL INCLUDING any base path (see `siteRoot`), so paths resolve under it. */
+const at = (origin: string, path: string) => new URL(path.replace(/^\//, ''), origin.endsWith('/') ? origin : `${origin}/`).href;
 export const organizationId = (origin: string) => at(origin, '/#organization');
 export const websiteId = (origin: string) => at(origin, '/#website');
 

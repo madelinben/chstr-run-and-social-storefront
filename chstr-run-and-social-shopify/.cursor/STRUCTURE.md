@@ -13,6 +13,7 @@ Agent bind. Gates + scripts. Prose in `docs/`.
 - `docs/environment/cloudflare.md` — Pages deploy, DNS, env
 - `docs/environment/shopify.md` — Storefront API, cart, checkout, orders
 - `docs/environment/github.md` — PR CLI, CI
+- `docs/environment/github-pages.md` — MVP preview hosting on GitHub Pages
 
 ## Scripts (root)
 

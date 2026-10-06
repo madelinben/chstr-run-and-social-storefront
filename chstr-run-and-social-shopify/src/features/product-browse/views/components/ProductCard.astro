@@ -1,7 +1,7 @@
 ---
+import { withBase } from '@/utilities/with-base';
 import AddToCartForm from '@/features/product-browse/views/components/AddToCartForm.tsx';
-import { formatMoney } from '@/utilities/format-money';
-import { optionLabel } from '@/data/Product/sellable-products';
+import { formVariants, optionLabel, priceSummary, pricesVary } from '@/data/Product/product-display';
 import { shopifyImageUrl, shopifySrcSet } from '@/utilities/shopify-image-url';
 import type { ShopifyProduct } from '@/services/shopify/products';
 
@@ -11,12 +11,11 @@ interface Props {
 }
 const { product, eager = false } = Astro.props;
 const image = product.featuredImage;
-const from = product.variants.nodes[0].price.amount;
 const sizes = '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw';
 ---
 
 <li data-reveal class="overflow-hidden rounded-3xl border-4 border-border bg-card">
-  <a href={`/merchandise/${product.handle}/`} class="block" tabindex="-1" aria-hidden="true">
+  <a href={withBase(`/merchandise/${product.handle}/`)} class="block" tabindex="-1" aria-hidden="true">
     {image && (
       <img
         src={shopifyImageUrl(image.url, 640, 480)}
@@ -33,8 +32,8 @@ const sizes = '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw';
     )}
   </a>
   <div class="p-5">
-    <h2 class="text-2xl"><a href={`/merchandise/${product.handle}/`}>{product.title}</a></h2>
-    <p class="mt-1 font-display text-xl font-bold tabular-nums">{formatMoney(from)}</p>
-    <AddToCartForm client:visible name={product.title} optionLabel={optionLabel(product)} variants={product.variants.nodes} />
+    <h2 class="text-2xl"><a href={withBase(`/merchandise/${product.handle}/`)}>{product.title}</a></h2>
+    <p class="mt-1 font-display text-xl font-bold tabular-nums">{priceSummary(product)}</p>
+    <AddToCartForm client:visible name={product.title} optionLabel={optionLabel(product)} variants={formVariants(product)} showVariantPrices={pricesVary(product)} />
   </div>
 </li>

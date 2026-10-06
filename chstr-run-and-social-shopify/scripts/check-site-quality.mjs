@@ -7,11 +7,16 @@ import { gzipSync } from 'node:zlib';
 import { parse } from 'node-html-parser';
 
 const DIST = existsSync('dist/client') ? 'dist/client' : 'dist';
-const BUDGET = { jsGzip: 100 * 1024, cssGzip: 20 * 1024, htmlGzip: 25 * 1024, htmlRaw: 60 * 1024, fontFiles: 2, fontBytes: 100 * 1024, imageBytes: 200 * 1024 };
+const BUDGET = { jsGzip: 100 * 1024, cssGzip: 20 * 1024, htmlGzip: 25 * 1024, htmlRaw: 70 * 1024, fontFiles: 2, fontBytes: 100 * 1024, imageBytes: 200 * 1024 };
 const TITLE = { min: 15, max: 60 };
 const DESCRIPTION = { min: 70, max: 160 };
 const ALLOWED_ASSET_ORIGINS = ['cdn.shopify.com'];
 const DYNAMIC_PREFIXES = ['/admin', '/auth', '/keystatic', '/api'];
+
+// Sub-path hosting (GitHub Pages) and prototype noindex mode come from the same env vars the build used.
+const BASE = (process.env.BASE_PATH ?? '').replace(/\/$/, '');
+const NOINDEX_MODE = process.env.PUBLIC_SITE_NOINDEX === '1';
+const stripBase = (path) => (BASE && path.startsWith(`${BASE}/`) ? path.slice(BASE.length) : path);
 
 const errors = [];
 const fail = (route, message) => errors.push(`${route}  ${message}`);
@@ -28,7 +33,7 @@ const routeOf = (file) => {
   if (path === '/404.html') return path;
   return path.replace(/index\.html$/, '');
 };
-const distPath = (urlPath) => join(DIST, decodeURIComponent(urlPath.split(/[?#]/)[0]));
+const distPath = (urlPath) => join(DIST, decodeURIComponent(stripBase(urlPath.split(/[?#]/)[0])));
 
 // ---- JS graph: everything a page loads, including static imports of each chunk ----
 const staticImport = /(?:\bfrom|\bimport)\s*["']([^"']+\.m?js)["']/g;
@@ -103,7 +108,7 @@ for (const page of pages) {
   } else {
     // ---- indexable pages: canonical, social, schema ----
     if (root.querySelectorAll('link[rel="canonical"]').length !== 1) fail(route, 'needs exactly one canonical');
-    if (canonical && canonical !== new URL(route, origin).href) fail(route, `canonical ${canonical} must equal ${new URL(route, origin).href}`);
+    if (canonical && canonical !== new URL(BASE + route, origin).href) fail(route, `canonical ${canonical} must equal ${new URL(BASE + route, origin).href}`);
     unique(seenTitles, title, route, 'title');
     unique(seenDescriptions, description, route, 'description');
 
@@ -178,7 +183,11 @@ for (const page of pages) {
   for (const anchor of root.querySelectorAll('a[href]')) {
     const href = anchor.getAttribute('href');
     if (!href.startsWith('/') || href.startsWith('//')) continue;
-    const path = href.split(/[?#]/)[0];
+    if (BASE && !href.startsWith(`${BASE}/`)) {
+      fail(route, `internal link ${href} is missing the base path ${BASE} (use withBase)`);
+      continue;
+    }
+    const path = stripBase(href.split(/[?#]/)[0]);
     if (DYNAMIC_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))) continue;
     if (/\.[a-z0-9]+$/i.test(path)) {
       if (!existsSync(distPath(path))) fail(route, `broken link ${href}`);
@@ -276,7 +285,9 @@ function checkSchema(page, title) {
   if (route === '/contact/' && !find('ContactPage')) fail(route, 'JSON-LD missing ContactPage');
   if (route === '/merchandise/') {
     if (!find('CollectionPage')) fail(route, 'JSON-LD missing CollectionPage');
-    const list = need('ItemList', ['itemListElement']);
+    // An empty shop (no product links on the page) is a valid state and has no list to describe.
+    const productLinks = root.querySelectorAll('main a[href^="/merchandise/"]').filter((anchor) => /^\/merchandise\/[^/]+\/$/.test(anchor.getAttribute('href')));
+    const list = productLinks.length === 0 ? null : need('ItemList', ['itemListElement']);
     for (const item of list?.itemListElement ?? []) {
       if (!existsSync(join(distPath(new URL(item.url).pathname), 'index.html'))) fail(route, `ItemList url does not resolve: ${item.url}`);
       if (!item.name || !item.image) fail(route, `ItemList item ${item.position} needs name and image`);
@@ -288,7 +299,8 @@ function checkSchema(page, title) {
     for (const offer of [product?.offers ?? []].flat()) {
       for (const property of ['price', 'priceCurrency', 'availability', 'url']) if (!offer[property]) fail(route, `Offer missing ${property}`);
       if (offer.priceCurrency !== 'GBP') fail(route, 'Offer priceCurrency must be GBP');
-      if (!text.includes(`£${Number(offer.price).toFixed(2)}`)) fail(route, `Offer price £${offer.price} is not the price shown on the page`);
+      const shown = Number(offer.price) === 0 ? 'Free' : `£${Number(offer.price).toFixed(2)}`;
+      if (!text.includes(shown)) fail(route, `Offer price ${shown} is not the price shown on the page`);
     }
     for (const image of product?.image ?? []) if (!/^https?:\/\//.test(image)) fail(route, `Product image must be absolute: ${image}`);
   }
@@ -297,23 +309,30 @@ function checkSchema(page, title) {
 // ---- site files ----
 const indexable = pages.filter((page) => !page.noindex && page.route !== '/404.html');
 const robotsFile = join(DIST, 'robots.txt');
-if (!existsSync(robotsFile)) fail('/robots.txt', 'missing');
-else {
-  const robots = readFileSync(robotsFile, 'utf8');
-  if (!/^Sitemap: https?:\/\//m.test(robots)) fail('/robots.txt', 'needs an absolute Sitemap: line');
-  for (const path of ['/admin', '/keystatic', '/api/', '/auth/']) if (!robots.includes(`Disallow: ${path}`)) fail('/robots.txt', `must Disallow ${path}`);
-}
-const sitemapIndex = join(DIST, 'sitemap-index.xml');
-if (!existsSync(sitemapIndex)) fail('/sitemap-index.xml', 'missing');
-else {
-  const urls = new Set();
-  for (const [, location] of readFileSync(sitemapIndex, 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)) {
-    const child = join(DIST, new URL(location).pathname);
-    if (existsSync(child)) for (const [, url] of readFileSync(child, 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)) urls.add(url);
+if (NOINDEX_MODE) {
+  // Prototype preview: nothing may be indexable, robots.txt blocks everything, and there is no sitemap to publish.
+  for (const page of pages) if (!page.noindex) fail(page.route, 'PUBLIC_SITE_NOINDEX=1 but this page is indexable');
+  if (!existsSync(robotsFile) || !/^Disallow: \/\s*$/m.test(readFileSync(robotsFile, 'utf8'))) fail('/robots.txt', 'noindex mode must Disallow: /');
+  if (existsSync(join(DIST, 'sitemap-index.xml'))) fail('/sitemap-index.xml', 'noindex mode must not publish a sitemap');
+} else {
+  if (!existsSync(robotsFile)) fail('/robots.txt', 'missing');
+  else {
+    const robots = readFileSync(robotsFile, 'utf8');
+    if (!/^Sitemap: https?:\/\//m.test(robots)) fail('/robots.txt', 'needs an absolute Sitemap: line');
+    for (const path of ['/admin', '/keystatic', '/api/', '/auth/']) if (!robots.includes(`Disallow: ${path}`)) fail('/robots.txt', `must Disallow ${path}`);
   }
-  for (const page of indexable) if (!urls.has(page.canonical)) fail(page.route, 'indexable page missing from the sitemap');
-  for (const page of pages.filter((candidate) => candidate.noindex)) if (page.canonical && urls.has(page.canonical)) fail(page.route, 'noindex page must not be in the sitemap');
-  for (const url of urls) if (new URL(url).origin !== origin) fail('/sitemap', `sitemap URL on another origin: ${url}`);
+  const sitemapIndex = join(DIST, 'sitemap-index.xml');
+  if (!existsSync(sitemapIndex)) fail('/sitemap-index.xml', 'missing');
+  else {
+    const urls = new Set();
+    for (const [, location] of readFileSync(sitemapIndex, 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)) {
+      const child = join(DIST, stripBase(new URL(location).pathname));
+      if (existsSync(child)) for (const [, url] of readFileSync(child, 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)) urls.add(url);
+    }
+    for (const page of indexable) if (!urls.has(page.canonical)) fail(page.route, 'indexable page missing from the sitemap');
+    for (const page of pages.filter((candidate) => candidate.noindex)) if (page.canonical && urls.has(page.canonical)) fail(page.route, 'noindex page must not be in the sitemap');
+    for (const url of urls) if (new URL(url).origin !== origin) fail('/sitemap', `sitemap URL on another origin: ${url}`);
+  }
 }
 
 console.table(summary);

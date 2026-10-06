@@ -1,4 +1,5 @@
 ---
+import { siteRoot, withBase } from '@/utilities/with-base';
 import { buildTitle } from '@/features/site-seo/utilities/meta-text';
 import {
   breadcrumbNode,
@@ -23,11 +24,13 @@ interface Props {
   noindex?: boolean;
 }
 
-const { title, absoluteTitle, description, image, imageAlt, ogType = 'website', breadcrumbs = [], pageType, schema = [], noindex = false } = Astro.props;
+const { title, absoluteTitle, description, image, imageAlt, ogType = 'website', breadcrumbs = [], pageType, schema = [], noindex: pageNoindex = false } = Astro.props;
+// Prototype deployments (GitHub Pages preview for the customer) must not be indexed ahead of the real domain.
+const noindex = pageNoindex || import.meta.env.PUBLIC_SITE_NOINDEX === '1';
 
 const site = Astro.site;
 if (!site) throw new Error('`site` is missing in astro.config.mjs (set SITE_ORIGIN).');
-const origin = site.origin;
+const origin = siteRoot(site);
 
 // One canonical form: directory pages end in a slash, files keep their extension.
 const pathname = /\.[a-z0-9]+$/i.test(Astro.url.pathname) || Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
@@ -35,8 +38,8 @@ const canonical = new URL(pathname, site).href;
 
 const fullTitle = buildTitle(title, absoluteTitle);
 // Crawlers do not render SVG share images, so those fall back to the default card.
-const rawImage = image && !image.endsWith('.svg') ? image : '/og-default.png';
-const ogImage = new URL(rawImage, site).href;
+const rawImage = image && !image.endsWith('.svg') ? image : withBase('/og-default.png');
+const ogImage = /^https?:\/\//.test(rawImage) ? rawImage : new URL(rawImage, site).href;
 const ogImageAlt = image && !image.endsWith('.svg') && imageAlt ? imageAlt : `${SITE_NAME}: a free run and social club in Chester`;
 
 const crumbs: Crumb[] = breadcrumbs.length > 0 ? [{ name: 'Home', path: '/' }, ...breadcrumbs] : [];

@@ -2,6 +2,10 @@
 
 Production shipping. Local dev: [SETUP.md](./SETUP.md).
 
+## 0. MVP preview: GitHub Pages
+
+First customer-facing prototype runs on free GitHub Pages as a noindex preview, built against the live Shopify store. Mechanics and one-time enable: `environment/github-pages.md`. The Cloudflare strategy below is the production plan.
+
 ## 1. Strategy (locked at intake)
 
 **Static host: Cloudflare Pages.** The site is fully static; Shopify provides commerce, checkout and order handling, so there is no server, database or secret to host. Cost: Pages free tier plus the Shopify plan. Gives up: nothing custom can run server-side — a future need (custom webhook, admin tool) would add Pages Functions.

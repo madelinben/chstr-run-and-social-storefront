@@ -12,16 +12,17 @@ import WaiverCallout from '@/features/waiver-sign/views/components/WaiverCallout
 import SocialBand from '@/features/contact-hub/views/components/SocialBand.astro';
 import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.tsx';
 import { getProductsServer } from '@/data/Product/get-products-server';
-import { formatMoney } from '@/utilities/format-money';
+import { priceSummary } from '@/data/Product/product-display';
 import { shopifyImageUrl } from '@/utilities/shopify-image-url';
 import { sessionEventNode } from '@/features/site-seo/utilities/schema-nodes';
+import { siteRoot, toAbsolute, withBase } from '@/utilities/with-base';
 
-const eventImage = new URL('/og-default.png', Astro.site).href;
+const eventImage = toAbsolute(Astro.site!, '/og-default.png');
 const products = (await getProductsServer()).map((product) => ({
-  href: `/merchandise/${product.handle}/`,
+  href: withBase(`/merchandise/${product.handle}/`),
   name: product.title,
-  price: formatMoney(product.variants.nodes[0].price.amount),
-  image: shopifyImageUrl(product.featuredImage?.url ?? '/og-default.png', 640, 480),
+  price: priceSummary(product),
+  image: shopifyImageUrl(product.featuredImage?.url ?? withBase('/og-default.png'), 640, 480),
 }));
 ---
 
@@ -29,7 +30,7 @@ const products = (await getProductsServer()).map((product) => ({
   title="Home"
   absoluteTitle="CHSTR Run & Social: Free Monday Run Club in Chester"
   description="Join CHSTR Run & Social every Monday at 18:30 at The Architect, Chester. A free, friendly run club with football, netball and social nights. All paces welcome."
-  schema={[sessionEventNode({ origin: Astro.site!.origin, now: new Date(), image: eventImage })]}
+  schema={[sessionEventNode({ origin: siteRoot(Astro.site!), now: new Date(), image: eventImage })]}
 >
   <CartLauncher slot="actions" client:idle />
   <HeroCollage />

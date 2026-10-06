@@ -3,12 +3,13 @@ import PageLayout from '@/layouts/PageLayout.astro';
 import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.tsx';
 import FaqAccordion from '@/features/faq-browse/views/components/FaqAccordion.astro';
 import { getFaqsServer } from '@/data/Faq/get-faqs-server';
+import { toAbsolute } from '@/utilities/with-base';
 import { faqPageNode } from '@/features/site-seo/utilities/schema-nodes';
 import PageBanner from '@/features/site-shell/views/components/PageBanner.astro';
 import PanelDivider from '@/features/site-shell/views/components/PanelDivider.astro';
 
 const faqs = await getFaqsServer();
-const url = new URL('/faqs/', Astro.site).href;
+const url = toAbsolute(Astro.site!, '/faqs/');
 ---
 
 <PageLayout
