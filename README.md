@@ -21,5 +21,6 @@ Both apps share the same look, pages and SEO/performance contract (`seo.mdc`, `p
 ## Documentation
 
 - [`docs/PREDEPLOY_CHECKLIST.md`](./docs/PREDEPLOY_CHECKLIST.md): every SEO, speed, accessibility, mobile and security check, how each is enforced, and the launch-day steps
+- [`docs/DEPLOYMENT_STRATEGY.md`](./docs/DEPLOYMENT_STRATEGY.md): production hosting and Shopify plan decision, costs, alternatives and what is still unverified
 - [`docs/FINDINGS.md`](./docs/FINDINGS.md): what we learned (Shopify, GitHub Pages, Astro 7, performance, product images) and the open questions for the club
 - Per app: `docs/` and `.cursor/rules/` inside each app folder
