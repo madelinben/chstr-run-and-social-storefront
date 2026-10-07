@@ -12,6 +12,22 @@ function endpoint() {
   return `https://${domain}/api/${STOREFRONT_API_VERSION}/graphql.json`;
 }
 
+const RETRY_DELAYS_MS = [400, 1200];
+
+/** Retries network failures, 429 and 5xx so a single blip cannot fail a build that depends on the live store. */
+export async function fetchWithRetry(url: string, init: RequestInit, delays: readonly number[] = RETRY_DELAYS_MS): Promise<Response> {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      const response = await fetch(url, init);
+      if (response.status !== 429 && response.status < 500) return response;
+      if (attempt >= delays.length) return response;
+    } catch (error) {
+      if (attempt >= delays.length) throw error;
+    }
+    await new Promise((resolve) => setTimeout(resolve, delays[attempt]));
+  }
+}
+
 const envelopeSchema = z.object({
   data: z.optional(z.unknown()),
   errors: z.optional(z.array(z.object({ message: z.string() }))),
@@ -23,7 +39,7 @@ export async function storefrontRequest<Schema extends z.ZodMiniType>(
   variables: Record<string, unknown>,
   schema: Schema,
 ): Promise<z.infer<Schema>> {
-  const response = await fetch(endpoint(), {
+  const response = await fetchWithRetry(endpoint(), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

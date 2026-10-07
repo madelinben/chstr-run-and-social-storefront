@@ -21,7 +21,10 @@
     "pipeline:branch-base": "git fetch origin main --quiet && git merge-base --is-ancestor origin/main HEAD",
     "pipeline": "pnpm pipeline:branch-base && pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm check:site && pnpm test:e2e",
     "predeploy": "pnpm pipeline",
-    "check:site": "node scripts/check-site-quality.mjs"
+    "check:site": "node scripts/check-site-quality.mjs",
+    "images:products": "node scripts/prepare-product-images.mjs",
+    "lhci": "npx --yes @lhci/cli@0.15.1 autorun --config=lighthouserc.cjs",
+    "baseline:update": "node scripts/check-site-quality.mjs --update-baseline"
   },
   "dependencies": {
     "@astrojs/react": "^7.0.0",
@@ -40,6 +43,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.6.3",

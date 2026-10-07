@@ -14,6 +14,18 @@ Free hosting for showing the prototype to the customer. Production strategy stay
 
 Repo **variables** (not secrets; all public by design): `PUBLIC_SHOPIFY_STORE_DOMAIN`, `PUBLIC_SHOPIFY_STOREFRONT_TOKEN`, `PUBLIC_WAIVER_URL`, `PUBLIC_INSTAGRAM_URL`, `PUBLIC_FACEBOOK_URL` (optional: `PUBLIC_WHATSAPP_NUMBER`, `PUBLIC_CONTACT_EMAIL`).
 
+## Repo variables that change the deployment
+
+| Variable | Effect |
+|---|---|
+| `SITE_NOINDEX` | `1` (default) = preview, hidden from search. `0` = public. Set `0` only on the real domain |
+| `SITE_ORIGIN` | e.g. `https://www.example.com`. When set, the site is built for that domain's root (no `/repo/` path) |
+| `SEO_STRICT` | `1` makes the build refuse a localhost or placeholder origin |
+| `PUBLIC_WHATSAPP_GROUP_URL`, `PUBLIC_WHATSAPP_NUMBER`, `PUBLIC_CONTACT_EMAIL` | contact buttons and schema, hidden until set |
+| `PUBLIC_GOOGLE_SITE_VERIFICATION` | Search Console meta tag |
+
+The full launch sequence is in `../../../docs/PREDEPLOY_CHECKLIST.md` (repo root `docs/`).
+
 ## One-time enable
 
 1. GitHub only serves Pages from a **private** repo on a paid plan. On a free account the repo must be public.

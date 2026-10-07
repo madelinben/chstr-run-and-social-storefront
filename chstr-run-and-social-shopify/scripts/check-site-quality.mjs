@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Enforces .cursor/rules/seo.mdc and performance.mdc against the BUILT site. Run after `pnpm build`.
 // Same file in both CHSTR repos. Change a limit here and in the rule in one commit.
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { parse } from 'node-html-parser';
@@ -78,6 +78,12 @@ if (process.env.SEO_STRICT === '1' && /localhost|127\.0\.0\.1|\.example|\.invali
 }
 
 const summary = [];
+// Which indexable pages are linked from another page (orphan check), and per-template size measurements (baseline check).
+const linkedFrom = new Map();
+const measurements = new Map();
+const templateOf = (route) => (/^\/merchandise\/[^/]+\/$/.test(route) ? '/merchandise/:product/' : route);
+const slugify = (text) => text.toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const warnings = [];
 const seenTitles = new Map();
 const seenDescriptions = new Map();
 const seenH1s = new Map();
@@ -93,6 +99,18 @@ for (const page of pages) {
   if (root.querySelector('html')?.getAttribute('lang') !== 'en-GB') fail(route, '<html lang> must be en-GB');
   const viewport = root.querySelector('meta[name="viewport"]')?.getAttribute('content') ?? '';
   if (viewport !== 'width=device-width, initial-scale=1') fail(route, `viewport must be "width=device-width, initial-scale=1", got "${viewport}"`);
+  // HTTPS only: no insecure sub-resource or link URLs. Local http://localhost builds are exempt.
+  if (!/^http:\/\/localhost/.test(origin)) {
+    for (const node of root.querySelectorAll('[src],[href],[srcset],[action],meta[content]')) {
+      for (const attribute of ['src', 'href', 'srcset', 'action', 'content']) {
+        const value = node.getAttribute(attribute);
+        if (value && /(^|[\s,])http:\/\//.test(value)) fail(route, `insecure http:// URL in ${attribute}: ${value.slice(0, 80)}`);
+      }
+    }
+  }
+  if (route === '/' && process.env.PUBLIC_GOOGLE_SITE_VERIFICATION && meta('meta[name="google-site-verification"]') !== process.env.PUBLIC_GOOGLE_SITE_VERIFICATION) {
+    fail(route, 'PUBLIC_GOOGLE_SITE_VERIFICATION is set but the home page has no matching google-site-verification meta tag');
+  }
   if (!root.querySelector('link[rel="icon"][type="image/svg+xml"]')) fail(route, 'missing SVG favicon');
   if (!root.querySelector('link[rel="apple-touch-icon"]')) fail(route, 'missing apple-touch-icon');
 
@@ -188,6 +206,7 @@ for (const page of pages) {
       continue;
     }
     const path = stripBase(href.split(/[?#]/)[0]);
+    if (path !== route) linkedFrom.set(path, [...(linkedFrom.get(path) ?? []), route]);
     if (DYNAMIC_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))) continue;
     if (/\.[a-z0-9]+$/i.test(path)) {
       if (!existsSync(distPath(path))) fail(route, `broken link ${href}`);
@@ -217,6 +236,14 @@ for (const page of pages) {
   if (jsBytes > BUDGET.jsGzip) fail(route, `JavaScript is ${kb(jsBytes)} gzip (limit ${kb(BUDGET.jsGzip)})`);
   if (cssBytes > BUDGET.cssGzip) fail(route, `CSS is ${kb(cssBytes)} gzip (limit ${kb(BUDGET.cssGzip)})`);
   if (htmlGzip > BUDGET.htmlGzip || raw.length > BUDGET.htmlRaw) fail(route, `HTML is ${kb(raw.length)} raw / ${kb(htmlGzip)} gzip (limits ${kb(BUDGET.htmlRaw)} / ${kb(BUDGET.htmlGzip)})`);
+  const template = templateOf(route);
+  const previous = measurements.get(template) ?? { js: 0, css: 0, html: 0 };
+  measurements.set(template, { js: Math.max(previous.js, jsBytes), css: Math.max(previous.css, cssBytes), html: Math.max(previous.html, htmlGzip) });
+  if (template === '/merchandise/:product/') {
+    const title = root.querySelector('h1')?.text.trim() ?? '';
+    const slug = route.split('/').filter(Boolean).at(-1);
+    if (title && slug !== slugify(title)) warnings.push(`${route}  slug "${slug}" differs from the product title "${title}" (rename the handle in Shopify, which can redirect the old URL)`);
+  }
   summary.push({ route, js: kb(jsBytes), css: kb(cssBytes), html: kb(htmlGzip), imgs: images.length, indexed: noindex ? 'no' : 'yes' });
 }
 
@@ -335,7 +362,40 @@ if (NOINDEX_MODE) {
   }
 }
 
+// ---- internal linking: every indexable page must be reachable from another page ----
+for (const page of indexable) if (page.route !== '/' && !linkedFrom.has(page.route)) fail(page.route, 'orphan page: no other page links to it (add an internal link)');
+
+// ---- llms.txt ----
+const llms = join(DIST, 'llms.txt');
+if (!existsSync(llms)) fail('/llms.txt', 'missing');
+else if (!/^# \S/.test(readFileSync(llms, 'utf8'))) fail('/llms.txt', 'must start with a "# Title" line (llmstxt.org)');
+
+// ---- size baseline: no page template may grow past tolerance without a deliberate baseline update ----
+const BASELINE_FILE = 'scripts/size-baseline.json';
+const TOLERANCE = { ratio: 0.1, bytes: 1536 }; // allow +10% or +1.5 KB, whichever is larger
+const current = Object.fromEntries([...measurements].sort(([a], [b]) => a.localeCompare(b)).map(([template, m]) => [template, { js: m.js, css: m.css, html: m.html }]));
+if (process.argv.includes('--update-baseline')) {
+  writeFileSync(BASELINE_FILE, `${JSON.stringify(current, null, 2)}\n`);
+  console.log(`Baseline written to ${BASELINE_FILE} (${Object.keys(current).length} page templates).`);
+} else if (!existsSync(BASELINE_FILE)) {
+  fail(BASELINE_FILE, 'missing. Run `node scripts/check-site-quality.mjs --update-baseline` after a clean build and commit it');
+} else {
+  const baseline = JSON.parse(readFileSync(BASELINE_FILE, 'utf8'));
+  for (const [template, now] of Object.entries(current)) {
+    const base = baseline[template];
+    if (!base) {
+      fail(template, 'new page template with no size baseline. Run with --update-baseline and commit the result');
+      continue;
+    }
+    for (const kind of ['js', 'css', 'html']) {
+      const allowed = base[kind] + Math.max(base[kind] * TOLERANCE.ratio, TOLERANCE.bytes);
+      if (now[kind] > allowed) fail(template, `${kind.toUpperCase()} grew from ${kb(base[kind])} to ${kb(now[kind])} (baseline +${Math.round(TOLERANCE.ratio * 100)}% / ${kb(TOLERANCE.bytes)} allowed). Justify it in the PR, then --update-baseline`);
+    }
+  }
+}
+
 console.table(summary);
+if (warnings.length) console.warn(`\n${warnings.length} warning(s):\n${warnings.map((warning) => `  ! ${warning}`).join('\n')}`);
 if (errors.length) {
   console.error(`\n${errors.length} site-quality problem(s) (rules: seo.mdc, performance.mdc):\n${errors.map((error) => `  ✗ ${error}`).join('\n')}`);
   process.exit(1);

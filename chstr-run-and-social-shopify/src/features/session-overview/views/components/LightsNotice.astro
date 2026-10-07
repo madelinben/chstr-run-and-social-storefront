@@ -1,0 +1,20 @@
+---
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<!-- Safety notice: it is dark on Monday evenings now. Keep the wording plain and visible. -->
+<aside aria-labelledby="lights-title" data-reveal class={`${className} flex items-start gap-4 rounded-3xl border-4 border-border bg-foreground p-5 text-background sm:items-center sm:p-6`}>
+  <svg viewBox="0 0 48 48" width="56" height="56" aria-hidden="true" class="shrink-0">
+    <circle cx="24" cy="24" r="22" fill="#c5d84a" stroke="#ffffff" stroke-width="3" />
+    <path d="M24 10a10 10 0 0 0-5 18.6V32h10v-3.4A10 10 0 0 0 24 10Z" fill="#0b1715" />
+    <rect x="19" y="34" width="10" height="4" rx="2" fill="#0b1715" />
+    <path d="M24 3v3M7 10l2 2M41 10l-2 2M3 24h3M42 24h3" stroke="#0b1715" stroke-width="3" stroke-linecap="round" />
+  </svg>
+  <div>
+    <h2 id="lights-title" class="text-2xl text-accent sm:text-3xl">Bring A Light</h2>
+    <p class="mt-1 max-w-prose text-lg">Now the nights are drawing in, everyone needs a light on a run. A head torch, a reflective running vest with lights, or any other light so drivers and other runners can see you.</p>
+  </div>
+</aside>

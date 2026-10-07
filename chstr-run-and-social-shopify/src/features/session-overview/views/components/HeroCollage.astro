@@ -3,6 +3,8 @@ import { withBase } from '@/utilities/with-base';
 import { Image } from 'astro:assets';
 import Logo from '@/features/site-shell/views/components/Logo.astro';
 import { heroColumns, tiles } from '@/data/Gallery/gallery-tiles';
+import WhatsAppJoin from '@/features/contact-hub/views/components/WhatsAppJoin.astro';
+import { SITE_MOTTO } from '@/utilities/brand';
 import { sessionFacts } from '@/features/session-overview/config';
 
 // Direction and speed per column so the mosaic never moves in lockstep.
@@ -69,7 +71,7 @@ const tilts = ['-3deg', '2deg', '-2deg', '3deg'];
       Mondays, 18:30, The Architect. Always free.
     </h1>
     <p class="hero-rise max-w-xl rounded-2xl bg-foreground/80 px-5 py-3 text-lg font-semibold text-background sm:text-xl" style="--i:4">
-      A free, friendly run club in Chester with football, netball and social nights. All paces welcome.
+      <strong class="font-black uppercase text-accent">{SITE_MOTTO}</strong><br />A free, friendly run club in Chester with football, netball and social nights.
     </p>
     <dl class="hero-rise grid w-full max-w-2xl gap-3 sm:grid-cols-3" style="--i:5">
       {sessionFacts.map((fact) => (
@@ -86,6 +88,7 @@ const tilts = ['-3deg', '2deg', '-2deg', '3deg'];
       <a href={withBase('/merchandise/')} class="min-h-10 rounded-full border-4 border-border bg-card px-8 py-3 font-display text-lg font-extrabold uppercase shadow-[0_6px_0_rgba(0,0,0,0.4)] transition-transform hover:-translate-y-0.5 active:scale-[0.96]">
         Shop the merch
       </a>
+      <WhatsAppJoin tone="solid" />
     </div>
   </div>
 </section>

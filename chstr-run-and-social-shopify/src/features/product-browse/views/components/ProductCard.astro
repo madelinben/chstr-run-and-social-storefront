@@ -1,38 +1,57 @@
 ---
-import { withBase } from '@/utilities/with-base';
+import { Image } from 'astro:assets';
 import AddToCartForm from '@/features/product-browse/views/components/AddToCartForm.tsx';
 import { formVariants, optionLabel, priceSummary, pricesVary } from '@/data/Product/product-display';
+import { getLocalMedia, leadMedia } from '@/data/Product/product-media';
 import { shopifyImageUrl, shopifySrcSet } from '@/utilities/shopify-image-url';
+import { withBase } from '@/utilities/with-base';
 import type { ShopifyProduct } from '@/services/shopify/products';
 
 interface Props {
   product: ShopifyProduct;
   eager?: boolean;
+  /** Scroll-reveal effect. Off for the first row, which is in the opening viewport. */
+  reveal?: boolean;
 }
-const { product, eager = false } = Astro.props;
-const image = product.featuredImage;
+const { product, eager = false, reveal = true } = Astro.props;
+const href = withBase(`/merchandise/${product.handle}/`);
+const local = getLocalMedia(product);
+const lead = local ? leadMedia(local, product) : undefined;
+const shopifyImage = product.featuredImage;
 const sizes = '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw';
+const loading = eager ? 'eager' : 'lazy';
+const priority = eager ? 'high' : 'auto';
 ---
 
-<li data-reveal class="overflow-hidden rounded-3xl border-4 border-border bg-card">
-  <a href={withBase(`/merchandise/${product.handle}/`)} class="block" tabindex="-1" aria-hidden="true">
-    {image && (
-      <img
-        src={shopifyImageUrl(image.url, 640, 480)}
-        srcset={shopifySrcSet(image.url, [320, 640, 960], 4 / 3) || undefined}
-        sizes={sizes}
-        alt=""
-        width="640"
-        height="480"
-        loading={eager ? 'eager' : 'lazy'}
-        fetchpriority={eager ? 'high' : 'auto'}
-        decoding={eager ? 'sync' : 'async'}
-        class="aspect-[4/3] w-full border-b-4 border-border object-cover"
-      />
+<li data-reveal={reveal ? true : undefined} class="group overflow-hidden rounded-3xl border-4 border-border bg-card">
+  <a href={href} class="relative block aspect-square overflow-hidden border-b-4 border-border bg-white" tabindex="-1" aria-hidden="true">
+    {lead ? (
+      <>
+        <Image src={lead.front} alt="" widths={[320, 480, 640]} {sizes} loading={loading} fetchpriority={priority} decoding={eager ? 'sync' : 'async'} class="size-full object-cover" />
+        {/* The back view fades in on hover or keyboard focus. Touch screens simply keep the front. */}
+        {lead.back && (
+          <Image src={lead.back} alt="" widths={[320, 480, 640]} {sizes} loading="lazy" decoding="async" class="absolute inset-0 size-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100" />
+        )}
+      </>
+    ) : (
+      shopifyImage && (
+        <img
+          src={shopifyImageUrl(shopifyImage.url, 640, 640)}
+          srcset={shopifySrcSet(shopifyImage.url, [320, 640, 960], 1) || undefined}
+          {sizes}
+          alt=""
+          width="640"
+          height="640"
+          loading={loading}
+          fetchpriority={priority}
+          decoding={eager ? 'sync' : 'async'}
+          class="size-full object-cover"
+        />
+      )
     )}
   </a>
   <div class="p-5">
-    <h2 class="text-2xl"><a href={withBase(`/merchandise/${product.handle}/`)}>{product.title}</a></h2>
+    <h2 class="text-2xl"><a href={href}>{product.title}</a></h2>
     <p class="mt-1 font-display text-xl font-bold tabular-nums">{priceSummary(product)}</p>
     <AddToCartForm client:visible name={product.title} optionLabel={optionLabel(product)} variants={formVariants(product)} showVariantPrices={pricesVary(product)} />
   </div>

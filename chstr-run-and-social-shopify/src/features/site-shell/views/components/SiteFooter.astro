@@ -1,8 +1,11 @@
 ---
 import { withBase } from '@/utilities/with-base';
+import { SITE_MOTTO } from '@/utilities/brand';
 import Logo from '@/features/site-shell/views/components/Logo.astro';
 
 const links = [
+  { href: withBase('/events/'), label: 'Events' },
+  { href: withBase('/gallery/'), label: 'Gallery' },
   { href: withBase('/faqs/'), label: 'FAQs' },
   { href: withBase('/waiver/'), label: 'Waiver' },
   { href: withBase('/merchandise/'), label: 'Merchandise' },
@@ -19,6 +22,7 @@ const socials = [
     <div>
       <div class="text-5xl text-card"><Logo /></div>
       <p class="mt-4 font-display text-xl font-extrabold uppercase text-accent">Mondays 18:30 · The Architect · Always Free</p>
+      <p class="mt-2 font-display text-lg font-black uppercase text-background">{SITE_MOTTO}</p>
       <p class="mt-2 max-w-sm text-sm">Running, football, netball and social nights in Chester.</p>
     </div>
     <nav aria-label="Footer">

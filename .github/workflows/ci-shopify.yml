@@ -45,5 +45,18 @@ jobs:
         run: node scripts/mock-storefront.mjs &
       - name: Build
         run: pnpm build
-      - name: Site quality (SEO, schema.org, budgets)
+      - name: Site quality (SEO, schema.org, links, size baseline)
         run: pnpm check:site
+      - name: Install browser for e2e and Lighthouse
+        run: pnpm exec playwright install --with-deps chromium
+      - name: End-to-end and accessibility (axe) tests
+        run: pnpm test:e2e
+      - name: Lighthouse CI (Core Web Vitals and category scores)
+        run: pnpm lhci
+      - name: Keep Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: chstr-run-and-social-shopify/.lighthouseci
+          retention-days: 14

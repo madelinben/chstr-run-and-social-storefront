@@ -1,4 +1,5 @@
 ---
+import WhatsAppJoin from '@/features/contact-hub/views/components/WhatsAppJoin.astro';
 import { withBase } from '@/utilities/with-base';
 const links = [
   import.meta.env.PUBLIC_INSTAGRAM_URL && { label: 'Instagram', href: import.meta.env.PUBLIC_INSTAGRAM_URL, tone: 'bg-accent', path: 'M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Zm5.2-3.2a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2Z' },
@@ -20,6 +21,7 @@ const links = [
           </a>
         </li>
       ))}
+      <li><WhatsAppJoin tone="outline" /></li>
       <li>
         <a href={withBase('/contact/')} class="inline-flex min-h-10 items-center rounded-full border-4 border-card px-6 py-3 font-display text-lg font-extrabold uppercase transition-transform hover:-translate-y-0.5 active:scale-[0.96]">Contact us</a>
       </li>

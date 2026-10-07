@@ -1,0 +1,21 @@
+---
+interface Props {
+  /** `solid` on light backgrounds, `outline` on dark ones. */
+  tone?: 'solid' | 'outline';
+  class?: string;
+}
+const { tone = 'solid', class: className = '' } = Astro.props;
+const groupUrl = import.meta.env.PUBLIC_WHATSAPP_GROUP_URL;
+const toneClass = tone === 'solid' ? 'bg-success text-success-foreground border-border' : 'bg-success text-success-foreground border-card';
+---
+
+{groupUrl && (
+  <a
+    href={groupUrl}
+    rel="noopener"
+    class={`${toneClass} ${className} inline-flex min-h-10 items-center gap-3 rounded-full border-4 px-6 py-3 font-display text-lg font-extrabold uppercase shadow-[0_6px_0_rgba(0,0,0,0.4)] transition-transform hover:-translate-y-0.5 active:scale-[0.96]`}
+  >
+    <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.2 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2Z" /></svg>
+    Join the WhatsApp group
+  </a>
+)}

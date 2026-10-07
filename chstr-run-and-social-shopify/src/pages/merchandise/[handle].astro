@@ -1,41 +1,74 @@
 ---
+import { Image, getImage } from 'astro:assets';
 import PageLayout from '@/layouts/PageLayout.astro';
 import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.tsx';
 import AddToCartForm from '@/features/product-browse/views/components/AddToCartForm.tsx';
+import MerchStrip from '@/features/product-browse/views/components/MerchStrip.astro';
+import SizeGuideModal from '@/features/product-browse/views/components/SizeGuideModal.astro';
 import { getProductsServer } from '@/data/Product/get-products-server';
-import { productNode } from '@/features/site-seo/utilities/schema-nodes';
 import { formVariants, hasSizeOption, optionLabel, priceSummary, pricesVary } from '@/data/Product/product-display';
-import SizeGuide from '@/features/product-browse/views/components/SizeGuide.astro';
+import { getLocalMedia, leadMedia } from '@/data/Product/product-media';
 import { productMetaDescription } from '@/features/site-seo/utilities/meta-text';
-import { siteRoot, toAbsolute, withBase } from '@/utilities/with-base';
+import { productNode } from '@/features/site-seo/utilities/schema-nodes';
 import { shopifyImageUrl, shopifySrcSet } from '@/utilities/shopify-image-url';
+import { siteRoot, toAbsolute, withBase } from '@/utilities/with-base';
 
 export async function getStaticPaths() {
   const products = await getProductsServer();
-  return products.map((product) => ({ params: { handle: product.handle }, props: { product } }));
+  return products.map((product) => ({
+    params: { handle: product.handle },
+    props: { product, related: products.filter((other) => other.handle !== product.handle).slice(0, 3) },
+  }));
 }
 
-const { product } = Astro.props;
-const url = toAbsolute(Astro.site!, `/merchandise/${product.handle}/`);
-const absolute = (path: string) => toAbsolute(Astro.site!, path);
-const [lead, ...rest] = product.images.nodes;
+const { product, related } = Astro.props;
+const site = Astro.site!;
+const url = toAbsolute(site, `/merchandise/${product.handle}/`);
+const absolute = (path: string) => toAbsolute(site, path);
 const description = product.description.trim();
+const fallbackDescription = description || `Collect the ${product.title} at a Monday run.`;
+
+// Pictures: our cleaned-up storefront images when we have them (front + back per colour), otherwise Shopify's uploads.
+const local = getLocalMedia(product);
+const lead = local ? leadMedia(local, product) : undefined;
+const views = (local ?? []).flatMap((entry) => [
+  { image: entry.front, alt: `${product.title} in ${entry.colour}, front view` },
+  ...(entry.back ? [{ image: entry.back, alt: `${product.title} in ${entry.colour}, back view` }] : []),
+]);
+const localUrls = await Promise.all(views.map(async (view) => absolute((await getImage({ src: view.image, width: 800 })).src)));
+const shopifyImages = product.images.nodes;
+const ogImage = lead ? absolute((await getImage({ src: lead.og, format: 'jpeg' })).src) : shopifyImages[0] ? absolute(shopifyImageUrl(shopifyImages[0].url, 1200, 630)) : undefined;
+const ogAlt = lead ? `${product.title}, front and back` : (shopifyImages[0]?.altText ?? product.title);
+
+const relatedItems = await Promise.all(
+  related.map(async (other) => {
+    const otherLocal = getLocalMedia(other);
+    const front = otherLocal ? leadMedia(otherLocal, other).front : undefined;
+    return {
+      href: withBase(`/merchandise/${other.handle}/`),
+      name: other.title,
+      price: priceSummary(other),
+      image: front ? (await getImage({ src: front, width: 640 })).src : shopifyImageUrl(other.featuredImage?.url ?? withBase('/og-default.png'), 640, 480),
+      ratio: front ? ('square' as const) : ('photo' as const),
+    };
+  }),
+);
 ---
 
 <PageLayout
   title={product.title}
   description={productMetaDescription(product.title, priceSummary(product), description)}
   ogType="product"
-  image={lead ? absolute(shopifyImageUrl(lead.url, 1200, 630)) : undefined}
-  imageAlt={lead?.altText ?? product.title}
+  image={ogImage}
+  imageAlt={ogAlt}
   breadcrumbs={[{ name: 'Merchandise', path: '/merchandise/' }, { name: product.title, path: `/merchandise/${product.handle}/` }]}
   schema={[
     productNode({
-      origin: siteRoot(Astro.site!),
+      origin: siteRoot(site),
       url,
       name: product.title,
-      description: description || `Collect the ${product.title} at a Monday run.`,
-      images: product.images.nodes.map((image) => absolute(shopifyImageUrl(image.url, 1200))),
+      description: fallbackDescription,
+      images: local ? localUrls : shopifyImages.map((image) => absolute(shopifyImageUrl(image.url, 1200))),
       sku: product.handle,
       offers: product.variants.nodes.map((variant) => ({ price: Number(variant.price.amount).toFixed(2), inStock: variant.availableForSale, name: variant.title === 'Default Title' ? undefined : variant.title })),
     }),
@@ -43,30 +76,46 @@ const description = product.description.trim();
 >
   <CartLauncher slot="actions" client:idle />
   <section class="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-2">
-    <div class="flex flex-col gap-4">
-      {[lead, ...rest].filter((image) => image !== undefined).map((image, index) => (
-        <img
-          src={shopifyImageUrl(image.url, 960)}
-          srcset={shopifySrcSet(image.url, [480, 960, 1440]) || undefined}
-          sizes="(min-width: 768px) 50vw, 100vw"
-          alt={image.altText ?? product.title}
-          width={image.width ?? 1600}
-          height={image.height ?? 900}
-          loading={index === 0 ? undefined : 'lazy'}
-          fetchpriority={index === 0 ? 'high' : undefined}
-          decoding={index === 0 ? 'sync' : 'async'}
-          class="h-auto w-full rounded-3xl border-4 border-border bg-card"
-        />
-      ))}
+    <div class={local ? 'grid grid-cols-2 gap-4' : 'flex flex-col gap-4'}>
+      {local
+        ? views.map((view, index) => (
+            <Image
+              src={view.image}
+              alt={view.alt}
+              widths={[320, 480, 800]}
+              sizes="(min-width: 768px) 25vw, 46vw"
+              loading={index === 0 ? 'eager' : 'lazy'}
+              fetchpriority={index === 0 ? 'high' : 'auto'}
+              decoding={index === 0 ? 'sync' : 'async'}
+              class="aspect-square w-full rounded-3xl border-4 border-border bg-white object-cover"
+            />
+          ))
+        : shopifyImages.map((image, index) => (
+            <img
+              src={shopifyImageUrl(image.url, 960)}
+              srcset={shopifySrcSet(image.url, [480, 960, 1440]) || undefined}
+              sizes="(min-width: 768px) 50vw, 100vw"
+              alt={image.altText ?? product.title}
+              width={image.width ?? 1600}
+              height={image.height ?? 900}
+              loading={index === 0 ? undefined : 'lazy'}
+              fetchpriority={index === 0 ? 'high' : undefined}
+              decoding={index === 0 ? 'sync' : 'async'}
+              class="h-auto w-full rounded-3xl border-4 border-border bg-card"
+            />
+          ))}
     </div>
     <div>
       <a href={withBase('/merchandise/')} class="font-bold underline">← All merchandise</a>
       <h1 class="mt-4 text-4xl sm:text-5xl">{product.title}</h1>
       <p class="mt-2 font-display text-2xl font-bold tabular-nums">{priceSummary(product)}</p>
-      <p class="mt-6 max-w-prose whitespace-pre-line">{description || `Collect the ${product.title} at a Monday run.`}</p>
+      <p class="mt-6 max-w-prose whitespace-pre-line">{fallbackDescription}</p>
       <AddToCartForm client:visible name={product.title} optionLabel={optionLabel(product)} variants={formVariants(product)} showVariantPrices={pricesVary(product)} />
-      {hasSizeOption(product) && <SizeGuide />}
-      <p class="mt-6 text-sm text-muted-foreground">Collect your order at a Monday run. No delivery.</p>
+      {hasSizeOption(product) && <SizeGuideModal class="mt-6" />}
+      <p class="mt-6 max-w-prose text-sm text-muted-foreground">
+        Pay online, then collect at a <a class="font-bold underline" href={withBase('/events/')}>Monday run</a>. No delivery. Questions about sizes or orders? See the <a class="font-bold underline" href={withBase('/faqs/')}>FAQs</a> or <a class="font-bold underline" href={withBase('/contact/')}>get in touch</a>.
+      </p>
     </div>
   </section>
+  <MerchStrip products={relatedItems} heading="More From The Shop" />
 </PageLayout>

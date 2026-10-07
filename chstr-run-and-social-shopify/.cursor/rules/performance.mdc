@@ -38,6 +38,11 @@ Staff-only routes (`/keystatic`, `/admin`) are exempt from JS budgets but must n
 - **robots.txt, sitemap, canonical host:** generated here (`seo.mdc`); the apex→`www` redirect is Cloudflare config
 - **Manual measurement:** GTmetrix, PageSpeed Insights or Lighthouse on the deployed preview. `check:site` guards the build; it does not replace a real-device run
 
+## Regression guard
+
+- `scripts/size-baseline.json` records gzip JS, CSS and HTML per page template. `check:site` fails if a template grows by more than 10% or 1.5 KB. If growth is intended, justify it in the PR, run `pnpm baseline:update` and commit the file
+- `lighthouserc.cjs` (run as `pnpm lhci`, and in CI) asserts Performance, Accessibility, Best Practices and SEO >= 95, LCP <= 2.5 s, CLS <= 0.1, TBT <= 200 ms on six templates
+
 ## Rendering
 
 - Static-first: public pages prerender at build. Request-time work only in `src/pages/api/`, `/auth`, `/admin`
@@ -45,6 +50,7 @@ Staff-only routes (`/keystatic`, `/admin`) are exempt from JS budgets but must n
 - No `client:load`. Use `client:idle` / `client:visible`; a new island must name its reason in the PR. Prefer no island: native `<details>`, `<dialog>`, CSS
 - No animation library on public pages. Reveals use CSS transitions + one `IntersectionObserver`. Animate `transform` / `opacity` only; `will-change` only while animating; respect `prefers-reduced-motion`
 - Heavy interactivity (cart dialog, galleries) is lazy: `client:idle` / `client:visible`, never above-the-fold blocking
+- Scroll-reveal (`data-reveal`) is for content below the first screen only. Anything in the opening viewport (first gallery row, first shop row, first FAQs, hero, banner) must not wait for JavaScript, or LCP suffers (the gallery measured 2.9 s until this was fixed)
 - No layout reads (`getBoundingClientRect`, `offsetWidth`) during render or scroll handlers
 
 ## LCP

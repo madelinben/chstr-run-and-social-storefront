@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { SESSIONS } from '@/domain/session/session-schedule';
 import { breadcrumbNode, faqPageNode, organizationNode, productNode, sessionEventNode } from '@/features/site-seo/utilities/schema-nodes';
 
 const origin = 'https://www.example.test';
@@ -16,11 +17,21 @@ describe('schema nodes', () => {
     expect(JSON.stringify(node)).toContain('https://wa.me/447700900123');
   });
 
-  it('Event is free, weekly, Monday, and starts on the schedule', () => {
-    const node = sessionEventNode({ origin, now: new Date('2026-10-01T12:00:00Z'), image: `${origin}/og-default.png` });
+  it('run Event is free, weekly, Monday, and starts on the schedule', () => {
+    const node = sessionEventNode({ origin, now: new Date('2026-10-01T12:00:00Z'), image: `${origin}/og-default.png`, session: SESSIONS.run, id: `${origin}/#run`, description: 'd', url: `${origin}/`, free: true });
     expect(node.startDate).toBe('2026-10-05T18:30:00+01:00');
     expect(node.isAccessibleForFree).toBe(true);
+    expect(node).not.toHaveProperty('endDate');
     expect(node.eventSchedule).toMatchObject({ repeatFrequency: 'P1W', byDay: 'https://schema.org/Monday' });
+  });
+
+  it('football Event has the venue address and an end, and never claims to be free', () => {
+    const node = sessionEventNode({ origin, now: new Date('2026-10-01T12:00:00Z'), image: `${origin}/og-default.png`, session: SESSIONS.football, id: `${origin}/#football`, description: 'd', url: `${origin}/events/`, free: false });
+    expect(node.startDate).toBe('2026-10-01T20:00:00+01:00');
+    expect(node.endDate).toBe('2026-10-01T21:00:00+01:00');
+    expect(node).not.toHaveProperty('isAccessibleForFree');
+    expect(node).not.toHaveProperty('offers');
+    expect(JSON.stringify(node.location)).toContain('CH1 4BJ');
   });
 
   it('Product offers carry real availability, GBP and the price shown', () => {

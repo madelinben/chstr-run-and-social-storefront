@@ -5,27 +5,27 @@ interface Product {
   name: string;
   price: string;
   image: string;
+  /** `square` for studio cut-outs, `photo` (4:3) for Shopify's landscape uploads. */
+  ratio: 'square' | 'photo';
 }
 interface Props {
   products: Product[];
-  /** `photo` is 4:3 (landscape product photos); `square` is 1:1. */
-  aspect?: 'square' | 'photo';
+  heading?: string;
 }
-const { products, aspect = 'square' } = Astro.props;
-const height = aspect === 'photo' ? 480 : 640;
+const { products, heading = 'Wear The Crew' } = Astro.props;
 ---
 
 {products.length > 0 && (
   <section class="mx-auto max-w-6xl px-6 py-20">
     <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
-      <h2 data-reveal class="text-4xl sm:text-6xl">Wear The Crew</h2>
+      <h2 data-reveal class="text-4xl sm:text-6xl">{heading}</h2>
       <a data-reveal href={withBase('/merchandise/')} class="min-h-10 rounded-full border-4 border-border bg-accent px-6 py-2 font-display font-extrabold uppercase transition-transform hover:-translate-y-0.5 active:scale-[0.96]">All merchandise</a>
     </div>
     <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {products.slice(0, 3).map((product, index) => (
         <li data-reveal="scale" style={`--reveal-delay:${index * 90}ms`}>
           <a href={product.href} class="tilt group block overflow-hidden rounded-3xl border-4 border-border bg-card">
-            <img src={product.image} alt="" width="640" height={height} loading="lazy" decoding="async" class={`${aspect === 'photo' ? 'aspect-[4/3]' : 'aspect-square'} w-full border-b-4 border-border object-cover transition-transform duration-500 group-hover:scale-105`} />
+            <img src={product.image} alt="" width="640" height={product.ratio === 'photo' ? 480 : 640} loading="lazy" decoding="async" class={`${product.ratio === 'photo' ? 'aspect-[4/3]' : 'aspect-square'} w-full border-b-4 border-border object-cover transition-transform duration-500 group-hover:scale-105`} />
             <span class="flex items-baseline justify-between gap-3 p-5">
               <span class="font-display text-xl font-extrabold uppercase">{product.name}</span>
               <span class="font-display text-xl font-bold tabular-nums">{product.price}</span>

@@ -49,3 +49,60 @@ test('reduced motion stops the drifting columns', async ({ browser }) => {
   expect(animation).toBe('none');
   await context.close();
 });
+
+test('events page lists football with its venue and a calendar download', async ({ page }) => {
+  await page.goto('/events/');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Events');
+  await expect(page.getByText('Chester University Football Pitches').first()).toBeVisible();
+  await expect(page.getByText(/Parkgate Rd/).first()).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Book Back to Netball' })).toHaveAttribute('href', /chesternetballclub\.org\/back-to-netball/);
+  const download = await page.getByRole('link', { name: 'Download calendar file' }).getAttribute('href');
+  const ics = await page.request.get(download!);
+  expect(ics.status()).toBe(200);
+  expect(await ics.text()).toContain('BEGIN:VCALENDAR');
+});
+
+test('the lights notice is on the home and waiver pages', async ({ page }) => {
+  for (const path of ['/', '/waiver/']) {
+    await page.goto(path);
+    await expect(page.getByRole('heading', { name: 'Bring A Light' })).toBeVisible();
+    await expect(page.getByText(/head torch/i).first()).toBeVisible();
+  }
+});
+
+test('the brand motto shows on the home page', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByText('All people, all paces, all welcome.').first()).toBeVisible();
+});
+
+test('gallery page has real alt text on every picture', async ({ page }) => {
+  await page.goto('/gallery/');
+  const images = page.locator('main ul:not([aria-hidden]) img'); // the banner's decorative thumbnails are aria-hidden
+  expect(await images.count()).toBeGreaterThan(10);
+  for (const alt of await images.evaluateAll((nodes) => nodes.map((node) => node.getAttribute('alt')))) expect((alt ?? '').length).toBeGreaterThan(5);
+});
+
+test('a product with cleaned-up pictures shows its back view on hover and front and back in the gallery', async ({ page }) => {
+  await page.goto('/merchandise/');
+  const card = page.locator('li', { has: page.getByRole('heading', { name: 'Heavyweight Hoodie' }) });
+  await expect(card.locator('img')).toHaveCount(2); // front, plus the back that fades in on hover
+  const back = card.locator('img').nth(1);
+  await expect(back).toHaveCSS('opacity', '0');
+  await card.hover();
+  await expect(back).toHaveCSS('opacity', '1');
+
+  await page.goto('/merchandise/jumper/');
+  await expect(page.getByRole('img', { name: /Grey, front view/ })).toBeVisible();
+  await expect(page.getByRole('img', { name: /Grey, back view/ })).toBeVisible();
+  await expect(page.getByRole('img', { name: /Blue, back view/ })).toBeVisible();
+});
+
+test('the size guide modal opens from the merchandise page', async ({ page }) => {
+  await page.goto('/merchandise/');
+  await page.getByRole('button', { name: 'Size guide' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Size Guide' });
+  await expect(dialog.getByRole('row', { name: /XL/ }).first()).toBeVisible();
+  await expect(dialog.getByText('43"–45"')).toBeVisible();
+  await dialog.getByRole('button', { name: 'Close size guide' }).click();
+  await expect(dialog).toBeHidden();
+});

@@ -26,6 +26,8 @@ Local: repo-root `.env.local` (copy from `.env.example` via `pnpm setup`). Never
 |---|---|
 | PUBLIC_SHOPIFY_STORE_DOMAIN | `your-store.myshopify.com` |
 | PUBLIC_SHOPIFY_STOREFRONT_TOKEN | Storefront API **public** access token (read products, manage cart). Admin tokens never enter this repo. |
+| PUBLIC_WHATSAPP_GROUP_URL | WhatsApp group invite link (`https://chat.whatsapp.com/...`). The Join button is hidden until set |
+| PUBLIC_GOOGLE_SITE_VERIFICATION | Search Console HTML-tag value. The meta tag appears once set |
 | PUBLIC_WAIVER_URL | Jotform waiver (`https://form.jotform.com/261512447166052`) |
 | PUBLIC_WHATSAPP_NUMBER | click-to-chat on `/contact` |
 | PUBLIC_INSTAGRAM_URL / PUBLIC_FACEBOOK_URL | social links |

@@ -17,6 +17,12 @@ const products = [
     variants: { nodes: [variant(21, 'Default Title', '15.0')] },
   },
 ];
+// Mirrors a real store product that has cleaned-up front/back pictures (handle matches src/data/Product/product-media.ts).
+products.push({
+  id: 'gid://shopify/Product/3', handle: 'jumper', title: 'Heavyweight Hoodie', options: [{ name: 'Color' }], description: 'Heavyweight hoodie with the CHSTR back print.',
+  featuredImage: image('club-tee'), images: { nodes: [image('club-tee')] },
+  variants: { nodes: [variant(31, 'Grey', '30.0'), variant(32, 'Blue', '30.0')] },
+});
 const variants = new Map(products.flatMap((p) => p.variants.nodes.map((v) => [v.id, { variant: v, product: p }])));
 const carts = new Map();
 

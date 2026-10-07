@@ -7,3 +7,8 @@ dist
 !.env.example
 playwright-report
 test-results
+
+.lighthouseci
+
+# Chrome temp profiles that Lighthouse can leave behind under WSL
+C:*

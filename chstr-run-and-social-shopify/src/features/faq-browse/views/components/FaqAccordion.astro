@@ -10,8 +10,8 @@ const items = entries.map((entry) => ({ entry, html: withBaseInHtml(entry.render
   <p>No questions yet. <a class="underline" href={withBase('/contact/')}>Ask us anything</a>.</p>
 ) : (
   <div class="flex flex-col gap-3">
-    {items.map(({ entry, html }) => (
-      <details data-reveal class="group rounded-2xl border-4 border-border bg-card p-4 open:bg-accent">
+    {items.map(({ entry, html }, index) => (
+      <details data-reveal={index >= 3 ? true : undefined} class="group rounded-2xl border-4 border-border bg-card p-4 open:bg-accent">
         <summary class="flex min-h-10 cursor-pointer items-center justify-between gap-4 font-display text-xl font-semibold">
           {entry.data.question}
           <span aria-hidden="true" class="transition-transform group-open:rotate-45">+</span>

@@ -1,0 +1,53 @@
+---
+import { SESSIONS, nextSessionStart, sessionEnd } from '@/domain/session/session-schedule';
+import { NETBALL } from '@/features/session-overview/config';
+import { googleCalendarUrl, locationText } from '@/features/event-browse/utilities/calendar';
+import { formatSessionDay, formatSessionTime } from '@/features/event-browse/utilities/format-session';
+
+interface Props {
+  now: Date;
+  /** Per-session blurb used in calendar entries. */
+  descriptions: { run: string; football: string };
+}
+const { now, descriptions } = Astro.props;
+
+const mapUrl = (query: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+const sessions = [
+  { session: SESSIONS.run, blurb: 'Meet at The Architect for a run at your own pace, then stay for the social. Free, always.', description: descriptions.run },
+  { session: SESSIONS.football, blurb: 'Come and play. All people, all paces, all welcome on the pitch too.', description: descriptions.football },
+].map((entry) => {
+  const start = nextSessionStart(now, entry.session);
+  const end = sessionEnd(start, entry.session);
+  return { ...entry, start, time: end ? `${formatSessionTime(start)} to ${formatSessionTime(end)}` : formatSessionTime(start), calendarUrl: googleCalendarUrl(now, { session: entry.session, description: entry.description, url: '' }) };
+});
+const netballAddress = `${NETBALL.venueName}, ${NETBALL.streetAddress}, ${NETBALL.locality} ${NETBALL.postalCode}`;
+---
+
+<ul class="grid gap-6 md:grid-cols-2">
+  {sessions.map(({ session, blurb, start, time, calendarUrl }) => (
+    <li class="flex flex-col rounded-3xl border-4 border-border bg-card p-6">
+      <p class="font-display text-sm font-bold uppercase tracking-[0.25em] text-muted-foreground">Every {session.dayName}</p>
+      <h2 class="mt-1 text-3xl">{session.id === 'run' ? 'Run And Social' : 'Football'}</h2>
+      <p class="mt-3 font-display text-4xl font-black tabular-nums">{time}</p>
+      <p class="mt-1 text-sm text-muted-foreground">Next: <time datetime={start}>{formatSessionDay(start)}</time></p>
+      <p class="mt-4 font-bold">{session.venueName}</p>
+      <p>{locationText(session).replace(`${session.venueName}, `, '')}</p>
+      <p class="mt-3 text-pretty">{blurb}</p>
+      <div class="mt-auto flex flex-wrap gap-3 pt-6">
+        <a href={mapUrl(locationText(session))} rel="noopener" class="min-h-10 rounded-full border-4 border-border bg-accent px-5 py-2 font-display font-extrabold uppercase transition-transform hover:-translate-y-0.5 active:scale-[0.96]">Directions</a>
+        <a href={calendarUrl} rel="noopener" class="min-h-10 rounded-full border-4 border-border bg-card px-5 py-2 font-display font-extrabold uppercase transition-transform hover:-translate-y-0.5 active:scale-[0.96]">Add to calendar</a>
+      </div>
+    </li>
+  ))}
+  <li data-reveal="scale" style="--reveal-delay:270ms" class="flex flex-col rounded-3xl border-4 border-border bg-secondary p-6 md:col-span-2">
+    <p class="font-display text-sm font-bold uppercase tracking-[0.25em] text-muted-foreground">Book online</p>
+    <h2 class="mt-1 text-3xl">Netball</h2>
+    <p class="mt-3 max-w-prose text-lg">Netball is booked online through <strong>{NETBALL.programme}</strong> at {NETBALL.venueName}.</p>
+    <p class="mt-2 font-bold">{netballAddress}</p>
+    <p class="mt-2 max-w-prose text-pretty">The Back to Netball page, run by Chester Netball Club, currently lists {NETBALL.listedTimes}. Times and booking are theirs, so check that page for the latest.</p>
+    <div class="mt-6 flex flex-wrap gap-3">
+      <a href={NETBALL.programmeUrl} rel="noopener" class="min-h-10 rounded-full border-4 border-border bg-accent px-5 py-2 font-display font-extrabold uppercase transition-transform hover:-translate-y-0.5 active:scale-[0.96]">Book Back to Netball</a>
+      <a href={mapUrl(netballAddress)} rel="noopener" class="min-h-10 rounded-full border-4 border-border bg-card px-5 py-2 font-display font-extrabold uppercase transition-transform hover:-translate-y-0.5 active:scale-[0.96]">Directions</a>
+    </div>
+  </li>
+</ul>

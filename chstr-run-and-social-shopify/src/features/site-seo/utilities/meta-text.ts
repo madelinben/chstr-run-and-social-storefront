@@ -1,4 +1,4 @@
-import { SITE_NAME } from '@/features/site-seo/utilities/schema-nodes';
+import { SITE_NAME } from '@/utilities/brand';
 
 const TITLE_MAX = 60;
 const DESCRIPTION_MIN = 90;

@@ -1,4 +1,5 @@
-import { nextSessionStart, SESSION_SCHEDULE } from '@/domain/session/session-schedule';
+import { SITE_MOTTO, SITE_NAME } from '@/utilities/brand';
+import { nextSessionStart, SESSIONS, sessionEnd, TIME_ZONE, type Session } from '@/domain/session/session-schedule';
 
 export interface JsonLdNode {
   '@type': string | string[];
@@ -11,7 +12,6 @@ export interface Crumb {
   path: string;
 }
 
-export const SITE_NAME = 'CHSTR Run & Social';
 
 /** `origin` is the site root URL INCLUDING any base path (see `siteRoot`), so paths resolve under it. */
 const at = (origin: string, path: string) => new URL(path.replace(/^\//, ''), origin.endsWith('/') ? origin : `${origin}/`).href;
@@ -28,11 +28,12 @@ export function organizationNode(input: { origin: string; sameAs: string[]; emai
     '@id': organizationId(input.origin),
     name: SITE_NAME,
     alternateName: 'CHSTR',
+    slogan: SITE_MOTTO,
     url: at(input.origin, '/'),
     logo: { '@type': 'ImageObject', url: at(input.origin, '/apple-touch-icon.png'), width: 180, height: 180 },
     description: 'A free, friendly run and social club in Chester: running, football, netball and social nights.',
-    address: { '@type': 'PostalAddress', addressLocality: SESSION_SCHEDULE.locality, addressCountry: SESSION_SCHEDULE.countryCode },
-    areaServed: SESSION_SCHEDULE.locality,
+    address: { '@type': 'PostalAddress', addressLocality: SESSIONS.run.locality, addressCountry: SESSIONS.run.countryCode },
+    areaServed: SESSIONS.run.locality,
     ...(input.sameAs.length > 0 && { sameAs: input.sameAs }),
     ...(contactPoints.length > 0 && { contactPoint: contactPoints }),
   };
@@ -73,33 +74,47 @@ export function faqPageNode(url: string, items: { question: string; answer: stri
   };
 }
 
-/** The recurring weekly session. `startDate` is the next occurrence at build time, so the site is rebuilt at least weekly. */
-export function sessionEventNode(input: { origin: string; now: Date; image: string }): JsonLdNode {
-  const startDate = nextSessionStart(input.now);
+const hhmm = (session: Session) => `${String(session.startHour).padStart(2, '0')}:${String(session.startMinute).padStart(2, '0')}:00`;
+
+/**
+ * A recurring weekly session as a schema.org Event. `startDate` is the next occurrence at build time, so the site is rebuilt at least weekly.
+ * Only claim `free` when it is known to be free (the Monday run is; do not assume it for other sessions).
+ */
+export function sessionEventNode(input: { origin: string; now: Date; image: string; session: Session; id: string; description: string; url: string; free: boolean }): JsonLdNode {
+  const { session } = input;
+  const startDate = nextSessionStart(input.now, session);
+  const endDate = sessionEnd(startDate, session);
   return {
     '@type': 'Event',
-    '@id': at(input.origin, '/#session'),
-    name: `${SITE_NAME} weekly run and social`,
-    description: `A free ${SESSION_SCHEDULE.dayName} run followed by a social at ${SESSION_SCHEDULE.venueName}, ${SESSION_SCHEDULE.locality}. All paces welcome; new runners sign the waiver first.`,
+    '@id': input.id,
+    name: `${SITE_NAME}: ${session.name}`,
+    description: input.description,
     startDate,
+    ...(endDate && { endDate }),
     eventSchedule: {
       '@type': 'Schedule',
       repeatFrequency: 'P1W',
-      byDay: `https://schema.org/${SESSION_SCHEDULE.dayName}`,
-      startTime: `${String(SESSION_SCHEDULE.startHour).padStart(2, '0')}:${String(SESSION_SCHEDULE.startMinute).padStart(2, '0')}:00`,
-      scheduleTimezone: SESSION_SCHEDULE.timeZone,
+      byDay: `https://schema.org/${session.dayName}`,
+      startTime: hhmm(session),
+      scheduleTimezone: TIME_ZONE,
     },
     eventStatus: 'https://schema.org/EventScheduled',
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-    isAccessibleForFree: true,
+    ...(input.free && { isAccessibleForFree: true }),
     image: [input.image],
     location: {
       '@type': 'Place',
-      name: SESSION_SCHEDULE.venueName,
-      address: { '@type': 'PostalAddress', addressLocality: SESSION_SCHEDULE.locality, addressCountry: SESSION_SCHEDULE.countryCode },
+      name: session.venueName,
+      address: {
+        '@type': 'PostalAddress',
+        ...(session.streetAddress && { streetAddress: session.streetAddress }),
+        addressLocality: session.locality,
+        ...(session.postalCode && { postalCode: session.postalCode }),
+        addressCountry: session.countryCode,
+      },
     },
     organizer: { '@id': organizationId(input.origin) },
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP', availability: 'https://schema.org/InStock', url: at(input.origin, '/'), validFrom: startDate },
+    ...(input.free && { offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP', availability: 'https://schema.org/InStock', url: input.url, validFrom: startDate } }),
   };
 }
 

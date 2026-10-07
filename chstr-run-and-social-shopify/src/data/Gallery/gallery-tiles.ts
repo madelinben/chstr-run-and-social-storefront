@@ -66,3 +66,6 @@ export const heroColumns: TileId[][] = [
 
 /** Gallery section: nine tiles, shown in a masonry flow. */
 export const galleryTiles: TileId[] = ['hillSunset', 'smileyCrowd', 'sprintSunrise', 'chesterRoute', 'pintCheers', 'finishMedal', 'friendsRunning', 'citySkyline', 'socialNight'];
+
+/** Every picture, for the gallery page. */
+export const allTileIds = Object.keys(tiles) as TileId[];

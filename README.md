@@ -17,3 +17,9 @@ pnpm setup && pnpm dev
 Shared at the repo root: `.github/` (CI per app, path-filtered; one PR template) and `.githooks/` (pre-push runs `pnpm check` in both apps). Hooks are wired by each app's `pnpm setup` / `postinstall`.
 
 Both apps share the same look, pages and SEO/performance contract (`seo.mdc`, `performance.mdc`, enforced by `pnpm check:site`). There are no shared packages by design: a duplicated file is cheaper than a coupled release while this is a prototype. Fix a shared component in both.
+
+## Documentation
+
+- [`docs/PREDEPLOY_CHECKLIST.md`](./docs/PREDEPLOY_CHECKLIST.md): every SEO, speed, accessibility, mobile and security check, how each is enforced, and the launch-day steps
+- [`docs/FINDINGS.md`](./docs/FINDINGS.md): what we learned (Shopify, GitHub Pages, Astro 7, performance, product images) and the open questions for the club
+- Per app: `docs/` and `.cursor/rules/` inside each app folder

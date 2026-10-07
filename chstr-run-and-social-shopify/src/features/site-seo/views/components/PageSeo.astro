@@ -1,10 +1,10 @@
 ---
 import { siteRoot, withBase } from '@/utilities/with-base';
+import { SITE_NAME } from '@/utilities/brand';
 import { buildTitle } from '@/features/site-seo/utilities/meta-text';
 import {
   breadcrumbNode,
   organizationNode,
-  SITE_NAME,
   webPageNode,
   websiteNode,
   type Crumb,
@@ -58,6 +58,7 @@ const jsonLd = JSON.stringify({ '@context': 'https://schema.org', '@graph': grap
 <meta name="description" content={description} />
 <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large'} />
 <link rel="canonical" href={canonical} />
+{import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION && <meta name="google-site-verification" content={import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION} />}
 <meta property="og:site_name" content={SITE_NAME} />
 <meta property="og:locale" content="en_GB" />
 <meta property="og:type" content={ogType} />

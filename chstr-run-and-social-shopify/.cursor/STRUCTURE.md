@@ -13,6 +13,7 @@ Agent bind. Gates + scripts. Prose in `docs/`.
 - `docs/environment/cloudflare.md` — Pages deploy, DNS, env
 - `docs/environment/shopify.md` — Storefront API, cart, checkout, orders
 - `docs/environment/github.md` — PR CLI, CI
+- Repo root `docs/PREDEPLOY_CHECKLIST.md` — SEO, speed, accessibility, security checklist; `docs/FINDINGS.md` — what we learned and open questions
 - `docs/environment/github-pages.md` — MVP preview hosting on GitHub Pages
 
 ## Scripts (root)
@@ -30,6 +31,9 @@ Agent bind. Gates + scripts. Prose in `docs/`.
 | `lint` / `lint:fix` | ESLint |
 | `typecheck` | `astro check` |
 | `check` | `check:entry-files` → `lint:fix` → `lint` → `typecheck` |
+| `images:products` | crop supplier mock-ups into storefront images (`assets/images` to `src/assets/products`) |
+| `baseline:update` | rewrite `scripts/size-baseline.json` after intended size growth |
+| `lhci` | Lighthouse CI against `dist` (`lighthouserc.cjs`) |
 | `check:site` | SEO + schema.org + performance budgets on the built site (after `build`) |
 | `check:entry-files` | fail if `CLAUDE.md` / `AGENTS.md` / `PROJECT_RULES.md` differ |
 | `node scripts/mock-storefront.mjs` | local stand-in for the Storefront API on :4400 (e2e uses it) |
@@ -45,7 +49,9 @@ Agent bind. Gates + scripts. Prose in `docs/`.
 | `/contact` | public | built |
 | `/merchandise` | public | built |
 | `/merchandise/[handle]` | public | built |
-| `/robots.txt`, `/sitemap-index.xml` | public | generated |
+| `/events` | public | built |
+| `/gallery` | public | built |
+| `/robots.txt`, `/sitemap-index.xml`, `/llms.txt`, `/chstr-sessions.ics` | public | generated |
 
 ## Paths
 

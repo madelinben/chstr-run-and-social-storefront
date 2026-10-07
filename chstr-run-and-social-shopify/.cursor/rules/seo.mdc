@@ -41,6 +41,8 @@ Every page's graph carries `Organization` (`SportsClub`), `WebSite` and a `WebPa
 | Home `/` | `Event` for the weekly session: `name`, `startDate` (next Monday 18:30 Europe/London, computed at build), `eventSchedule` (`Schedule`, weekly, Monday), `location` (`Place` + `PostalAddress`), `isAccessibleForFree: true`, `offers` (price 0 GBP), `organizer`, `eventStatus`, `eventAttendanceMode` |
 | `/faqs` | `FAQPage` with every question from the content collection; answers are plain text of the visible answer — never text that is not on the page |
 | `/waiver` | `WebPage` |
+| `/events` | one `Event` per weekly session (`startDate` next occurrence, `eventSchedule`, `location` with full address where known). Only mark an event free when it is known to be free |
+| `/gallery` | page type `ImageGallery` |
 | `/contact` | `ContactPage`; `Organization.contactPoint` and `sameAs` (every social profile) |
 | `/merchandise` | `CollectionPage` + `ItemList` (`itemListElement` `ListItem` with `position`, `url`, `name`, `image`) |
 | `/merchandise/<product>` | `Product`: `name`, `description`, `image[]` (absolute), `sku` or `url`, `brand`, `offers` (`Offer`: `price`, `priceCurrency` `GBP`, `availability` from real stock, `url`, `itemCondition`). Price and availability must equal what the page shows. Variants → one `Offer` each |
@@ -55,6 +57,18 @@ An out-of-stock product page stays indexed and returns 200: say "Sold out" on th
 ## Host and URL consistency
 
 One host: `www.<domain>` is canonical. The apex redirects (301) to it at Cloudflare. HTTP redirects to HTTPS. Trailing slash is always present on page URLs. Internal links use the canonical form so there are no redirect hops.
+
+## Search visibility switch
+
+`PUBLIC_SITE_NOINDEX=1` (repo variable `SITE_NOINDEX`) makes a preview: every page `noindex, nofollow`, `robots.txt` `Disallow: /`, no sitemap. `0` is public. The mode is all-or-nothing and `check:site` fails on a page that disagrees. Only the real domain is public.
+
+## Discoverability checks (all enforced by `check:site`)
+
+- Every indexable page is linked from at least one other page (no orphans); internal links resolve and end with a slash
+- HTTPS only: no `http://` URL in the built HTML
+- `llms.txt` exists, starts with `# Title`, and lists the key facts and pages (built from the same data as the pages)
+- When `PUBLIC_GOOGLE_SITE_VERIFICATION` is set, the home page carries the matching `google-site-verification` meta tag
+- Product slugs should match the product title (warning); fix the handle in Shopify
 
 ## Site-level files
 

@@ -38,11 +38,10 @@ jobs:
       PUBLIC_FACEBOOK_URL: ${{ vars.PUBLIC_FACEBOOK_URL }}
       PUBLIC_WHATSAPP_NUMBER: ${{ vars.PUBLIC_WHATSAPP_NUMBER }}
       PUBLIC_CONTACT_EMAIL: ${{ vars.PUBLIC_CONTACT_EMAIL }}
-      # Project sites are served from /<repo>/ on <owner>.github.io.
-      SITE_ORIGIN: https://${{ github.repository_owner }}.github.io
-      BASE_PATH: /${{ github.event.repository.name }}
-      # Keep the preview out of search engines until the real domain launches.
-      PUBLIC_SITE_NOINDEX: '1'
+      PUBLIC_WHATSAPP_GROUP_URL: ${{ vars.PUBLIC_WHATSAPP_GROUP_URL }}
+      PUBLIC_GOOGLE_SITE_VERIFICATION: ${{ vars.PUBLIC_GOOGLE_SITE_VERIFICATION }}
+      # Preview stays out of search engines. Set the repo variable SITE_NOINDEX to 0 to let search engines in (docs/PREDEPLOY_CHECKLIST.md).
+      PUBLIC_SITE_NOINDEX: ${{ vars.SITE_NOINDEX || '1' }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -54,6 +53,20 @@ jobs:
           cache: pnpm
           cache-dependency-path: chstr-run-and-social-shopify/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
+      - name: Resolve the public URL
+        working-directory: .
+        env:
+          CUSTOM_ORIGIN: ${{ vars.SITE_ORIGIN }}
+        run: |
+          # Default: a GitHub Pages project site, https://<owner>.github.io/<repo>/.
+          # With a custom domain, set repo variable SITE_ORIGIN (e.g. https://www.example.com): the site is then served from the root.
+          if [ -n "$CUSTOM_ORIGIN" ]; then
+            echo "SITE_ORIGIN=$CUSTOM_ORIGIN" >> "$GITHUB_ENV"
+            echo "BASE_PATH=" >> "$GITHUB_ENV"
+          else
+            echo "SITE_ORIGIN=https://${GITHUB_REPOSITORY_OWNER}.github.io" >> "$GITHUB_ENV"
+            echo "BASE_PATH=/${GITHUB_REPOSITORY#*/}" >> "$GITHUB_ENV"
+          fi
       - name: Build against the live store
         run: pnpm build
       - name: Site quality (SEO, schema.org, budgets)

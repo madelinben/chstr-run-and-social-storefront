@@ -3,6 +3,7 @@ import PageLayout from '@/layouts/PageLayout.astro';
 import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.tsx';
 import ProductCard from '@/features/product-browse/views/components/ProductCard.astro';
 import PageBanner from '@/features/site-shell/views/components/PageBanner.astro';
+import SizeGuideModal from '@/features/product-browse/views/components/SizeGuideModal.astro';
 import PanelDivider from '@/features/site-shell/views/components/PanelDivider.astro';
 import { getProductsServer } from '@/data/Product/get-products-server';
 import { itemListNode } from '@/features/site-seo/utilities/schema-nodes';
@@ -24,7 +25,10 @@ const absolute = (path: string) => toAbsolute(Astro.site!, path);
   <CartLauncher slot="actions" client:idle />
   <PageBanner title="Merchandise" kicker="Wear the crew" tiles={['trainersLaces', 'bubbleCluster', 'wordMondays']} />
   <section class="mx-auto max-w-6xl px-6 py-16">
-    <p class="mb-8 max-w-prose">Pay online, then collect at the next Monday run. No delivery, no account needed.</p>
+    <div class="mb-8 flex flex-wrap items-center gap-x-6 gap-y-4">
+      <p class="max-w-prose">Pay online, then collect at the next <a class="font-bold underline" href={withBase('/events/')}>Monday run</a>. No delivery, no account needed.</p>
+      <SizeGuideModal />
+    </div>
     {products.length === 0 ? (
       <div class="rounded-3xl border-4 border-border bg-accent p-8">
         <h2 class="text-3xl">New Merch Is On The Way</h2>
@@ -32,7 +36,7 @@ const absolute = (path: string) => toAbsolute(Astro.site!, path);
       </div>
     ) : (
       <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {products.map((product, index) => <ProductCard product={product} eager={index === 0} />)}
+        {products.map((product, index) => <ProductCard product={product} eager={index === 0} reveal={index >= 3} />)}
       </ul>
     )}
   </section>

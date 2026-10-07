@@ -1,0 +1,43 @@
+---
+import { Image } from 'astro:assets';
+import PageLayout from '@/layouts/PageLayout.astro';
+import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.tsx';
+import PageBanner from '@/features/site-shell/views/components/PageBanner.astro';
+import PanelDivider from '@/features/site-shell/views/components/PanelDivider.astro';
+import SocialBand from '@/features/contact-hub/views/components/SocialBand.astro';
+import { allTileIds, tiles } from '@/data/Gallery/gallery-tiles';
+
+// Tiles from this index on get the scroll-reveal; the first row is in the opening viewport and must not wait for JavaScript.
+const REVEAL_FROM = 4;
+---
+
+<PageLayout
+  title="Photo Gallery"
+  description="The CHSTR Run & Social crew in pictures: Monday runs, Thursday football, netball and social nights in Chester. All people, all paces, all welcome."
+  pageType="ImageGallery"
+  breadcrumbs={[{ name: 'Gallery', path: '/gallery/' }]}
+>
+  <CartLauncher slot="actions" client:idle />
+  <PageBanner title="Gallery" kicker="The crew" tiles={['smileyCrowd', 'sprintSunrise', 'pintCheers']} />
+  <section class="mx-auto max-w-6xl px-6 py-16">
+    <p class="mb-10 max-w-prose text-lg">Runners, footballers, netballers and a lot of good chat. Follow us on social for the latest from each week.</p>
+    <ul class="columns-2 gap-4 md:columns-3 lg:columns-4">
+      {allTileIds.map((id, index) => (
+        <li data-reveal={index >= REVEAL_FROM ? 'scale' : undefined} style={`--reveal-delay:${(index % 4) * 80}ms`} class="tilt mb-4 break-inside-avoid overflow-hidden rounded-3xl border-4 border-border">
+          <Image
+            src={tiles[id].image}
+            alt={tiles[id].alt}
+            widths={[320, 480, 640]}
+            sizes="(min-width: 1024px) 23vw, (min-width: 768px) 31vw, 46vw"
+            class="h-auto w-full"
+            loading={index === 0 ? 'eager' : 'lazy'}
+            fetchpriority={index === 0 ? 'high' : 'auto'}
+            decoding={index === 0 ? 'sync' : 'async'}
+          />
+        </li>
+      ))}
+    </ul>
+  </section>
+  <PanelDivider />
+  <SocialBand />
+</PageLayout>

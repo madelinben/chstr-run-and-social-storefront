@@ -1,0 +1,25 @@
+---
+import { SESSIONS, upcomingStarts } from '@/domain/session/session-schedule';
+import { formatSessionDay, formatSessionTime } from '@/features/event-browse/utilities/format-session';
+
+interface Props {
+  now: Date;
+  /** How many weeks ahead to list. */
+  weeks?: number;
+}
+const { now, weeks = 6 } = Astro.props;
+
+const dates = [SESSIONS.run, SESSIONS.football]
+  .flatMap((session) => upcomingStarts(now, session, weeks).map((start) => ({ session, start })))
+  .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+---
+
+<ol class="divide-y-4 divide-border rounded-3xl border-4 border-border bg-card">
+  {dates.map(({ session, start }) => (
+    <li class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 p-4 sm:px-6">
+      <time datetime={start} class="font-display text-xl font-extrabold tabular-nums">{formatSessionDay(start)} · {formatSessionTime(start)}</time>
+      <span class="font-semibold">{session.name}</span>
+      <span class="text-sm text-muted-foreground">{session.venueName}</span>
+    </li>
+  ))}
+</ol>
