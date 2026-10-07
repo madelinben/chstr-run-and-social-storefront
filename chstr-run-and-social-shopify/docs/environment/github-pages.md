@@ -12,7 +12,7 @@ Free hosting for showing the prototype to the customer. Production strategy stay
 | `BASE_PATH` | `/<repo>` | project sites live under a sub-path; every internal URL goes through `withBase` (`src/utilities/with-base.ts`) |
 | `PUBLIC_SITE_NOINDEX` | `1` | preview must not be indexed: `noindex` on every page, `robots.txt` `Disallow: /`, no sitemap |
 
-Repo **variables** (not secrets; all public by design): `PUBLIC_SHOPIFY_STORE_DOMAIN`, `PUBLIC_SHOPIFY_STOREFRONT_TOKEN`, `PUBLIC_WAIVER_URL`, `PUBLIC_INSTAGRAM_URL`, `PUBLIC_FACEBOOK_URL` (optional: `PUBLIC_WHATSAPP_NUMBER`, `PUBLIC_CONTACT_EMAIL`).
+Repo **variables** (not secrets; all public by design): `PUBLIC_SHOPIFY_STORE_DOMAIN`, `PUBLIC_SHOPIFY_STOREFRONT_TOKEN`, `ADMIN_ENABLED` (optional, turns on `/admin/`, see `docs/ADMIN.md`). Contact and social links are content now: edit them in `/admin/` or `src/content/site/settings.json`.
 
 ## Repo variables that change the deployment
 
@@ -21,7 +21,6 @@ Repo **variables** (not secrets; all public by design): `PUBLIC_SHOPIFY_STORE_DO
 | `SITE_NOINDEX` | `1` (default) = preview, hidden from search. `0` = public. Set `0` only on the real domain |
 | `SITE_ORIGIN` | e.g. `https://www.example.com`. When set, the site is built for that domain's root (no `/repo/` path) |
 | `SEO_STRICT` | `1` makes the build refuse a localhost or placeholder origin |
-| `PUBLIC_WHATSAPP_GROUP_URL`, `PUBLIC_WHATSAPP_NUMBER`, `PUBLIC_CONTACT_EMAIL` | contact buttons and schema, hidden until set |
 | `PUBLIC_GOOGLE_SITE_VERIFICATION` | Search Console meta tag |
 
 The full launch sequence is in `../../../docs/PREDEPLOY_CHECKLIST.md` (repo root `docs/`).

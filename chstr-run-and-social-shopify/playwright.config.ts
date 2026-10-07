@@ -14,7 +14,7 @@ export default defineConfig({
       command: `pnpm build && pnpm exec astro preview --port ${port} && sleep 3600`,
       url: `http://localhost:${port}`,
       reuseExistingServer: true,
-      env: { PUBLIC_SHOPIFY_STOREFRONT_URL: 'http://localhost:4400' },
+      env: { PUBLIC_SHOPIFY_STOREFRONT_URL: 'http://localhost:4400', PUBLIC_ADMIN_ENABLED: '1', PUBLIC_ADMIN_REPOSITORY: 'club/site', PUBLIC_ADMIN_BRANCH: 'main', PUBLIC_ADMIN_CONTENT_ROOT: 'app/' },
     },
   ],
 });

@@ -1,0 +1,14 @@
+---
+description: Editable site content lives in JSON validated by one schema; the admin edits it
+globs: src/content/**,src/data/Content/**,src/features/content-admin/**,src/pages/admin/**
+alwaysApply: false
+---
+
+# Site content and the admin
+
+- Club copy, session times, events, members, pictures, home cards, contact and social links live in `src/content/site/*.json`. FAQs are `src/content/faqs/*.md`. Never hard-code them in components, and never add env vars for them.
+- `src/data/Content/schemas.ts` defines every file (`zod/mini` only: full `zod` in a shared chunk adds about 10 KB to every public page). The build loads and checks them in `site-content.ts` and fails with a plain message on a bad edit.
+- Consumers read through the loaders (`settings.ts`, `sessions.ts`, `Gallery/gallery-tiles.ts`, `Event/club-events.ts`, `Member/members.ts`). Add a field: schema, JSON, loader; the admin form follows (see `docs/ADMIN.md`).
+- Picture ids are file names in `src/assets/gallery` or `src/assets/uploads` without extension.
+- The admin (`/admin/`) saves one GitHub commit. It talks only to `ContentStore` and `AdminAuth` (`features/content-admin/models`); keep it that way so protection can change without touching screens. It must stay `noindex, nofollow`, carry the CSP meta tag, load no third-party script, and stay off unless `PUBLIC_ADMIN_ENABLED=1`.
+- Products are not content: they stay in Shopify.

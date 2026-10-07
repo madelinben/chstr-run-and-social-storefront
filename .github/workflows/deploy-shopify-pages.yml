@@ -33,12 +33,11 @@ jobs:
       # All of these are public values (the Storefront token ships to the browser by design), so they are repo variables, not secrets.
       PUBLIC_SHOPIFY_STORE_DOMAIN: ${{ vars.PUBLIC_SHOPIFY_STORE_DOMAIN }}
       PUBLIC_SHOPIFY_STOREFRONT_TOKEN: ${{ vars.PUBLIC_SHOPIFY_STOREFRONT_TOKEN }}
-      PUBLIC_WAIVER_URL: ${{ vars.PUBLIC_WAIVER_URL }}
-      PUBLIC_INSTAGRAM_URL: ${{ vars.PUBLIC_INSTAGRAM_URL }}
-      PUBLIC_FACEBOOK_URL: ${{ vars.PUBLIC_FACEBOOK_URL }}
-      PUBLIC_WHATSAPP_NUMBER: ${{ vars.PUBLIC_WHATSAPP_NUMBER }}
-      PUBLIC_CONTACT_EMAIL: ${{ vars.PUBLIC_CONTACT_EMAIL }}
-      PUBLIC_WHATSAPP_GROUP_URL: ${{ vars.PUBLIC_WHATSAPP_GROUP_URL }}
+      # Content editor at /admin/. Off unless the repo variable ADMIN_ENABLED is 1. Contact links and all other content live in src/content/site/*.json.
+      PUBLIC_ADMIN_ENABLED: ${{ vars.ADMIN_ENABLED || '0' }}
+      PUBLIC_ADMIN_REPOSITORY: ${{ github.repository }}
+      PUBLIC_ADMIN_BRANCH: ${{ github.event.repository.default_branch }}
+      PUBLIC_ADMIN_CONTENT_ROOT: chstr-run-and-social-shopify/
       PUBLIC_GOOGLE_SITE_VERIFICATION: ${{ vars.PUBLIC_GOOGLE_SITE_VERIFICATION }}
       # Preview stays out of search engines. Set the repo variable SITE_NOINDEX to 0 to let search engines in (docs/PREDEPLOY_CHECKLIST.md).
       PUBLIC_SITE_NOINDEX: ${{ vars.SITE_NOINDEX || '1' }}

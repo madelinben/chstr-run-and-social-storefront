@@ -1,5 +1,5 @@
 import type { ImageMetadata } from 'astro';
-import { z } from 'zod';
+import type * as z from 'zod/mini';
 import { CONTENT_FILES, type ContentKey, type SiteContentData } from '@/data/Content/schemas';
 import { crossCheckContent } from '@/data/Content/validate-content';
 import settingsJson from '@/content/site/settings.json';
@@ -15,7 +15,7 @@ import homeJson from '@/content/site/home.json';
  */
 const raw: Record<ContentKey, unknown> = { settings: settingsJson, sessions: sessionsJson, events: eventsJson, members: membersJson, pictures: picturesJson, home: homeJson };
 
-function parseFile<Schema extends z.ZodType>(key: ContentKey, schema: Schema): z.output<Schema> {
+function parseFile<Schema extends z.ZodMiniType>(key: ContentKey, schema: Schema): z.output<Schema> {
   const result = schema.safeParse(raw[key]);
   if (!result.success) {
     const lines = result.error.issues.map((issue) => `  ${issue.path.join('.') || '(whole file)'}: ${issue.message}`);

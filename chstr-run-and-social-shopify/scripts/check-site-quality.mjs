@@ -27,7 +27,9 @@ function walk(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => (entry.isDirectory() ? walk(join(dir, entry.name)) : [join(dir, entry.name)]));
 }
 
-const htmlFiles = walk(DIST).filter((file) => file.endsWith('.html'));
+// The admin is a private tool, not a public page: it is exempt from the page rules and checked on its own below.
+const adminFile = join(DIST, 'admin', 'index.html');
+const htmlFiles = walk(DIST).filter((file) => file.endsWith('.html') && file !== adminFile);
 const routeOf = (file) => {
   const path = '/' + relative(DIST, file).replaceAll('\\', '/');
   if (path === '/404.html') return path;
@@ -352,6 +354,12 @@ function checkSchema(page, title) {
 }
 
 // ---- site files ----
+if (existsSync(adminFile)) {
+  const admin = readFileSync(adminFile, 'utf8');
+  if (!/<meta name="robots" content="noindex, nofollow"/.test(admin)) fail('/admin/', 'the admin must be noindex, nofollow');
+  if (!/<meta http-equiv="Content-Security-Policy" content="[^"]*connect-src https:\/\/api\.github\.com[;"]/.test(admin)) fail('/admin/', 'the admin must carry a Content-Security-Policy that limits connections to api.github.com');
+  if (/<script[^>]+src="https?:\/\//.test(admin)) fail('/admin/', 'the admin must not load third-party scripts');
+}
 const indexable = pages.filter((page) => !page.noindex && page.route !== '/404.html');
 const robotsFile = join(DIST, 'robots.txt');
 if (NOINDEX_MODE) {

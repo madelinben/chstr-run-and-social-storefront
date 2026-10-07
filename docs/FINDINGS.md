@@ -18,7 +18,7 @@ What we learned while building and testing the two prototypes, so nobody has to 
 | Merchandise | pay online, collect at a Monday run; no delivery | brief |
 | Waiver | Jotform link, signed once before the first session | brief |
 
-Where these live in code: `src/domain/session/session-schedule.ts` (weekly times, venues and the netball booking link), `src/data/Event/club-events.ts` (special events), `src/data/Member/members.ts` (leaders, local legends), `src/utilities/brand.ts` (name, motto, route rule), `src/features/session-overview/config.ts` (activities), `src/content/faqs/` (FAQ answers).
+Where these live: `src/content/site/*.json` (sessions, events, members, pictures, home, settings: motto, route rule, contact and social links) and `src/content/faqs/` (FAQ answers). All are editable in `/admin/` (`docs/ADMIN.md`). Code reads them through `src/data/Content/`; `src/utilities/brand.ts` keeps only the fixed club name.
 
 ## 2. Shopify
 
@@ -85,13 +85,23 @@ Where these live in code: `src/domain/session/session-schedule.ts` (weekly times
 
 ## 7b. Special events, members and type safety
 
-- **Special events** are data (`club-events.ts`): each gets a page at `/events/<slug>/` with its own gallery, and the archive is `/events/past/`. Whether an event is past or coming up is decided at build time in London time (`domain/event`), and the Monday rebuild moves it across on its own: the **18 Oct 2026 long run** is shown as a special event until the day has passed.
+- **Special events** are content (`src/content/site/events.json`, edited in the admin): each gets a page at `/events/<slug>/` with its own gallery, and the archive is `/events/past/`. Whether an event is past or coming up is decided at build time in London time (`domain/event`), and the Monday rebuild moves it across on its own: the **18 Oct 2026 long run** is shown as a special event until the day has passed.
 - **Dates are plain calendar dates** (`YYYY-MM-DD`), so no timezone can shift them by a day. A test confirms the weekdays: 5 Oct is a Monday, 5 Sep a Saturday, 14 Jun and 18 Oct Sundays.
 - **Event galleries are illustrations for now.** Real photos come from Instagram, which we cannot read automatically. Swap them following the steps in `.cursor/rules/theme.mdc`.
 - **The members page** (`/members/`) has the three leaders, a Local Legends space (an invitation until the club names the first legends), and a Strava-style glossary (kudos, fly-by, personal best, Local Legend, segment).
 - **Strict type safety**: `tsconfig.json` extends `astro/tsconfigs/strictest` and ESLint uses the strict typescript-eslint set. Turning on `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes` found 20 genuine "might be undefined" cases (for example a product with no variants, or a list indexed past its end); they were fixed with types (`NonEmpty`, `requireSite`) rather than assertions. No `any`, no non-null `!`, no unchecked casts.
 - **Tablet widths**: adding an 8th nav link made the page overflow sideways by up to 417 px at 768 px and 161 px at 1024 px, which no phone or desktop test could see. The single-row header now starts at 1280 px; e2e checks 768 and 1024 as well.
 - **No runtime errors**: an e2e test visits every page and fails on any console error, uncaught exception, failed request or 4xx/5xx response.
+
+## 7c. Content model and admin
+
+- **All editable content is JSON validated by one schema** (`src/data/Content/schemas.ts`). The build fails with a plain message on a bad edit; the admin refuses the same edit before saving. Cross-file rules (every picture an event uses must exist; at least one hero and one gallery picture) are in `validate-content.ts`.
+- **The admin is a static page that commits to GitHub** (git trees API, one commit per save), so there is no server to host or pay for. It needs a fine-grained token (this repo only, Contents read/write), kept in memory in that tab. It is off unless repo variable `ADMIN_ENABLED=1`.
+- **Protection is designed for, not finished.** Static hosting cannot hide `/admin/`'s HTML, so today the lock is the token plus `noindex`, robots Disallow, a CSP limiting connections to `api.github.com`, and a check in `check:site`. The `AdminAuth` and `ContentStore` interfaces are the seam for Google sign-in or Cloudflare Access later.
+- **Cost of the admin on public pages: about +2.7 KB gzip JS.** Using full `zod` in the admin made a shared chunk grow by 10 KB for every page (the cart already uses `zod/mini`). The content schemas therefore use `zod/mini` only. The admin page itself is exempt from the JS budget and Lighthouse; it is checked on its own.
+- **Contact and social links moved from env vars to `settings.json`.** The WhatsApp group link is still empty: the club needs to paste the `https://chat.whatsapp.com/...` invite into Contact and links.
+- **Pictures:** uploads are shrunk to 1600 px WebP in the browser and saved to `src/assets/uploads/`; Astro then makes the responsive AVIF/WebP sizes at build. The picture id is the file name.
+- **Session "free" flag removed:** the events page still labels football and netball as not-free in schema.org (existing behaviour). Confirm with the club whether either charges, then set it on the schema in `events.astro`.
 
 ## 8. Things we could not do, and why
 

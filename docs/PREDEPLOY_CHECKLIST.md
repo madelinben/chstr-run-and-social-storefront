@@ -127,7 +127,8 @@ Every layout is designed for a 360 px phone first and enhanced at `sm` / `md` / 
 4. **Search Console**: add a URL-prefix property for the live URL, choose the HTML tag method, copy the `content` value, set repo variable `PUBLIC_GOOGLE_SITE_VERIFICATION`, redeploy, click Verify. Submit `/sitemap-index.xml`. Use URL Inspection on the home page and one product, then Request indexing.
 5. **Rich Results Test** (search.google.com/test/rich-results) on `/`, `/events/`, `/faqs/` and a product page. Fix anything it flags.
 6. **PageSpeed Insights** on the live home, shop and a product page (mobile). Compare with the numbers in section 2.
-7. **Links that need real values**: `PUBLIC_WHATSAPP_GROUP_URL` (the Join button is hidden until it is set), the waiver link, the netball booking link (`SESSIONS.netball.bookingUrl`), Instagram and Facebook.
+7. **Links that need real values**: the WhatsApp group invite (`/admin/` Contact and links, or `src/content/site/settings.json`; the Join button and the contact item stay hidden until it is set), the waiver link, the netball booking link (`sessions.json`), Instagram and Facebook.
+7a. **Admin**: set repo variable `ADMIN_ENABLED=1` only when someone will use it, create a one-repo fine-grained token (Contents read/write, short expiry), and test one save end to end. Before a real domain launch decide on stronger protection (Cloudflare Access in front of `/admin/*`); see `docs/ADMIN.md`.
 7b. **Content to confirm with the club**: the open questions in `FINDINGS.md` section 9 (event details and photos, leaders' wording, Local Legends, the 18 Oct long run, the size guide asterisk).
 8. **Social previews**: paste the home page and a product URL into Facebook's Sharing Debugger and a WhatsApp chat; check the image and title.
 9. **Weekly rebuild** is scheduled for Mondays so the Event dates stay current; confirm the first scheduled run succeeded.

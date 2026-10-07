@@ -1,0 +1,16 @@
+---
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import AdminApp from '@/features/content-admin/views/components/AdminApp';
+
+// Off unless PUBLIC_ADMIN_ENABLED=1 and the repository is named, so production can leave the editor out entirely.
+const enabled = import.meta.env.PUBLIC_ADMIN_ENABLED === '1' && Boolean(import.meta.env.PUBLIC_ADMIN_REPOSITORY);
+const target = {
+  repository: import.meta.env.PUBLIC_ADMIN_REPOSITORY ?? '',
+  branch: import.meta.env.PUBLIC_ADMIN_BRANCH ?? 'main',
+  root: import.meta.env.PUBLIC_ADMIN_CONTENT_ROOT ?? '',
+};
+---
+
+<AdminLayout title="Site admin">
+  {enabled ? <AdminApp client:only="react" target={target} /> : <p class="mx-auto max-w-xl">The admin is switched off for this build.</p>}
+</AdminLayout>

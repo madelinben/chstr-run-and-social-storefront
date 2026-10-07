@@ -10,7 +10,7 @@ const BASE_PATH = process.env.BASE_PATH || undefined;
 // Prototype previews are kept out of search engines: no sitemap, noindex, robots Disallow (see PageSeo).
 const NOINDEX = process.env.PUBLIC_SITE_NOINDEX === '1';
 // Pages that must never be indexed or listed in the sitemap (seo.mdc).
-const NOT_INDEXED = ['/404'];
+const NOT_INDEXED = ['/404', '/admin'];
 
 // Fully static. Shopify Storefront API is called at build time (products) and from the browser (cart).
 export default defineConfig({

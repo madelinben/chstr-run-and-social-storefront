@@ -44,6 +44,7 @@ No user accounts. Products and cart via the Shopify Storefront API (`src/service
 | `error-pages.mdc` | 404 / 500 pages |
 | `testing.mdc` | tests, e2e |
 | `generated.mdc` | `generated/**` |
+| `content.mdc` | `src/content/**`, `src/data/Content/**`, the admin |
 
 ## Gates before merge
 

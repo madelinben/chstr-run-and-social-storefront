@@ -25,7 +25,7 @@ export function crossCheckContent(content: SiteContentData, libraryIds: Readonly
 }
 
 /** Where is this picture used? For warning before a delete. */
-export function picturesInUse(content: SiteContentData): Map<string, string[]> {
+export function picturesInUse(content: Pick<SiteContentData, 'events' | 'home'>): Map<string, string[]> {
   const uses = new Map<string, string[]>();
   const add = (id: string, where: string) => uses.set(id, [...(uses.get(id) ?? []), where]);
   content.events.forEach((event) => event.gallery.forEach((id) => add(id, `event "${event.title}"`)));
