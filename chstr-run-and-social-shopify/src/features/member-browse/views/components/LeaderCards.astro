@@ -1,0 +1,23 @@
+---
+import { leaders } from '@/data/Member/members';
+
+interface Props {
+  /** Heading level for each card title: `h3` under a section heading, `h2` when the cards are the page's main content. */
+  headingLevel?: 'h2' | 'h3';
+  /** Show the longer welcome line and the Strava flourish. */
+  detailed?: boolean;
+}
+const { headingLevel: Heading = 'h3', detailed = false } = Astro.props;
+---
+
+<ul class="grid gap-6 md:grid-cols-3">
+  {leaders.map((leader, index) => (
+    <li data-reveal="scale" style={`--reveal-delay:${index * 90}ms`} class="tilt flex flex-col rounded-3xl border-4 border-border bg-card p-6">
+      <div aria-hidden="true" class={`${leader.tone} grid size-24 place-items-center rounded-full border-4 border-border font-display text-5xl font-black`}>{leader.name.charAt(0)}</div>
+      <Heading class="mt-4 text-3xl">{leader.name}</Heading>
+      <p class="mt-1 font-display text-lg font-bold">{leader.role}</p>
+      {detailed && <p class="mt-3 text-pretty">{leader.welcome}</p>}
+      {detailed && <p class="mt-4 inline-flex w-fit items-center gap-2 rounded-full border-4 border-border bg-accent px-4 py-1 text-sm font-extrabold uppercase">👍 {leader.kudos}</p>}
+    </li>
+  ))}
+</ul>

@@ -1,4 +1,5 @@
-import { nextSessionStart, sessionEnd, TIME_ZONE, toLondonIso, type Session } from '@/domain/session/session-schedule';
+import { nextSessionStart, sessionEnd, toLondonIso, type Session } from '@/domain/session/session-schedule';
+import { TIME_ZONE } from '@/utilities/time-zone';
 
 /** Calendar apps need an end. Sessions with no fixed length (the Monday run) get this. */
 export const DEFAULT_CALENDAR_MINUTES = 60;

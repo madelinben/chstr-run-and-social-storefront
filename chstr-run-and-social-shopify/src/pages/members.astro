@@ -1,0 +1,84 @@
+---
+import { requireSite } from '@/utilities/require-site';
+import PageLayout from '@/layouts/PageLayout.astro';
+import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.tsx';
+import PageBanner from '@/features/site-shell/views/components/PageBanner.astro';
+import PanelDivider from '@/features/site-shell/views/components/PanelDivider.astro';
+import LeaderCards from '@/features/member-browse/views/components/LeaderCards.astro';
+import WhatsAppJoin from '@/features/contact-hub/views/components/WhatsAppJoin.astro';
+import { leaders, legends, stravaGlossary } from '@/data/Member/members';
+import { organizationId, type JsonLdNode } from '@/features/site-seo/utilities/schema-nodes';
+import { siteRoot, toAbsolute, withBase } from '@/utilities/with-base';
+
+const root = siteRoot(requireSite(Astro.site));
+const people: JsonLdNode[] = leaders.map((leader) => ({
+  '@type': 'Person',
+  '@id': `${toAbsolute(requireSite(Astro.site), '/members/')}#${leader.name.toLowerCase()}`,
+  name: leader.name,
+  jobTitle: leader.role,
+  memberOf: { '@id': organizationId(root) },
+}));
+---
+
+<PageLayout
+  title="Meet the Crew and Members"
+  description="Meet the CHSTR Run & Social crew before your first run: Corey runs the social and football, Emily and Nathan plan the routes. Plus our Local Legends."
+  pageType="AboutPage"
+  breadcrumbs={[{ name: 'Members', path: '/members/' }]}
+  schema={people}
+>
+  <CartLauncher slot="actions" client:idle />
+  <PageBanner title="Members" kicker="Who to look for" tiles={['smileyCrowd', 'speechBubbles', 'friendsRunning']} />
+
+  <section class="mx-auto max-w-6xl px-6 py-16">
+    <h2 data-reveal class="mb-3 text-4xl sm:text-5xl">Say Hello To The Crew</h2>
+    <p data-reveal class="mb-10 max-w-prose text-lg">New? Look for these three on Monday at <a class="font-bold underline" href={withBase('/events/')}>The Architect</a>. Tell them it is your first time and they will point you at a pace group and introduce you round.</p>
+    <LeaderCards headingLevel="h3" detailed />
+  </section>
+
+  <PanelDivider />
+
+  <section class="mx-auto max-w-6xl px-6 py-16">
+    <h2 data-reveal class="mb-3 text-4xl sm:text-5xl">Local Legends</h2>
+    <p data-reveal class="mb-10 max-w-prose text-lg">On Strava a Local Legend is whoever shows up the most. At CHSTR it is the people who make Monday what it is: the ones who greet the new faces, bring the good chat and never skip the social.</p>
+    {legends.length === 0 ? (
+      <div data-reveal class="rounded-3xl border-4 border-border bg-foreground p-8 text-background sm:p-10">
+        <h3 class="text-3xl text-accent">This Space Is Waiting For Its First Legends</h3>
+        <p class="mt-3 max-w-prose text-lg">Know someone who has earned serious kudos? Tell us who and why, and they will get their name up here.</p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <WhatsAppJoin tone="outline" />
+          <a href={withBase('/contact/')} class="inline-flex min-h-10 items-center rounded-full border-4 border-card px-6 py-3 font-display text-lg font-extrabold uppercase transition-transform hover:-translate-y-0.5 active:scale-[0.96]">Nominate a legend</a>
+        </div>
+      </div>
+    ) : (
+      <ul class="grid gap-6 md:grid-cols-3">
+        {legends.map((legend) => (
+          <li data-reveal="scale" class="rounded-3xl border-4 border-border bg-accent p-6">
+            <h3 class="text-2xl">{legend.name}</h3>
+            <p class="mt-2">{legend.reason}</p>
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
+
+  <section class="border-y-4 border-border bg-accent py-16 text-accent-foreground">
+    <div class="mx-auto max-w-6xl px-6">
+      <h2 data-reveal class="mb-3 text-4xl sm:text-5xl">Club Life, Strava Style</h2>
+      <p data-reveal class="mb-10 max-w-prose text-lg">We run, we log it, we give each other kudos. Here is the CHSTR translation.</p>
+      <dl class="grid gap-4 md:grid-cols-2">
+        {stravaGlossary.map((entry, index) => (
+          <div data-reveal={index % 2 === 0 ? 'left' : 'right'} class="rounded-2xl border-4 border-border bg-card p-5 text-foreground">
+            <dt class="font-display text-2xl font-extrabold uppercase">{entry.term}</dt>
+            <dd class="mt-1">{entry.meaning}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-4xl px-6 py-16 text-center">
+    <h2 data-reveal class="text-4xl sm:text-5xl">Give It A Go</h2>
+    <p data-reveal class="mx-auto mt-3 max-w-prose text-lg">Mondays, 18:30, The Architect. Always free. First time? <a class="font-bold underline" href={withBase('/waiver/')}>Sign the waiver</a>, bring a light, and come and meet everyone.</p>
+  </section>
+</PageLayout>

@@ -1,4 +1,4 @@
-import { TIME_ZONE } from '@/domain/session/session-schedule';
+import { TIME_ZONE } from '@/utilities/time-zone';
 
 const formatter = new Intl.DateTimeFormat('en-GB', { timeZone: TIME_ZONE, weekday: 'short', day: 'numeric', month: 'short' });
 const timeFormatter = new Intl.DateTimeFormat('en-GB', { timeZone: TIME_ZONE, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });

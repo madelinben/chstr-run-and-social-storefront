@@ -14,6 +14,7 @@ Use `/caveman ultra` in chat. Build uses `/ponytail`.
 - DRY reuse existing components and helpers
 - Astro `.astro` components by default; React island (`client:*`) only for interactivity (cart, product live price/stock, FAQ accordion)
 - styling: tailwindcss, tailwind-merge, tailwind-variants
+- types: `tsconfig.json` extends `astro/tsconfigs/strictest` and lint uses typescript-eslint `strict`. No `any`, no non-null `!`, no casts to silence the compiler. Indexing can return `undefined`: use `NonEmpty` (`utilities/non-empty.ts`), `requireSite`, or handle the case
 - animation: CSS transitions + one `IntersectionObserver` (no animation library on public pages, `performance.mdc`); honour `prefers-reduced-motion`
 - follow active sub-plan under `docs/feature/*/sub-plans/`
 - run scripts via pnpm per `.cursor/STRUCTURE.md`

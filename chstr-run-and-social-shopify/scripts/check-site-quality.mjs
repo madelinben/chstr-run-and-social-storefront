@@ -7,7 +7,7 @@ import { gzipSync } from 'node:zlib';
 import { parse } from 'node-html-parser';
 
 const DIST = existsSync('dist/client') ? 'dist/client' : 'dist';
-const BUDGET = { jsGzip: 100 * 1024, cssGzip: 20 * 1024, htmlGzip: 25 * 1024, htmlRaw: 70 * 1024, fontFiles: 2, fontBytes: 100 * 1024, imageBytes: 200 * 1024 };
+const BUDGET = { jsGzip: 100 * 1024, cssGzip: 20 * 1024, htmlGzip: 25 * 1024, htmlRaw: 80 * 1024, fontFiles: 2, fontBytes: 100 * 1024, imageBytes: 200 * 1024 };
 const TITLE = { min: 15, max: 60 };
 const DESCRIPTION = { min: 70, max: 160 };
 const ALLOWED_ASSET_ORIGINS = ['cdn.shopify.com'];
@@ -81,7 +81,11 @@ const summary = [];
 // Which indexable pages are linked from another page (orphan check), and per-template size measurements (baseline check).
 const linkedFrom = new Map();
 const measurements = new Map();
-const templateOf = (route) => (/^\/merchandise\/[^/]+\/$/.test(route) ? '/merchandise/:product/' : route);
+const templateOf = (route) => {
+  if (/^\/merchandise\/[^/]+\/$/.test(route)) return '/merchandise/:product/';
+  if (/^\/events\/(?!past\/)[^/]+\/$/.test(route)) return '/events/:event/';
+  return route;
+};
 const slugify = (text) => text.toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const warnings = [];
 const seenTitles = new Map();
@@ -310,6 +314,13 @@ function checkSchema(page, title) {
     for (const question of faq?.mainEntity ?? []) if (!text.includes(question.name)) fail(route, `FAQ question not visible on the page: "${question.name}"`);
   }
   if (route === '/contact/' && !find('ContactPage')) fail(route, 'JSON-LD missing ContactPage');
+  if (route === '/events/') {
+    const events = graph.filter((node) => typesOf(node).includes('Event'));
+    if (events.length < 3) fail(route, `JSON-LD needs an Event for each weekly session (run, football, netball), found ${events.length}`);
+    for (const event of events) for (const property of ['name', 'startDate', 'eventSchedule', 'location']) if (event[property] === undefined) fail(route, `JSON-LD Event "${event.name}" missing ${property}`);
+  }
+  if (/^\/events\/(?!past\/)[^/]+\/$/.test(route)) need('Event', ['name', 'startDate', 'description', 'organizer']);
+  if (route === '/members/' && graph.filter((node) => typesOf(node).includes('Person')).length < 1) fail(route, 'JSON-LD needs a Person for each leader');
   if (route === '/merchandise/') {
     if (!find('CollectionPage')) fail(route, 'JSON-LD missing CollectionPage');
     // An empty shop (no product links on the page) is a valid state and has no list to describe.

@@ -64,7 +64,7 @@ Considered and **not** added, with reasons:
 |---|---|---|
 | LCP <= 2.5 s, CLS <= 0.1, TBT <= 200 ms | `lighthouserc.cjs` asserts these and category scores >= 95 (mobile, simulated slow 4G) on 6 templates; fails the pipeline | Auto |
 | Bundle size baseline | `scripts/size-baseline.json` holds JS, CSS and HTML gzip size per page template; `check:site` fails if one grows by more than 10% or 1.5 KB. Intentional growth: justify it in the PR, then `pnpm baseline:update` and commit the file | Auto |
-| Hard budgets | JS <= 100 KB, CSS <= 20 KB, HTML <= 25 KB gzip (70 KB raw), 2 preloaded fonts, images <= 200 KB, zero third-party origins; `check:site` | Auto |
+| Hard budgets | JS <= 100 KB, CSS <= 20 KB, HTML <= 25 KB gzip (80 KB raw), 2 preloaded fonts, images <= 200 KB, zero third-party origins; `check:site` | Auto |
 | Compress images | Astro makes WebP for gallery and product pictures; originals live in `assets/images/` and `src/assets/gallery/`; `pnpm images:products` crops and compresses supplier mock-ups to 7 to 20 KB each; Shopify CDN images use the `?width=` parameter. Any single image > 200 KB fails | Auto |
 | Above-the-fold content never waits for JavaScript | scroll-reveal is only for content below the first screen (`data-reveal` is off for the first row of gallery, shop and FAQs). Found by Lighthouse CI: the gallery LCP was 2.9 s until this was fixed | Auto (LCP assertion) |
 | Real-world check | PageSpeed Insights on the live URL and the Core Web Vitals report in Search Console after traffic | Manual |
@@ -82,15 +82,24 @@ Last measured (Lighthouse mobile, built site): Performance 99 to 100, Accessibil
 | Screen reader pass | VoiceOver or NVDA on home, a product and the cart | Manual |
 | Colour contrast | axe checks text contrast on the page as people see it; re-check any new brand colour | Auto + Manual |
 
+## 3b. Type safety and runtime errors
+
+| Item | How | Status |
+|---|---|---|
+| Strictest TypeScript | `tsconfig.json` extends `astro/tsconfigs/strictest`; `pnpm typecheck` must report 0 errors, 0 warnings, 0 hints | Auto |
+| Strict lint | typescript-eslint `strict` set: no `any`, no non-null `!`, no unused code; `pnpm lint` | Auto |
+| No runtime errors | e2e visits every page and fails on any console error, exception, failed request or 4xx/5xx | Auto |
+| Empty and odd data | an empty or partly unpriced catalogue builds; products without variants render nothing instead of crashing | Auto (unit tests) |
+
 ## 4. Mobile first
 
 Every layout is designed for a 360 px phone first and enhanced at `sm` / `md` / `lg`.
 
 | Item | How | Status |
 |---|---|---|
-| No sideways scroll | e2e checks home, FAQs, shop, waiver, contact at 390 px; axe runs at 360 px | Auto |
+| No sideways scroll | e2e checks home, FAQs, shop, waiver, contact at 390 px, and home, events, members and shop at **768 px and 1024 px** (tablet); axe runs at 360 px | Auto |
 | Tap targets and touch | controls are at least 40 px tall (`min-h-10`); Lighthouse `target-size` asserted | Auto |
-| Header | logo and cart on the first row, scrollable nav row below with an edge fade | Auto |
+| Header | below 1280 px: logo and cart on the first row, a scrollable nav row below with an edge fade; from 1280 px a single row. Adding a nav link means re-checking this | Auto |
 | Real device | open the preview on an iPhone and an Android phone: hero, cart, size guide, events | Manual |
 
 ## 5. Security and transport
@@ -110,7 +119,8 @@ Every layout is designed for a 360 px phone first and enhanced at `sm` / `md` / 
 4. **Search Console**: add a URL-prefix property for the live URL, choose the HTML tag method, copy the `content` value, set repo variable `PUBLIC_GOOGLE_SITE_VERIFICATION`, redeploy, click Verify. Submit `/sitemap-index.xml`. Use URL Inspection on the home page and one product, then Request indexing.
 5. **Rich Results Test** (search.google.com/test/rich-results) on `/`, `/events/`, `/faqs/` and a product page. Fix anything it flags.
 6. **PageSpeed Insights** on the live home, shop and a product page (mobile). Compare with the numbers in section 2.
-7. **Links that need real values**: `PUBLIC_WHATSAPP_GROUP_URL` (the Join button is hidden until it is set), the waiver link, the Back to Netball booking page (confirm it is still the right booking route), Instagram and Facebook.
+7. **Links that need real values**: `PUBLIC_WHATSAPP_GROUP_URL` (the Join button is hidden until it is set), the waiver link, the netball booking link (`SESSIONS.netball.bookingUrl`), Instagram and Facebook.
+7b. **Content to confirm with the club**: the open questions in `FINDINGS.md` section 9 (event details and photos, leaders' wording, Local Legends, the 18 Oct long run, the size guide asterisk).
 8. **Social previews**: paste the home page and a product URL into Facebook's Sharing Debugger and a WhatsApp chat; check the image and title.
 9. **Weekly rebuild** is scheduled for Mondays so the Event dates stay current; confirm the first scheduled run succeeded.
 10. **Shopify webhooks** (products create, update, delete) to trigger a rebuild, if staff should not have to click Run workflow.

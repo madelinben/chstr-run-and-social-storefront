@@ -1,4 +1,5 @@
 ---
+import { requireSite } from '@/utilities/require-site';
 import PageLayout from '@/layouts/PageLayout.astro';
 import HeroCollage from '@/features/session-overview/views/components/HeroCollage.astro';
 import MondayPlan from '@/features/session-overview/views/components/MondayPlan.astro';
@@ -17,11 +18,13 @@ import { priceSummary } from '@/data/Product/product-display';
 import { getLocalMedia, leadMedia } from '@/data/Product/product-media';
 import { shopifyImageUrl } from '@/utilities/shopify-image-url';
 import { SESSIONS } from '@/domain/session/session-schedule';
+import ClubEventsTeaser from '@/features/event-browse/views/components/ClubEventsTeaser.astro';
+import WhoToLookFor from '@/features/member-browse/views/components/WhoToLookFor.astro';
 import LightsNotice from '@/features/session-overview/views/components/LightsNotice.astro';
 import { sessionEventNode } from '@/features/site-seo/utilities/schema-nodes';
 import { siteRoot, toAbsolute, withBase } from '@/utilities/with-base';
 
-const eventImage = toAbsolute(Astro.site!, '/og-default.png');
+const eventImage = toAbsolute(requireSite(Astro.site), '/og-default.png');
 const products = await Promise.all(
   (await getProductsServer()).map(async (product) => {
     const local = getLocalMedia(product);
@@ -43,12 +46,12 @@ const products = await Promise.all(
   description="CHSTR Run & Social: a free Monday run club in Chester. All people, all paces, all welcome. Mondays 18:30 at The Architect, plus football and netball."
   schema={[
     sessionEventNode({
-      origin: siteRoot(Astro.site!),
+      origin: siteRoot(requireSite(Astro.site)),
       now: new Date(),
       image: eventImage,
       session: SESSIONS.run,
-      id: `${siteRoot(Astro.site!)}#session-run`,
-      url: siteRoot(Astro.site!),
+      id: `${siteRoot(requireSite(Astro.site))}#session-run`,
+      url: siteRoot(requireSite(Astro.site)),
       free: true,
       description: 'A free Monday run followed by a social at The Architect, Chester. All people, all paces, all welcome. New runners sign the waiver first, and everyone needs a light on dark nights.',
     }),
@@ -60,9 +63,11 @@ const products = await Promise.all(
   <section class="mx-auto max-w-6xl px-6 pt-16"><LightsNotice /></section>
   <MondayPlan />
   <PanelDivider />
+  <WhoToLookFor />
   <ActivitiesSection />
   <TickerBand words={['Mondays', '18:30', 'The Architect', 'Chester', 'Always free']} tone="ink" reverse />
   <GalleryMosaic />
+  <ClubEventsTeaser now={new Date()} />
   <MerchStrip products={products} />
   <PanelDivider />
   <FaqTeaser />

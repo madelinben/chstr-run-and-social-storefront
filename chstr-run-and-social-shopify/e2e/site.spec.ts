@@ -55,9 +55,12 @@ test('events page lists football with its venue and a calendar download', async 
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Events');
   await expect(page.getByText('Chester University Football Pitches').first()).toBeVisible();
   await expect(page.getByText(/Parkgate Rd/).first()).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Book Back to Netball' })).toHaveAttribute('href', /chesternetballclub\.org\/back-to-netball/);
+  await expect(page.getByRole('link', { name: 'Book online' })).toHaveAttribute('href', 'https://portal.sportskey.com/venues/cheshire-county-sports-club/events/PNMF01');
+  await expect(page.getByText('Tuesday').first()).toBeVisible();
+  await expect(page.getByText('19:30 to 20:30')).toBeVisible();
   const download = await page.getByRole('link', { name: 'Download calendar file' }).getAttribute('href');
-  const ics = await page.request.get(download!);
+  if (!download) throw new Error('The calendar download link has no href');
+  const ics = await page.request.get(download);
   expect(ics.status()).toBe(200);
   expect(await ics.text()).toContain('BEGIN:VCALENDAR');
 });
@@ -106,3 +109,84 @@ test('the size guide modal opens from the merchandise page', async ({ page }) =>
   await dialog.getByRole('button', { name: 'Close size guide' }).click();
   await expect(dialog).toBeHidden();
 });
+
+test('the Monday route rule is stated on the home page, events page and FAQs', async ({ page }) => {
+  for (const path of ['/', '/events/', '/faqs/']) {
+    await page.goto(path);
+    // Present in the page text (the FAQ answer sits inside a collapsed <details>, so check content, not visibility).
+    await expect(page.locator('main')).toContainText('never more than twice a month');
+  }
+});
+
+test('the members page introduces the leaders and has space for local legends', async ({ page }) => {
+  await page.goto('/members/');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Members');
+  for (const [name, role] of [['Corey', /social and the football/], ['Emily', /ASICS FrontRunner/], ['Nathan', /Plans the routes/]] as const) {
+    const card = page.locator('li', { has: page.getByRole('heading', { name }) });
+    await expect(card.getByText(role)).toBeVisible();
+  }
+  await expect(page.getByRole('heading', { name: 'Local Legends' })).toBeVisible();
+  await expect(page.getByText('Kudos', { exact: true }).first()).toBeVisible();
+});
+
+test('the home page tells new members who to look for and what the club has done', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Who To Look For' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Corey' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'What We Have Been Up To' })).toBeVisible();
+});
+
+test('past events: an archive page and a gallery page for each event', async ({ page }) => {
+  await page.goto('/events/past/');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Past Events');
+  for (const title of ['Chester Marathon Sign Making', 'The Big Run at FYP Gym Saltney', '10k Run With Wrexham Run Club']) await expect(page.getByRole('heading', { name: title })).toBeVisible();
+
+  await page.goto('/events/big-run-fyp-gym-saltney/');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('The Big Run at FYP Gym Saltney');
+  await expect(page.getByText('Saturday 5 September 2026')).toBeVisible();
+  await expect(page.getByText('With Steazy Wrexham Run Club', { exact: true })).toBeVisible();
+  // The event's own gallery: the list right after its heading (the cards further down are link thumbnails with empty alt).
+  const gallery = page.getByRole('heading', { name: 'Gallery From The Day' }).locator('xpath=following-sibling::ul[1]').locator('img');
+  expect(await gallery.count()).toBeGreaterThanOrEqual(4);
+  for (const alt of await gallery.evaluateAll((nodes) => nodes.map((node) => node.getAttribute('alt')))) expect((alt ?? '').length).toBeGreaterThan(5);
+});
+
+test('the 18 October long run is listed as special event until it has happened', async ({ page }) => {
+  await page.goto('/events/long-run/');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Long Run');
+  await expect(page.getByText('Sunday 18 October 2026')).toBeVisible();
+});
+
+test('no console errors, uncaught exceptions or failed requests on any page', async ({ page }) => {
+  const problems: string[] = [];
+  page.on('console', (message) => message.type() === 'error' && problems.push(`console: ${message.text()}`));
+  page.on('pageerror', (error) => problems.push(`exception: ${error.message}`));
+  page.on('requestfailed', (request) => problems.push(`failed: ${request.url()}`));
+  page.on('response', (response) => response.status() >= 400 && problems.push(`${response.status()}: ${response.url()}`));
+  for (const path of ['/', '/events/', '/events/past/', '/events/long-run/', '/gallery/', '/members/', '/faqs/', '/waiver/', '/contact/', '/merchandise/', '/merchandise/club-tee/', '/merchandise/jumper/', '/llms.txt', '/robots.txt']) {
+    await page.goto(path, { waitUntil: 'networkidle' });
+    await page.evaluate(async () => {
+      for (let y = 0; y < document.body.scrollHeight; y += 600) {
+        window.scrollTo(0, y);
+        await new Promise((resolve) => setTimeout(resolve, 40));
+      }
+    });
+  }
+  // The calendar file is a download, so fetch it rather than navigate to it.
+  const calendar = await page.request.get('/chstr-sessions.ics');
+  if (calendar.status() >= 400) problems.push(`${calendar.status()}: /chstr-sessions.ics`);
+  expect(problems).toEqual([]);
+});
+
+for (const width of [768, 1024]) {
+  for (const path of ['/', '/events/', '/members/', '/merchandise/']) {
+    test(`header and layout fit at ${width}px on ${path}`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto(path);
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      expect(overflow).toBeLessThanOrEqual(0);
+      const header = await page.locator('header').boundingBox();
+      expect(header?.height ?? 0).toBeLessThan(130);
+    });
+  }
+}

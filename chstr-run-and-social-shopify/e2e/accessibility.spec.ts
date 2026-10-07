@@ -2,7 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 // WCAG 2.1 A and AA plus axe best practices, on every public page, at desktop and phone width.
-const pages = ['/', '/events/', '/gallery/', '/faqs/', '/waiver/', '/contact/', '/merchandise/', '/merchandise/club-tee/'];
+const pages = ['/', '/events/', '/events/past/', '/events/big-run-fyp-gym-saltney/', '/gallery/', '/members/', '/faqs/', '/waiver/', '/contact/', '/merchandise/', '/merchandise/club-tee/'];
 
 for (const [name, viewport] of [['desktop', { width: 1366, height: 800 }], ['phone', { width: 360, height: 740 }]] as const) {
   for (const path of pages) {

@@ -24,6 +24,7 @@ import hoodieBlueFront from '@/assets/products/hoodie-blue-front.webp';
 import hoodieBlueBack from '@/assets/products/hoodie-blue-back.webp';
 import hoodieBlueOg from '@/assets/products/hoodie-blue-og.jpg';
 import type { ShopifyProduct } from '@/services/shopify/products';
+import type { NonEmpty } from '@/utilities/non-empty';
 
 /** One colourway: the front, optionally the back (shown on hover and in the gallery), and a 1200x630 share image. */
 export interface ColourMedia {
@@ -38,7 +39,7 @@ export interface ColourMedia {
  * Storefront images per Shopify product HANDLE, made from the supplier mock-ups by `pnpm images:products`.
  * A product with no entry here falls back to the images uploaded in Shopify. If you rename a handle in Shopify, rename it here.
  */
-const LOCAL_MEDIA: Record<string, ColourMedia[]> = {
+const LOCAL_MEDIA: Record<string, NonEmpty<ColourMedia>> = {
   'technical-running-cap': [
     { colour: 'Black', front: capBlackFront, og: capBlackOg },
     { colour: 'Green', front: capGreenFront, og: capGreenOg },
@@ -56,7 +57,7 @@ const LOCAL_MEDIA: Record<string, ColourMedia[]> = {
   ],
 };
 
-export function getLocalMedia(product: Pick<ShopifyProduct, 'handle'>): ColourMedia[] | undefined {
+export function getLocalMedia(product: Pick<ShopifyProduct, 'handle'>): NonEmpty<ColourMedia> | undefined {
   return LOCAL_MEDIA[product.handle];
 }
 
@@ -64,11 +65,12 @@ export function getLocalMedia(product: Pick<ShopifyProduct, 'handle'>): ColourMe
  * The colourway to lead with: the first in-stock variant's colour that we have pictures for,
  * else the first variant's, else the first picture set.
  */
-export function leadMedia(media: ColourMedia[], product: Pick<ShopifyProduct, 'variants'>): ColourMedia {
+export function leadMedia(media: NonEmpty<ColourMedia>, product: Pick<ShopifyProduct, 'variants'>): ColourMedia {
   const wanted = [...product.variants.nodes.filter((variant) => variant.availableForSale), ...product.variants.nodes];
   for (const variant of wanted) {
     const match = media.find((entry) => variant.title.toLowerCase().split(' / ').includes(entry.colour.toLowerCase()));
     if (match) return match;
   }
-  return media[0];
+  const [first] = media;
+  return first;
 }

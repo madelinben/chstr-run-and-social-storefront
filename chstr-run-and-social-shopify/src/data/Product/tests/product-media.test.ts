@@ -23,7 +23,8 @@ describe('getLocalMedia', () => {
 });
 
 describe('leadMedia', () => {
-  const media = getLocalMedia({ handle: 'jumper' })!;
+  const media = getLocalMedia({ handle: 'jumper' });
+  if (!media) throw new Error('The hoodie (jumper) pictures are missing from product-media.ts');
 
   it('leads with the first in-stock variant that has pictures', () => {
     expect(leadMedia(media, variants([['Grey', false], ['Blue', true]])).colour).toBe('Blue');

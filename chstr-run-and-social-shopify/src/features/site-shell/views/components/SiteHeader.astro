@@ -6,6 +6,7 @@ const links = [
   { href: withBase('/'), label: 'Home' },
   { href: withBase('/events/'), label: 'Events' },
   { href: withBase('/gallery/'), label: 'Gallery' },
+  { href: withBase('/members/'), label: 'Members' },
   { href: withBase('/faqs/'), label: 'FAQs' },
   { href: withBase('/waiver/'), label: 'Waiver' },
   { href: withBase('/merchandise/'), label: 'Merchandise' },
@@ -17,9 +18,9 @@ const current = Astro.url.pathname;
 
 <header class="sticky top-0 z-40 border-b-4 border-border bg-background">
   <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:bg-accent focus:p-2">Skip To Content</a>
-  <div class="mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 px-4 py-2 sm:px-6 md:flex md:justify-between">
+  <div class="mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 px-4 py-2 sm:px-6 xl:flex xl:justify-between">
     <a href={withBase('/')} class="shrink-0 text-3xl" aria-label="CHSTR Run &amp; Social home"><Logo /></a>
-    <nav aria-label="Main" class="order-3 col-span-2 flex items-center gap-1 overflow-x-auto [scrollbar-width:none] max-md:[mask-image:linear-gradient(to_right,#000_88%,transparent)] md:order-none md:overflow-visible">
+    <nav aria-label="Main" class="order-3 col-span-2 flex items-center gap-1 overflow-x-auto [scrollbar-width:none] max-xl:[mask-image:linear-gradient(to_right,#000_92%,transparent)] xl:order-none xl:overflow-visible">
       {links.map((link) => (
         <a
           href={link.href}

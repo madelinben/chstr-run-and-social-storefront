@@ -10,12 +10,15 @@ What we learned while building and testing the two prototypes, so nobody has to 
 | Motto | "All people, all paces, all welcome." | club |
 | Run | Mondays 18:30, The Architect, Chester. Always free | brief |
 | Football | Thursdays 8pm to 9pm, Chester University Football Pitches, Parkgate Rd, Chester CH1 4BJ | club |
-| Netball | The Cheshire County Sports Club, Plas Newton Ln, Chester CH2 1PR; booked online through Back to Netball | club |
+| Netball | Tuesdays 7:30pm to 8:30pm, The Cheshire County Sports Club, Plas Newton Ln, Chester CH2 1PR; book online through Back to Netball: https://portal.sportskey.com/venues/cheshire-county-sports-club/events/PNMF01 | club |
+| Monday routes | The route changes every week. A few favourites come round again, but never more than twice a month | club |
+| Leaders | Corey runs the social and the football; Emily plans the routes and is an ASICS FrontRunner; Nathan plans the routes | club |
+| Special events | 5 Oct 2026 popcorn, Life in Chester sign making for the Chester Marathon and bead making; 5 Sep 2026 The Big Run at FYP Gym, Saltney with Steazy Wrexham Run Club; 14 Jun 2026 10k run with Wrexham Run Club at The Architect; 18 Oct 2026 long run | club |
 | Lights | Required on dark nights: head torch, reflective running vest with lights, or any light. Shown on home, waiver, events and FAQs | club |
 | Merchandise | pay online, collect at a Monday run; no delivery | brief |
 | Waiver | Jotform link, signed once before the first session | brief |
 
-Where these live in code: `src/domain/session/session-schedule.ts` (times and venues), `src/features/session-overview/config.ts` (netball, activities), `src/utilities/brand.ts` (name and motto), `src/content/faqs/` (FAQ answers).
+Where these live in code: `src/domain/session/session-schedule.ts` (weekly times, venues and the netball booking link), `src/data/Event/club-events.ts` (special events), `src/data/Member/members.ts` (leaders, local legends), `src/utilities/brand.ts` (name, motto, route rule), `src/features/session-overview/config.ts` (activities), `src/content/faqs/` (FAQ answers).
 
 ## 2. Shopify
 
@@ -74,9 +77,19 @@ Where these live in code: `src/domain/session/session-schedule.ts` (times and ve
 - Netball is run by Chester Netball Club, so the page links to their Back to Netball page and says times and booking are theirs.
 - The calendar feed refreshes on each build (weekly).
 
+## 7b. Special events, members and type safety
+
+- **Special events** are data (`club-events.ts`): each gets a page at `/events/<slug>/` with its own gallery, and the archive is `/events/past/`. Whether an event is past or coming up is decided at build time in London time (`domain/event`), and the Monday rebuild moves it across on its own: the **18 Oct 2026 long run** is shown as a special event until the day has passed.
+- **Dates are plain calendar dates** (`YYYY-MM-DD`), so no timezone can shift them by a day. A test confirms the weekdays: 5 Oct is a Monday, 5 Sep a Saturday, 14 Jun and 18 Oct Sundays.
+- **Event galleries are illustrations for now.** Real photos come from Instagram, which we cannot read automatically. Swap them following the steps in `.cursor/rules/theme.mdc`.
+- **The members page** (`/members/`) has the three leaders, a Local Legends space (an invitation until the club names the first legends), and a Strava-style glossary (kudos, fly-by, personal best, Local Legend, segment).
+- **Strict type safety**: `tsconfig.json` extends `astro/tsconfigs/strictest` and ESLint uses the strict typescript-eslint set. Turning on `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes` found 20 genuine "might be undefined" cases (for example a product with no variants, or a list indexed past its end); they were fixed with types (`NonEmpty`, `requireSite`) rather than assertions. No `any`, no non-null `!`, no unchecked casts.
+- **Tablet widths**: adding an 8th nav link made the page overflow sideways by up to 417 px at 768 px and 161 px at 1024 px, which no phone or desktop test could see. The single-row header now starts at 1280 px; e2e checks 768 and 1024 as well.
+- **No runtime errors**: an e2e test visits every page and fails on any console error, uncaught exception, failed request or 4xx/5xx response.
+
 ## 8. Things we could not do, and why
 
-- **Mine Instagram and Facebook for past questions.** Both block automated reading and neither page is indexed by search, so we could not read comments. The FAQ answers only facts the club has given us. Please paste real questions to extend it (see section 9).
+- **Mine Instagram and Facebook for past questions, posts and event photos.** Both block automated reading, and web searches for the club's events (The Big Run, Steazy Wrexham Run Club, Life in Chester) returned nothing. The FAQ answers and event pages therefore use only facts the club gave us. Please paste real questions, post links and photos to extend them (see section 9).
 - **Verify Search Console.** It needs the live URL and a Google account (checklist section 6).
 - **Test a real checkout and the Cloudflare prototype end to end.** They need paid-plan payments and credentials the club has not set up yet.
 - **A real WhatsApp invite link** was not available, so the Join button is built but hidden until `PUBLIC_WHATSAPP_GROUP_URL` is set.
@@ -84,13 +97,18 @@ Where these live in code: `src/domain/session/session-schedule.ts` (times and ve
 ## 9. Open questions for the club
 
 1. The **WhatsApp group invite link** (`https://chat.whatsapp.com/...`).
-2. **Netball**: the public Back to Netball page lists **Tuesdays 8:00pm to 9:30pm** at the Cheshire County Sports Club and says "simply turn up and join in", with no booking link. You said it must be booked online through Back to Netball. Which is right, and is there a specific booking link to use?
-3. **Football**: is it free? Is there anything to bring or book?
-4. What does the **asterisk on 3XL\*** in the size guide mean (the guide image has no footnote)? It is omitted from the site until we know.
-5. Is the size guide measurement **chest** (we assumed so) and do 3XL and 4XL have UK sizes?
-6. How long does the **Monday run** last, and what time does the social start? Calendar entries default to one hour.
-7. Pace groups, **bag drop** and what happens after the run: the home page and FAQs describe them briefly from the original brief. Please confirm or correct the wording.
-8. **Product data in Shopify**: prices, stock settings, descriptions and tidy handles (see section 2).
-9. **Real photos**: the gallery and hero currently use illustrations. Replace them using the steps in `.cursor/rules/theme.mdc`.
-10. **Street address of The Architect**, so the weekly run's location can be a full address in the schema and on the Events page.
-11. A **returns policy** for merchandise, so shipping and returns schema can be added.
+2. **5 Oct 2026**: we treated "popcorn, Life in Chester sign making for the Chester Marathon" and "Life in Chester bead making" as **one event on that date**. If bead making was a different day, give us its date and we will split it.
+3. **18 Oct 2026 long run**: this date is after today, so it is shown as a coming-up special event, not a past one. Is the year right? What are the start time, place and distance?
+4. **Event details and photos** for The Big Run (FYP Gym, Saltney, 5 Sep), the 10k with Wrexham Run Club (The Architect, 14 Jun), the sign making and the long run: distances, headcounts, anything worth saying, and the photos for each gallery.
+5. **Football**: is it free? Is there anything to bring or book?
+6. What does the **asterisk on 3XL\*** in the size guide mean (the guide image has no footnote)? It is omitted from the site until we know.
+7. Is the size guide measurement **chest** (we assumed so) and do 3XL and 4XL have UK sizes?
+8. How long does the **Monday run** last, and what time does the social start? Calendar entries default to one hour.
+9. Pace groups, **bag drop** and what happens after the run: the home page and FAQs describe them briefly from the original brief. Please confirm or correct the wording.
+10. **Leaders**: confirm the wording of each role (we wrote "ASICS FrontRunner" for Emily) and send photos if they are happy to appear. Names for the first **Local Legends**.
+11. **Product data in Shopify**: prices, stock settings, descriptions and tidy handles (see section 2).
+12. **Real photos** for the hero, gallery and events (see `.cursor/rules/theme.mdc`).
+13. **Street address of The Architect**, so the weekly run's location can be a full address in the schema and on the Events page.
+14. A **returns policy** for merchandise, so shipping and returns schema can be added.
+
+Resolved: netball is **Tuesdays 7:30pm to 8:30pm**, booked at the SportsKey link above (this replaced the earlier open question about the Back to Netball page's "turn up" wording).

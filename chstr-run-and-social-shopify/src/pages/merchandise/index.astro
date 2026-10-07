@@ -1,4 +1,5 @@
 ---
+import { requireSite } from '@/utilities/require-site';
 import PageLayout from '@/layouts/PageLayout.astro';
 import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.tsx';
 import ProductCard from '@/features/product-browse/views/components/ProductCard.astro';
@@ -11,8 +12,8 @@ import { toAbsolute, withBase } from '@/utilities/with-base';
 import { shopifyImageUrl } from '@/utilities/shopify-image-url';
 
 const products = await getProductsServer();
-const url = toAbsolute(Astro.site!, '/merchandise/');
-const absolute = (path: string) => toAbsolute(Astro.site!, path);
+const url = toAbsolute(requireSite(Astro.site), '/merchandise/');
+const absolute = (path: string) => toAbsolute(requireSite(Astro.site), path);
 ---
 
 <PageLayout

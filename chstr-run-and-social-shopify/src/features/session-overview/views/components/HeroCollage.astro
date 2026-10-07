@@ -7,16 +7,8 @@ import WhatsAppJoin from '@/features/contact-hub/views/components/WhatsAppJoin.a
 import { SITE_MOTTO } from '@/utilities/brand';
 import { sessionFacts } from '@/features/session-overview/config';
 
-// Direction and speed per column so the mosaic never moves in lockstep.
-const drift = [
-  { seconds: 70, reverse: false },
-  { seconds: 55, reverse: true },
-  { seconds: 85, reverse: false },
-  { seconds: 62, reverse: true },
-  { seconds: 75, reverse: false },
-  { seconds: 58, reverse: true },
-];
-const tilts = ['-3deg', '2deg', '-2deg', '3deg'];
+const TILTS = ['-3deg', '2deg', '-2deg', '3deg'];
+const tiltFor = (index: number) => TILTS[index % TILTS.length] ?? '0deg';
 ---
 
 <section class="relative isolate flex min-h-[100svh] items-center justify-center overflow-hidden border-b-4 border-border bg-foreground">
@@ -24,15 +16,15 @@ const tilts = ['-3deg', '2deg', '-2deg', '3deg'];
   <div aria-hidden="true" class="absolute inset-0 -z-10 grid grid-cols-4 gap-2 px-2 md:grid-cols-6">
     {heroColumns.map((column, columnIndex) => (
       <div class={`overflow-hidden ${columnIndex > 3 ? 'hidden md:block' : ''}`}>
-        <div class="hero-col flex flex-col gap-2" style={`--drift:${drift[columnIndex].seconds}s;--dir:${drift[columnIndex].reverse ? 'reverse' : 'normal'}`}>
+        <div class="hero-col flex flex-col gap-2" style={`--drift:${column.seconds}s;--dir:${column.reverse ? 'reverse' : 'normal'}`}>
           {[0, 1].flatMap((copy) =>
-            column.map((id, tileIndex) => {
+            column.tiles.map((id, tileIndex) => {
               const tile = tiles[id];
               const first = columnIndex === 0 && tileIndex === 0 && copy === 0;
               return (
                 <div
                   class="hero-tile overflow-hidden rounded-2xl border-4 border-border"
-                  style={`aspect-ratio:${tile.image.width}/${tile.image.height};--i:${columnIndex * 4 + tileIndex};--r:${tilts[tileIndex % 4]}`}
+                  style={`aspect-ratio:${tile.image.width}/${tile.image.height};--i:${columnIndex * 4 + tileIndex};--r:${tiltFor(tileIndex)}`}
                 >
                   <Image
                     src={tile.image}

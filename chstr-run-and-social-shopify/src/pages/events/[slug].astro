@@ -1,0 +1,88 @@
+---
+import { requireSite } from '@/utilities/require-site';
+import { Image } from 'astro:assets';
+import PageLayout from '@/layouts/PageLayout.astro';
+import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.tsx';
+import PageBanner from '@/features/site-shell/views/components/PageBanner.astro';
+import ClubEventCard from '@/features/event-browse/views/components/ClubEventCard.astro';
+import { clubEvents, type ClubEvent } from '@/data/Event/club-events';
+import { tiles } from '@/data/Gallery/gallery-tiles';
+import { formatEventDate, splitEvents } from '@/domain/event/club-event-timing';
+import { clubEventNode } from '@/features/site-seo/utilities/schema-nodes';
+import { siteRoot, toAbsolute, withBase } from '@/utilities/with-base';
+
+export function getStaticPaths() {
+  return clubEvents.map((event) => ({ params: { slug: event.slug }, props: { event } }));
+}
+
+interface Props {
+  event: ClubEvent;
+}
+const { event } = Astro.props;
+const now = new Date();
+const { upcoming } = splitEvents(clubEvents, now);
+const isUpcoming = upcoming.some((candidate) => candidate.slug === event.slug);
+const others = clubEvents.filter((candidate) => candidate.slug !== event.slug).slice(0, 3);
+const otherUpcoming = new Set(upcoming.map((candidate) => candidate.slug));
+const url = toAbsolute(requireSite(Astro.site), `/events/${event.slug}/`);
+const description = `${event.summary} ${isUpcoming ? 'Coming up with' : 'A past event with'} CHSTR Run & Social in Chester: ${formatEventDate(event.date)}.`;
+---
+
+<PageLayout
+  title={event.title}
+  description={description}
+  pageType={isUpcoming ? 'WebPage' : 'ImageGallery'}
+  breadcrumbs={[{ name: 'Events', path: '/events/' }, ...(isUpcoming ? [] : [{ name: 'Past events', path: '/events/past/' }]), { name: event.title, path: `/events/${event.slug}/` }]}
+  schema={[clubEventNode({ origin: siteRoot(requireSite(Astro.site)), id: `${url}#event`, url, name: event.title, description, date: event.date, where: event.where, image: toAbsolute(requireSite(Astro.site), '/og-default.png') })]}
+>
+  <CartLauncher slot="actions" client:idle />
+  <PageBanner title={event.title} kicker={isUpcoming ? 'Coming up' : 'Past event'} tiles={event.gallery.slice(0, 3)} />
+
+  <section class="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-[1fr_1.3fr]">
+    <div>
+      <p class="font-display text-xl font-extrabold uppercase"><time datetime={event.date}>{formatEventDate(event.date)}</time></p>
+      {event.where && <p class="mt-1 text-lg font-bold">{event.where}</p>}
+      <p class="mt-4 max-w-prose text-lg text-pretty">{event.summary}</p>
+      <ul class="mt-6 flex flex-col gap-2">
+        {event.highlights.map((highlight) => (
+          <li class="flex gap-3"><span aria-hidden="true" class="mt-2 size-3 shrink-0 rounded-full border-2 border-border bg-accent"></span>{highlight}</li>
+        ))}
+      </ul>
+      {event.partner && <p class="mt-6 rounded-2xl border-4 border-border bg-accent p-4 font-semibold text-accent-foreground">With {event.partner}</p>}
+      <p class="mt-6 max-w-prose">
+        {isUpcoming
+          ? <>Add it to your plans and come along. <a class="font-bold underline" href={withBase('/events/')}>See everything that is on</a>.</>
+          : <>Want to be part of the next one? Come to a <a class="font-bold underline" href={withBase('/events/')}>Monday run</a>, or <a class="font-bold underline" href={withBase('/members/')}>meet the crew</a> first.</>}
+      </p>
+    </div>
+
+    <div>
+      <h2 class="mb-4 text-3xl">{isUpcoming ? 'Gallery' : 'Gallery From The Day'}</h2>
+      <ul class="grid grid-cols-2 gap-4">
+        {event.gallery.map((id, index) => (
+          <li class="overflow-hidden rounded-3xl border-4 border-border">
+            <Image
+              src={tiles[id].image}
+              alt={tiles[id].alt}
+              widths={[320, 480, 640]}
+              sizes="(min-width: 768px) 28vw, 46vw"
+              class="aspect-square w-full object-cover"
+              loading={index === 0 ? 'eager' : 'lazy'}
+              fetchpriority={index === 0 ? 'high' : 'auto'}
+              decoding={index === 0 ? 'sync' : 'async'}
+            />
+          </li>
+        ))}
+      </ul>
+      <p class="mt-4 text-sm text-muted-foreground">More pictures from our events are on <a class="font-bold underline" href={import.meta.env.PUBLIC_INSTAGRAM_URL ?? withBase('/contact/')} rel="noopener">Instagram</a>.</p>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-6 pb-16">
+    <h2 class="mb-8 text-4xl">More From The Club</h2>
+    <ul class="grid gap-6 md:grid-cols-3">
+      {others.map((other) => <ClubEventCard event={other} upcoming={otherUpcoming.has(other.slug)} />)}
+    </ul>
+    <p class="mt-8"><a class="font-bold underline" href={withBase('/events/past/')}>All past events →</a></p>
+  </section>
+</PageLayout>

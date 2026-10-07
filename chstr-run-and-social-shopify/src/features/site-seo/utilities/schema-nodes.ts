@@ -1,5 +1,6 @@
 import { SITE_MOTTO, SITE_NAME } from '@/utilities/brand';
-import { nextSessionStart, SESSIONS, sessionEnd, TIME_ZONE, type Session } from '@/domain/session/session-schedule';
+import { nextSessionStart, SESSIONS, sessionEnd, type Session } from '@/domain/session/session-schedule';
+import { TIME_ZONE } from '@/utilities/time-zone';
 
 export interface JsonLdNode {
   '@type': string | string[];
@@ -43,7 +44,7 @@ export function websiteNode(origin: string): JsonLdNode {
   return { '@type': 'WebSite', '@id': websiteId(origin), url: at(origin, '/'), name: SITE_NAME, inLanguage: 'en-GB', publisher: { '@id': organizationId(origin) } };
 }
 
-export function webPageNode(input: { origin: string; url: string; name: string; description: string; type?: string; image?: string; hasBreadcrumb: boolean }): JsonLdNode {
+export function webPageNode(input: { origin: string; url: string; name: string; description: string; type?: string | undefined; image?: string | undefined; hasBreadcrumb: boolean }): JsonLdNode {
   return {
     '@type': input.type ?? 'WebPage',
     '@id': `${input.url}#webpage`,
@@ -118,11 +119,28 @@ export function sessionEventNode(input: { origin: string; now: Date; image: stri
   };
 }
 
+/** A one-off club event (past or upcoming). `date` is a plain calendar date; `where` is a place name when known. */
+export function clubEventNode(input: { origin: string; id: string; url: string; name: string; description: string; date: string; where?: string | undefined; image: string }): JsonLdNode {
+  return {
+    '@type': 'Event',
+    '@id': input.id,
+    url: input.url,
+    name: input.name,
+    description: input.description,
+    startDate: input.date,
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    image: [input.image],
+    ...(input.where && { location: { '@type': 'Place', name: input.where, address: { '@type': 'PostalAddress', addressCountry: 'GB' } } }),
+    organizer: { '@id': organizationId(input.origin) },
+  };
+}
+
 export interface ProductOffer {
   /** Decimal string, e.g. "20.00". */
   price: string;
   inStock: boolean;
-  name?: string;
+  name?: string | undefined;
 }
 
 export function productNode(input: { url: string; origin: string; name: string; description: string; images: string[]; offers: ProductOffer[]; sku?: string }): JsonLdNode {

@@ -1,4 +1,5 @@
 ---
+import { requireSite } from '@/utilities/require-site';
 import { Image, getImage } from 'astro:assets';
 import PageLayout from '@/layouts/PageLayout.astro';
 import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.tsx';
@@ -22,7 +23,7 @@ export async function getStaticPaths() {
 }
 
 const { product, related } = Astro.props;
-const site = Astro.site!;
+const site = requireSite(Astro.site);
 const url = toAbsolute(site, `/merchandise/${product.handle}/`);
 const absolute = (path: string) => toAbsolute(site, path);
 const description = product.description.trim();

@@ -1,42 +1,54 @@
 ---
+import { requireSite } from '@/utilities/require-site';
 import PageLayout from '@/layouts/PageLayout.astro';
 import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.tsx';
 import PageBanner from '@/features/site-shell/views/components/PageBanner.astro';
 import PanelDivider from '@/features/site-shell/views/components/PanelDivider.astro';
+import ClubEventCard from '@/features/event-browse/views/components/ClubEventCard.astro';
 import SessionCards from '@/features/event-browse/views/components/SessionCards.astro';
 import UpcomingDates from '@/features/event-browse/views/components/UpcomingDates.astro';
 import LightsNotice from '@/features/session-overview/views/components/LightsNotice.astro';
 import WhatsAppJoin from '@/features/contact-hub/views/components/WhatsAppJoin.astro';
+import { clubEvents } from '@/data/Event/club-events';
+import { splitEvents } from '@/domain/event/club-event-timing';
 import { SESSIONS } from '@/domain/session/session-schedule';
+import { sessionCopy } from '@/features/event-browse/config';
 import { sessionEventNode } from '@/features/site-seo/utilities/schema-nodes';
 import { siteRoot, toAbsolute, withBase } from '@/utilities/with-base';
 
 const now = new Date();
-const root = siteRoot(Astro.site!);
-const pageUrl = toAbsolute(Astro.site!, '/events/');
-const image = toAbsolute(Astro.site!, '/og-default.png');
-const descriptions = {
-  run: 'A free Monday run followed by a social at The Architect, Chester. All people, all paces, all welcome. Bring a light on dark nights.',
-  football: 'Thursday football at Chester University Football Pitches, Parkgate Rd, Chester CH1 4BJ. All people, all paces, all welcome.',
-};
+const { upcoming: specialEvents } = splitEvents(clubEvents, now);
+const root = siteRoot(requireSite(Astro.site));
+const pageUrl = toAbsolute(requireSite(Astro.site), '/events/');
+const image = toAbsolute(requireSite(Astro.site), '/og-default.png');
 ---
 
 <PageLayout
   title="Events and Calendar"
-  description="When CHSTR Run & Social meets: Monday runs at The Architect, Thursday football and netball in Chester. See upcoming dates and add them to your calendar."
+  description="When CHSTR Run & Social meets: Monday runs at The Architect, Thursday football and Tuesday netball in Chester. See dates and add them to your calendar."
   breadcrumbs={[{ name: 'Events', path: '/events/' }]}
   schema={[
-    sessionEventNode({ origin: root, now, image, session: SESSIONS.run, id: `${pageUrl}#run`, url: pageUrl, free: true, description: descriptions.run }),
-    sessionEventNode({ origin: root, now, image, session: SESSIONS.football, id: `${pageUrl}#football`, url: pageUrl, free: false, description: descriptions.football }),
+    sessionEventNode({ origin: root, now, image, session: SESSIONS.run, id: `${pageUrl}#run`, url: pageUrl, free: true, description: sessionCopy.run.calendar }),
+    sessionEventNode({ origin: root, now, image, session: SESSIONS.football, id: `${pageUrl}#football`, url: pageUrl, free: false, description: sessionCopy.football.calendar }),
+    sessionEventNode({ origin: root, now, image, session: SESSIONS.netball, id: `${pageUrl}#netball`, url: SESSIONS.netball.bookingUrl, free: false, description: sessionCopy.netball.calendar }),
   ]}
 >
   <CartLauncher slot="actions" client:idle />
   <PageBanner title="Events" kicker="What's on" tiles={['stopwatch', 'footballKickabout', 'netballHoop']} />
 
   <section class="mx-auto max-w-6xl px-6 py-16">
-    <p class="mb-8 max-w-prose text-lg">Run on Mondays, play football on Thursdays and book netball online. Come to one or all three: all people, all paces, all welcome.</p>
-    <SessionCards now={now} descriptions={descriptions} />
+    <p class="mb-8 max-w-prose text-lg">Run on Mondays, play netball on Tuesdays and football on Thursdays. Come to one or all three: all people, all paces, all welcome.</p>
+    <SessionCards now={now} />
   </section>
+
+  {specialEvents.length > 0 && (
+    <section class="mx-auto max-w-6xl px-6 pb-16">
+      <h2 data-reveal class="mb-6 text-4xl sm:text-5xl">Special Events</h2>
+      <ul class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {specialEvents.map((event) => <ClubEventCard event={event} upcoming headingLevel="h3" />)}
+      </ul>
+    </section>
+  )}
 
   <PanelDivider />
 
@@ -45,9 +57,10 @@ const descriptions = {
     <UpcomingDates now={now} weeks={6} />
     <div class="mt-8 flex flex-wrap gap-3">
       <a href={withBase('/chstr-sessions.ics')} download class="min-h-10 rounded-full border-4 border-border bg-accent px-6 py-3 font-display font-extrabold uppercase shadow-[0_6px_0_rgba(0,0,0,0.4)] transition-transform hover:-translate-y-0.5 active:scale-[0.96]">Download calendar file</a>
+      <a href={withBase('/events/past/')} class="min-h-10 rounded-full border-4 border-border bg-card px-6 py-3 font-display font-extrabold uppercase transition-transform hover:-translate-y-0.5 active:scale-[0.96]">See past events</a>
       <WhatsAppJoin />
     </div>
-    <p class="mt-4 max-w-prose text-sm text-muted-foreground">The calendar file adds the Monday run and Thursday football as weekly events in Apple Calendar, Outlook or any calendar app. Dates refresh every Monday.</p>
+    <p class="mt-4 max-w-prose text-sm text-muted-foreground">The calendar file adds the Monday run, Tuesday netball and Thursday football as weekly events in Apple Calendar, Outlook or any calendar app. Dates refresh every Monday.</p>
   </section>
 
   <section class="mx-auto max-w-4xl px-6 pb-16"><LightsNotice /></section>

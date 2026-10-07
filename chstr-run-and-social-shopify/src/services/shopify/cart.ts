@@ -29,13 +29,17 @@ const CART_FIELDS = `
   lines(first: 50) { nodes { id quantity merchandise { ... on ProductVariant { id title product { title handle } } } } }
 `;
 
-const mutationResult = (key: string) => z.object({ [key]: z.object({ cart: z.nullable(cartSchema) }) });
+const cartPayload = z.object({ cart: z.nullable(cartSchema) });
+const createResult = z.object({ cartCreate: cartPayload });
+const addResult = z.object({ cartLinesAdd: cartPayload });
+const updateResult = z.object({ cartLinesUpdate: cartPayload });
+const removeResult = z.object({ cartLinesRemove: cartPayload });
 
 export async function createCart(variantId: string): Promise<ShopifyCart> {
   const data = await storefrontRequest(
     `mutation CartCreate($lines: [CartLineInput!]) { cartCreate(input: { lines: $lines }) { cart { ${CART_FIELDS} } } }`,
     { lines: [{ merchandiseId: variantId, quantity: 1 }] },
-    mutationResult('cartCreate'),
+    createResult,
   );
   if (!data.cartCreate.cart) throw new Error('Shopify did not create a cart.');
   return data.cartCreate.cart;
@@ -55,7 +59,7 @@ export async function addCartLine(cartId: string, variantId: string): Promise<Sh
   const data = await storefrontRequest(
     `mutation CartAdd($cartId: ID!, $lines: [CartLineInput!]!) { cartLinesAdd(cartId: $cartId, lines: $lines) { cart { ${CART_FIELDS} } } }`,
     { cartId, lines: [{ merchandiseId: variantId, quantity: 1 }] },
-    mutationResult('cartLinesAdd'),
+    addResult,
   );
   return data.cartLinesAdd.cart;
 }
@@ -64,7 +68,7 @@ export async function updateCartLine(cartId: string, lineId: string, quantity: n
   const data = await storefrontRequest(
     `mutation CartUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) { cartLinesUpdate(cartId: $cartId, lines: $lines) { cart { ${CART_FIELDS} } } }`,
     { cartId, lines: [{ id: lineId, quantity }] },
-    mutationResult('cartLinesUpdate'),
+    updateResult,
   );
   return data.cartLinesUpdate.cart;
 }
@@ -73,7 +77,7 @@ export async function removeCartLine(cartId: string, lineId: string): Promise<Sh
   const data = await storefrontRequest(
     `mutation CartRemove($cartId: ID!, $lineIds: [ID!]!) { cartLinesRemove(cartId: $cartId, lineIds: $lineIds) { cart { ${CART_FIELDS} } } }`,
     { cartId, lineIds: [lineId] },
-    mutationResult('cartLinesRemove'),
+    removeResult,
   );
   return data.cartLinesRemove.cart;
 }

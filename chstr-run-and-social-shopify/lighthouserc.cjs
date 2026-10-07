@@ -5,7 +5,7 @@ module.exports = {
     collect: {
       staticDistDir: './dist',
       // Representative templates: home (hero collage), a content page, the shop, a product, and the new pages.
-      url: ['/index.html', '/events/index.html', '/gallery/index.html', '/faqs/index.html', '/merchandise/index.html', '/merchandise/jumper/index.html'],
+      url: ['/index.html', '/events/index.html', '/gallery/index.html', '/members/index.html', '/events/past/index.html', '/events/big-run-fyp-gym-saltney/index.html', '/faqs/index.html', '/merchandise/index.html', '/merchandise/jumper/index.html'],
       numberOfRuns: 2,
       settings: { chromeFlags: '--no-sandbox --headless=new' },
     },

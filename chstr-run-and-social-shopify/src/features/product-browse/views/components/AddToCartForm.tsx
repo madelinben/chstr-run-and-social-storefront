@@ -21,13 +21,17 @@ interface Props {
 
 export default function AddToCartForm({ name, optionLabel, variants, showVariantPrices = false }: Props) {
   const firstAvailable = variants.find((variant) => variant.availableForSale) ?? variants[0];
-  const [variantId, setVariantId] = useState(firstAvailable.id);
+  const [variantId, setVariantId] = useState(firstAvailable?.id ?? '');
   const [added, setAdded] = useState(false);
   const selected = variants.find((variant) => variant.id === variantId) ?? firstAvailable;
   const hasChoice = variants.length > 1;
 
+  // A product with no variants cannot be bought: render nothing rather than a dead button.
+  if (!selected) return null;
+  const selectedId = selected.id;
+
   async function add() {
-    await addToCart(selected.id);
+    await addToCart(selectedId);
     setAdded(true);
   }
 

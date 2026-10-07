@@ -51,6 +51,9 @@ Agent bind. Gates + scripts. Prose in `docs/`.
 | `/merchandise/[handle]` | public | built |
 | `/events` | public | built |
 | `/gallery` | public | built |
+| `/members` | public | built |
+| `/events/past` | public | built |
+| `/events/[slug]` | public | built (one per entry in `club-events.ts`) |
 | `/robots.txt`, `/sitemap-index.xml`, `/llms.txt`, `/chstr-sessions.ics` | public | generated |
 
 ## Paths

@@ -48,6 +48,10 @@ Every picture comes from `src/data/Gallery/gallery-tiles.ts` (`tiles`, `heroColu
 
 Supplier mock-ups live in `assets/images/`. `pnpm images:products` turns them into clean 800 x 800 front and back WebP views and a 1200 x 630 share image per colour in `src/assets/products/`. `src/data/Product/product-media.ts` maps them to Shopify handles; a product without an entry uses its Shopify uploads. Cards show the front and fade to the back on hover or focus; product pages show every colour's front and back. Never crop product images by hand: change the table in the script and re-run it.
 
+## Event galleries, members
+
+Special events are data in `src/data/Event/club-events.ts` (date, summary, highlights, partner, venue, gallery tiles); each gets `/events/<slug>/` and appears in the archive `/events/past/` once its date has passed (London time, decided at build). Their galleries use the illustration tiles until real photos exist: add the photo to `src/assets/gallery/`, import it in `src/data/Gallery/gallery-tiles.ts` as a new tile id, and use that id in the event's `gallery`. Leaders and Local Legends are data in `src/data/Member/members.ts`; keep their roles exactly as the club words them.
+
 ## Layout signature
 
 Vertical panel dividers between page sections, revealed on scroll. One shared `PanelDivider` component in `features/site-shell`; every page section reuses it.

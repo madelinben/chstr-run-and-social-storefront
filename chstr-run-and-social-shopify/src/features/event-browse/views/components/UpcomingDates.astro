@@ -9,7 +9,7 @@ interface Props {
 }
 const { now, weeks = 6 } = Astro.props;
 
-const dates = [SESSIONS.run, SESSIONS.football]
+const dates = [SESSIONS.run, SESSIONS.football, SESSIONS.netball]
   .flatMap((session) => upcomingStarts(now, session, weeks).map((start) => ({ session, start })))
   .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 ---

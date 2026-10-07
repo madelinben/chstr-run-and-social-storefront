@@ -13,13 +13,13 @@ import {
 
 interface Props {
   title: string;
-  absoluteTitle?: string;
+  absoluteTitle?: string | undefined;
   description: string;
-  image?: string;
-  imageAlt?: string;
+  image?: string | undefined;
+  imageAlt?: string | undefined;
   ogType?: 'website' | 'product';
   breadcrumbs?: Crumb[];
-  pageType?: string;
+  pageType?: string | undefined;
   schema?: JsonLdNode[];
   noindex?: boolean;
 }

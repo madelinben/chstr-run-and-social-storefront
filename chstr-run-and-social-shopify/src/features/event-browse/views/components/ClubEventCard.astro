@@ -1,0 +1,31 @@
+---
+import { Image } from 'astro:assets';
+import { tiles } from '@/data/Gallery/gallery-tiles';
+import type { ClubEvent } from '@/data/Event/club-events';
+import { formatEventDateShort } from '@/domain/event/club-event-timing';
+import { withBase } from '@/utilities/with-base';
+
+interface Props {
+  event: ClubEvent;
+  upcoming: boolean;
+  /** Heading level for the card title. */
+  headingLevel?: 'h2' | 'h3';
+}
+const { event, upcoming, headingLevel: Heading = 'h3' } = Astro.props;
+const cover = tiles[event.gallery[0]];
+---
+
+<li data-reveal="scale" class="tilt group flex flex-col overflow-hidden rounded-3xl border-4 border-border bg-card">
+  <a href={withBase(`/events/${event.slug}/`)} class="block overflow-hidden border-b-4 border-border" tabindex="-1" aria-hidden="true">
+    <Image src={cover.image} alt="" widths={[320, 480, 640]} sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw" class="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+  </a>
+  <div class="flex flex-1 flex-col p-5">
+    <p class="flex flex-wrap items-center gap-2 text-sm font-bold uppercase tracking-widest text-muted-foreground">
+      <time datetime={event.date}>{formatEventDateShort(event.date)}</time>
+      {upcoming && <span class="rounded-full border-2 border-border bg-accent px-2 py-0.5 text-accent-foreground">Coming up</span>}
+    </p>
+    <Heading class="mt-1 text-2xl"><a href={withBase(`/events/${event.slug}/`)}>{event.title}</a></Heading>
+    <p class="mt-2 text-pretty">{event.summary}</p>
+    <p class="mt-auto pt-4 font-bold underline"><a href={withBase(`/events/${event.slug}/`)} aria-label={`${event.title}: see the photos and details`}>{upcoming ? 'Details' : 'See the photos'} →</a></p>
+  </div>
+</li>

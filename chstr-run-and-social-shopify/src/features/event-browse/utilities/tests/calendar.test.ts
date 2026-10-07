@@ -3,10 +3,9 @@ import { SESSIONS } from '@/domain/session/session-schedule';
 import { buildIcs, escapeText, googleCalendarUrl, localBasic } from '@/features/event-browse/utilities/calendar';
 
 const now = new Date('2026-10-07T12:00:00Z');
-const entries = [
-  { session: SESSIONS.run, description: 'A free run, then a social.', url: 'https://x.test/events/' },
-  { session: SESSIONS.football, description: 'Football, Thursdays.', url: 'https://x.test/events/' },
-];
+const runEntry = { session: SESSIONS.run, description: 'A free run, then a social.', url: 'https://x.test/events/' };
+const footballEntry = { session: SESSIONS.football, description: 'Football, Thursdays.', url: 'https://x.test/events/' };
+const entries = [runEntry, footballEntry];
 
 describe('localBasic', () => {
   it('keeps the wall-clock time and drops the offset', () => {
@@ -47,7 +46,7 @@ describe('buildIcs', () => {
 
 describe('googleCalendarUrl', () => {
   it('builds a weekly TEMPLATE link with the London timezone', () => {
-    const url = new URL(googleCalendarUrl(now, entries[1]));
+    const url = new URL(googleCalendarUrl(now, footballEntry));
     expect(url.origin + url.pathname).toBe('https://calendar.google.com/calendar/render');
     expect(url.searchParams.get('dates')).toBe('20261008T200000/20261008T210000');
     expect(url.searchParams.get('ctz')).toBe('Europe/London');

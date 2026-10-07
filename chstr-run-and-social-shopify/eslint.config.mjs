@@ -14,7 +14,7 @@ const layerBoundary = (from, forbidden) => ({
 export default defineConfig(
   { ignores: ['dist', '.astro', 'node_modules', 'generated', '.lighthouseci', 'lighthouserc.cjs'] },
   js.configs.recommended,
-  ...tseslint.configs.recommended,
+  ...tseslint.configs.strict,
   ...astro.configs.recommended,
   {
     plugins: { import: importPlugin },

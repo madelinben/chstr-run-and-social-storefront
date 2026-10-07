@@ -1,0 +1,39 @@
+---
+import { requireSite } from '@/utilities/require-site';
+import PageLayout from '@/layouts/PageLayout.astro';
+import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.tsx';
+import PageBanner from '@/features/site-shell/views/components/PageBanner.astro';
+import PanelDivider from '@/features/site-shell/views/components/PanelDivider.astro';
+import ClubEventCard from '@/features/event-browse/views/components/ClubEventCard.astro';
+import SocialBand from '@/features/contact-hub/views/components/SocialBand.astro';
+import { clubEvents } from '@/data/Event/club-events';
+import { splitEvents } from '@/domain/event/club-event-timing';
+import { itemListNode } from '@/features/site-seo/utilities/schema-nodes';
+import { toAbsolute, withBase } from '@/utilities/with-base';
+
+const { past } = splitEvents(clubEvents, new Date());
+const url = toAbsolute(requireSite(Astro.site), '/events/past/');
+---
+
+<PageLayout
+  title="Past Events"
+  description="What CHSTR Run & Social has been up to: runs with Wrexham Run Club, The Big Run at FYP Gym, sign making for the Chester Marathon and more. See the photos."
+  pageType="CollectionPage"
+  breadcrumbs={[{ name: 'Events', path: '/events/' }, { name: 'Past events', path: '/events/past/' }]}
+  schema={past.length === 0 ? [] : [itemListNode(url, past.map((event) => ({ url: toAbsolute(requireSite(Astro.site), `/events/${event.slug}/`), name: event.title, image: toAbsolute(requireSite(Astro.site), '/og-default.png') })))]}
+>
+  <CartLauncher slot="actions" client:idle />
+  <PageBanner title="Past Events" kicker="What we have been up to" tiles={['finishMedal', 'friendsRunning', 'smileyCrowd']} />
+  <section class="mx-auto max-w-6xl px-6 py-16">
+    <p class="mb-10 max-w-prose text-lg">Thinking of joining? This is the club in action: runs with friends from other clubs, crafts for the Chester Marathon and a lot of good chat. Each event has its own gallery. See what is on next on the <a class="font-bold underline" href={withBase('/events/')}>events page</a>.</p>
+    {past.length === 0 ? (
+      <p>Past events will appear here once they have happened.</p>
+    ) : (
+      <ul class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {past.map((event) => <ClubEventCard event={event} upcoming={false} headingLevel="h2" />)}
+      </ul>
+    )}
+  </section>
+  <PanelDivider />
+  <SocialBand />
+</PageLayout>

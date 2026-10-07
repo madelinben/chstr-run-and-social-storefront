@@ -1,4 +1,4 @@
-export const TIME_ZONE = 'Europe/London';
+import { TIME_ZONE } from '@/utilities/time-zone';
 
 export interface Session {
   id: string;
@@ -16,6 +16,8 @@ export interface Session {
   postalCode?: string;
   locality: string;
   countryCode: 'GB';
+  /** Where to book, when the session is booked online. */
+  bookingUrl?: string;
 }
 
 /** The one source for when and where CHSTR sessions happen. Copy, calendar files, schema.org and tests all read this. */
@@ -45,6 +47,21 @@ export const SESSIONS = {
     locality: 'Chester',
     countryCode: 'GB',
   },
+  netball: {
+    id: 'netball',
+    name: 'Tuesday netball (Back to Netball)',
+    dayName: 'Tuesday',
+    weekday: 2,
+    startHour: 19,
+    startMinute: 30,
+    durationMinutes: 60,
+    venueName: 'The Cheshire County Sports Club',
+    streetAddress: 'Plas Newton Ln',
+    postalCode: 'CH2 1PR',
+    locality: 'Chester',
+    countryCode: 'GB',
+    bookingUrl: 'https://portal.sportskey.com/venues/cheshire-county-sports-club/events/PNMF01',
+  },
 } as const satisfies Record<string, Session>;
 
 export type SessionId = keyof typeof SESSIONS;
@@ -57,7 +74,8 @@ function londonParts(instant: Date) {
       .formatToParts(instant)
       .map((part) => [part.type, part.value]),
   );
-  const weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(parts.weekday);
+  const weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(parts.weekday ?? '');
+  if (weekday < 0) throw new Error('Could not read the weekday from the London date parts.');
   return { year: Number(parts.year), month: Number(parts.month), day: Number(parts.day), hour: Number(parts.hour), minute: Number(parts.minute), weekday };
 }
 

@@ -8,22 +8,16 @@ export const sessionFacts = [
   { label: 'Cost', value: 'Always Free' },
 ] as const;
 
-/** Netball is run with Chester Netball Club's Back to Netball programme. Times and booking are theirs, not ours: link out and say so. */
+/** Netball is booked online through the Back to Netball programme at the club's venue. */
 export const NETBALL = {
-  venueName: 'The Cheshire County Sports Club',
-  streetAddress: 'Plas Newton Ln',
-  postalCode: 'CH2 1PR',
-  locality: 'Chester',
   programme: 'Back to Netball',
-  programmeUrl: 'https://www.chesternetballclub.org/back-to-netball',
-  /** Listed on the programme page when this was written; confirm before relying on it. */
-  listedTimes: 'Tuesdays, 8:00pm to 9:30pm',
+  session: SESSIONS.netball,
 } as const;
 
 export const activities = [
   { name: 'Running', note: 'Every Monday at 18:30, whatever your pace.', tile: 'sprintSunrise', color: 'bg-secondary', href: '/events/' },
   { name: 'Football', note: 'Thursdays, 8pm to 9pm at Chester University Football Pitches.', tile: 'footballKickabout', color: 'bg-accent', href: '/events/' },
-  { name: 'Netball', note: 'Book online through Back to Netball at The Cheshire County Sports Club.', tile: 'netballHoop', color: 'bg-card', href: '/events/' },
+  { name: 'Netball', note: 'Tuesdays, 7:30pm to 8:30pm at The Cheshire County Sports Club. Book online through Back to Netball.', tile: 'netballHoop', color: 'bg-card', href: '/events/' },
   { name: 'Social Nights', note: 'Out together in Chester.', tile: 'socialNight', color: 'bg-secondary', href: '/gallery/' },
 ] as const;
 

@@ -1,4 +1,5 @@
 import type { ImageMetadata } from 'astro';
+import type { NonEmpty } from '@/utilities/non-empty';
 import sprintSunrise from '@/assets/gallery/sprint-sunrise.webp';
 import friendsRunning from '@/assets/gallery/friends-running.webp';
 import pintCheers from '@/assets/gallery/pint-cheers.webp';
@@ -54,14 +55,22 @@ export const tiles = {
 
 export type TileId = keyof typeof tiles;
 
+export interface HeroColumn {
+  tiles: NonEmpty<TileId>;
+  /** Seconds for one full loop. Different per column so the mosaic never moves in lockstep. */
+  seconds: number;
+  /** Drift downwards instead of upwards. */
+  reverse: boolean;
+}
+
 /** Six drifting columns of the hero collage. Mixed portrait, square and landscape tiles for a mosaic rhythm. */
-export const heroColumns: TileId[][] = [
-  ['sprintSunrise', 'wordMondays', 'friendsRunning', 'bagDrop'],
-  ['pintCheers', 'chesterRoute', 'netballHoop', 'smileyCrowd'],
-  ['hillSunset', 'stopwatch', 'socialNight', 'trainersLaces'],
-  ['footballKickabout', 'speechBubbles', 'finishMedal', 'wordFree'],
-  ['nightRun', 'bubbleCluster', 'citySkyline', 'pintCheers'],
-  ['netballHoop', 'wordFree', 'friendsRunning', 'sprintSunrise'],
+export const heroColumns: readonly HeroColumn[] = [
+  { tiles: ['sprintSunrise', 'wordMondays', 'friendsRunning', 'bagDrop'], seconds: 70, reverse: false },
+  { tiles: ['pintCheers', 'chesterRoute', 'netballHoop', 'smileyCrowd'], seconds: 55, reverse: true },
+  { tiles: ['hillSunset', 'stopwatch', 'socialNight', 'trainersLaces'], seconds: 85, reverse: false },
+  { tiles: ['footballKickabout', 'speechBubbles', 'finishMedal', 'wordFree'], seconds: 62, reverse: true },
+  { tiles: ['nightRun', 'bubbleCluster', 'citySkyline', 'pintCheers'], seconds: 75, reverse: false },
+  { tiles: ['netballHoop', 'wordFree', 'friendsRunning', 'sprintSunrise'], seconds: 58, reverse: true },
 ];
 
 /** Gallery section: nine tiles, shown in a masonry flow. */

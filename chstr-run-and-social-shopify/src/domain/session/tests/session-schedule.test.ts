@@ -50,3 +50,16 @@ describe('upcomingStarts', () => {
     expect(upcomingStarts(new Date('2026-10-19T12:00:00Z'), SESSIONS.run, 2)).toEqual(['2026-10-19T18:30:00+01:00', '2026-10-26T18:30:00+00:00']);
   });
 });
+
+describe('netball (Tuesday 19:30-20:30, booked online)', () => {
+  it('finds the next Tuesday and ends an hour later', () => {
+    const start = nextSessionStart(new Date('2026-10-07T10:00:00Z'), SESSIONS.netball);
+    expect(start).toBe('2026-10-13T19:30:00+01:00');
+    expect(sessionEnd(start, SESSIONS.netball)).toBe('2026-10-13T20:30:00+01:00');
+  });
+
+  it('carries the booking link and the full venue address', () => {
+    expect(SESSIONS.netball.bookingUrl).toBe('https://portal.sportskey.com/venues/cheshire-county-sports-club/events/PNMF01');
+    expect(SESSIONS.netball.postalCode).toBe('CH2 1PR');
+  });
+});

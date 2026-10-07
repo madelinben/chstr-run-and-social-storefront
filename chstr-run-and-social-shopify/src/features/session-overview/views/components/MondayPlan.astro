@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import { tiles } from '@/data/Gallery/gallery-tiles';
+import { ROUTE_NOTE } from '@/utilities/brand';
 import { mondaySteps } from '@/features/session-overview/config';
 ---
 
@@ -19,4 +20,11 @@ import { mondaySteps } from '@/features/session-overview/config';
       </li>
     ))}
   </ol>
+  <aside data-reveal class="mt-10 flex items-center gap-4 rounded-3xl border-4 border-border bg-accent p-5 text-accent-foreground sm:p-6">
+    <svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true" class="shrink-0"><path d="M8 38c10-4 6-14 14-16s10 6 18-10" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" /><circle cx="8" cy="38" r="4" fill="currentColor" /><circle cx="40" cy="12" r="4" fill="currentColor" /></svg>
+    <div>
+      <h3 class="text-2xl">A New Route Most Weeks</h3>
+      <p class="mt-1 max-w-prose text-lg">{ROUTE_NOTE}</p>
+    </div>
+  </aside>
 </section>
