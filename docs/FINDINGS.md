@@ -61,6 +61,7 @@ Where these live in code: `src/domain/session/session-schedule.ts` (weekly times
 - **A shared `check:site` gate** catches regressions that tests miss: missing images after a missing dependency, broken base-path links, descriptions that are too short, a sitemap without a page, an orphaned page.
 - **Calendar text escaping**: a `;` in event text silently broke the `.ics` format until escaping was fixed and tested. A linter flagged it.
 - **Timezones**: session times are computed in `Europe/London`, with unit tests across both clock changes.
+- **CI timing flake**: axe once sampled the banner label while its entrance animation was still fading in, reporting a contrast failure on the slower CI machine only. The accessibility tests now run with reduced motion (which the site honours), so they never sample text mid-animation.
 - **Mobile**: the header wrapped to three lines until the nav became one scrollable row; the reveal effect pushed content a few pixels off-screen until `overflow-x: clip` was added to `main`.
 
 ## 6. Product images
