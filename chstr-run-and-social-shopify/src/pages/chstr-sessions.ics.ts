@@ -1,6 +1,6 @@
 import { requireSite } from '@/utilities/require-site';
 import type { APIRoute } from 'astro';
-import { SESSIONS } from '@/domain/session/session-schedule';
+import { SESSIONS } from '@/data/Content/sessions';
 import { sessionCopy } from '@/features/event-browse/config';
 import { buildIcs } from '@/features/event-browse/utilities/calendar';
 import { toAbsolute } from '@/utilities/with-base';

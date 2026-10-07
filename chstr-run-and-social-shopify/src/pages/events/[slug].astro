@@ -1,4 +1,5 @@
 ---
+import { socialLinks } from '@/data/Content/settings';
 import { requireSite } from '@/utilities/require-site';
 import { Image } from 'astro:assets';
 import PageLayout from '@/layouts/PageLayout.astro';
@@ -6,7 +7,7 @@ import CartLauncher from '@/features/cart-manage/views/components/CartLauncher.t
 import PageBanner from '@/features/site-shell/views/components/PageBanner.astro';
 import ClubEventCard from '@/features/event-browse/views/components/ClubEventCard.astro';
 import { clubEvents, type ClubEvent } from '@/data/Event/club-events';
-import { tiles } from '@/data/Gallery/gallery-tiles';
+import { getTile } from '@/data/Gallery/gallery-tiles';
 import { formatEventDate, splitEvents } from '@/domain/event/club-event-timing';
 import { clubEventNode } from '@/features/site-seo/utilities/schema-nodes';
 import { siteRoot, toAbsolute, withBase } from '@/utilities/with-base';
@@ -62,8 +63,8 @@ const description = `${event.summary} ${isUpcoming ? 'Coming up with' : 'A past 
         {event.gallery.map((id, index) => (
           <li class="overflow-hidden rounded-3xl border-4 border-border">
             <Image
-              src={tiles[id].image}
-              alt={tiles[id].alt}
+              src={getTile(id).image}
+              alt={getTile(id).alt}
               widths={[320, 480, 640]}
               sizes="(min-width: 768px) 28vw, 46vw"
               class="aspect-square w-full object-cover"
@@ -74,7 +75,7 @@ const description = `${event.summary} ${isUpcoming ? 'Coming up with' : 'A past 
           </li>
         ))}
       </ul>
-      <p class="mt-4 text-sm text-muted-foreground">More pictures from our events are on <a class="font-bold underline" href={import.meta.env.PUBLIC_INSTAGRAM_URL ?? withBase('/contact/')} rel="noopener">Instagram</a>.</p>
+      <p class="mt-4 text-sm text-muted-foreground">More pictures from our events are on <a class="font-bold underline" href={socialLinks.instagram ?? withBase('/contact/')} rel="noopener">Instagram</a>.</p>
     </div>
   </section>
 

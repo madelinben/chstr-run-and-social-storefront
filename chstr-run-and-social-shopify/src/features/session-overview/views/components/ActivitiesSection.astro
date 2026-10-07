@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import { tiles } from '@/data/Gallery/gallery-tiles';
+import { getTile } from '@/data/Gallery/gallery-tiles';
 import { activities } from '@/features/session-overview/config';
 ---
 
@@ -9,7 +9,7 @@ import { activities } from '@/features/session-overview/config';
   <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
     {activities.map((activity, index) => (
       <li data-reveal="scale" style={`--reveal-delay:${index * 90}ms`} class={`${activity.color} tilt group overflow-hidden rounded-3xl border-4 border-border`}>
-        <Image src={tiles[activity.tile].image} alt={tiles[activity.tile].alt} widths={[320, 480]} sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 90vw" class="aspect-square w-full border-b-4 border-border object-cover transition-transform duration-500 group-hover:scale-105" />
+        <Image src={getTile(activity.tile).image} alt={getTile(activity.tile).alt} widths={[320, 480]} sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 90vw" class="aspect-square w-full border-b-4 border-border object-cover transition-transform duration-500 group-hover:scale-105" />
         <div class="p-5">
           <h3 class="text-2xl">{activity.name}</h3>
           <p class="mt-1">{activity.note}</p>

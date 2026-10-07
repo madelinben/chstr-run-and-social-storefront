@@ -23,7 +23,7 @@ const url = toAbsolute(requireSite(Astro.site), '/events/past/');
   schema={past.length === 0 ? [] : [itemListNode(url, past.map((event) => ({ url: toAbsolute(requireSite(Astro.site), `/events/${event.slug}/`), name: event.title, image: toAbsolute(requireSite(Astro.site), '/og-default.png') })))]}
 >
   <CartLauncher slot="actions" client:idle />
-  <PageBanner title="Past Events" kicker="What we have been up to" tiles={['finishMedal', 'friendsRunning', 'smileyCrowd']} />
+  <PageBanner title="Past Events" kicker="What we have been up to" tiles={['finish-medal', 'friends-running', 'smiley-crowd']} />
   <section class="mx-auto max-w-6xl px-6 py-16">
     <p class="mb-10 max-w-prose text-lg">Thinking of joining? This is the club in action: runs with friends from other clubs, crafts for the Chester Marathon and a lot of good chat. Each event has its own gallery. See what is on next on the <a class="font-bold underline" href={withBase('/events/')}>events page</a>.</p>
     {past.length === 0 ? (

@@ -20,7 +20,7 @@ const url = toAbsolute(requireSite(Astro.site), '/faqs/');
   schema={faqs.length > 0 ? [faqPageNode(url, faqs)] : []}
 >
   <CartLauncher slot="actions" client:idle />
-  <PageBanner title="FAQs" kicker="Good to know" tiles={['speechBubbles', 'bagDrop', 'stopwatch']} />
+  <PageBanner title="FAQs" kicker="Good to know" tiles={['speech-bubbles', 'bag-drop', 'stopwatch-1830']} />
   <section class="mx-auto max-w-3xl px-6 py-16">
     <FaqAccordion />
   </section>

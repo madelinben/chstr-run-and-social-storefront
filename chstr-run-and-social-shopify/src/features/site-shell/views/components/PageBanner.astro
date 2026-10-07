@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import { tiles, type TileId } from '@/data/Gallery/gallery-tiles';
+import { getTile, type TileId } from '@/data/Gallery/gallery-tiles';
 
 interface Props {
   title: string;
@@ -20,7 +20,7 @@ const rotations = ['-rotate-6', 'rotate-3', '-rotate-2'];
     <ul aria-hidden="true" class="hidden gap-3 md:flex">
       {tileIds.map((id, index) => (
         <li class={`hero-tile ${rotations[index % 3]} w-32 overflow-hidden rounded-2xl border-4 border-card lg:w-40`} style={`--i:${index + 2}`}>
-          <Image src={tiles[id].image} alt="" widths={[160, 320]} sizes="160px" class="aspect-square w-full object-cover" loading="eager" decoding="async" />
+          <Image src={getTile(id).image} alt="" widths={[160, 320]} sizes="160px" class="aspect-square w-full object-cover" loading="eager" decoding="async" />
         </li>
       ))}
     </ul>

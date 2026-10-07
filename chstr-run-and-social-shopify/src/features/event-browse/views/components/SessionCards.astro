@@ -1,7 +1,8 @@
 ---
-import { SESSIONS, nextSessionStart, sessionEnd, type Session, type SessionId } from '@/domain/session/session-schedule';
+import { nextSessionStart, sessionEnd, type Session } from '@/domain/session/session-schedule';
+import { SESSIONS, type SessionId } from '@/data/Content/sessions';
 import { sessionCopy } from '@/features/event-browse/config';
-import { ROUTE_NOTE } from '@/utilities/brand';
+import { ROUTE_NOTE } from '@/data/Content/settings';
 import { googleCalendarUrl, locationText } from '@/features/event-browse/utilities/calendar';
 import { formatSessionDay, formatSessionTime } from '@/features/event-browse/utilities/format-session';
 

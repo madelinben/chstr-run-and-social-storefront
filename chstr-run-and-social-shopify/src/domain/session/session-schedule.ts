@@ -1,7 +1,7 @@
 import { TIME_ZONE } from '@/utilities/time-zone';
 
 export interface Session {
-  id: string;
+  id: 'run' | 'football' | 'netball';
   /** Public name, e.g. "Monday run and social". */
   name: string;
   dayName: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
@@ -19,52 +19,6 @@ export interface Session {
   /** Where to book, when the session is booked online. */
   bookingUrl?: string;
 }
-
-/** The one source for when and where CHSTR sessions happen. Copy, calendar files, schema.org and tests all read this. */
-export const SESSIONS = {
-  run: {
-    id: 'run',
-    name: 'Monday run and social',
-    dayName: 'Monday',
-    weekday: 1,
-    startHour: 18,
-    startMinute: 30,
-    venueName: 'The Architect',
-    locality: 'Chester',
-    countryCode: 'GB',
-  },
-  football: {
-    id: 'football',
-    name: 'Thursday football',
-    dayName: 'Thursday',
-    weekday: 4,
-    startHour: 20,
-    startMinute: 0,
-    durationMinutes: 60,
-    venueName: 'Chester University Football Pitches',
-    streetAddress: 'Parkgate Rd',
-    postalCode: 'CH1 4BJ',
-    locality: 'Chester',
-    countryCode: 'GB',
-  },
-  netball: {
-    id: 'netball',
-    name: 'Tuesday netball (Back to Netball)',
-    dayName: 'Tuesday',
-    weekday: 2,
-    startHour: 19,
-    startMinute: 30,
-    durationMinutes: 60,
-    venueName: 'The Cheshire County Sports Club',
-    streetAddress: 'Plas Newton Ln',
-    postalCode: 'CH2 1PR',
-    locality: 'Chester',
-    countryCode: 'GB',
-    bookingUrl: 'https://portal.sportskey.com/venues/cheshire-county-sports-club/events/PNMF01',
-  },
-} as const satisfies Record<string, Session>;
-
-export type SessionId = keyof typeof SESSIONS;
 
 const pad = (value: number) => String(value).padStart(2, '0');
 

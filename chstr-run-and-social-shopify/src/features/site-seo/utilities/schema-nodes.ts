@@ -1,5 +1,7 @@
-import { SITE_MOTTO, SITE_NAME } from '@/utilities/brand';
-import { nextSessionStart, SESSIONS, sessionEnd, type Session } from '@/domain/session/session-schedule';
+import { SITE_MOTTO } from '@/data/Content/settings';
+import { SITE_NAME } from '@/utilities/brand';
+import { nextSessionStart, sessionEnd, type Session } from '@/domain/session/session-schedule';
+import { SESSIONS } from '@/data/Content/sessions';
 import { TIME_ZONE } from '@/utilities/time-zone';
 
 export interface JsonLdNode {

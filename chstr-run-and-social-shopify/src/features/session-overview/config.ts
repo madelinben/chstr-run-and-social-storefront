@@ -1,4 +1,6 @@
-import { SESSIONS } from '@/domain/session/session-schedule';
+import { SESSIONS } from '@/data/Content/sessions';
+import { siteContent } from '@/data/Content/site-content';
+import type { Tone } from '@/data/Content/schemas';
 
 const hhmm = (hour: number, minute: number) => `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 
@@ -14,15 +16,9 @@ export const NETBALL = {
   session: SESSIONS.netball,
 } as const;
 
-export const activities = [
-  { name: 'Running', note: 'Every Monday at 18:30, whatever your pace.', tile: 'sprintSunrise', color: 'bg-secondary', href: '/events/' },
-  { name: 'Football', note: 'Thursdays, 8pm to 9pm at Chester University Football Pitches.', tile: 'footballKickabout', color: 'bg-accent', href: '/events/' },
-  { name: 'Netball', note: 'Tuesdays, 7:30pm to 8:30pm at The Cheshire County Sports Club. Book online through Back to Netball.', tile: 'netballHoop', color: 'bg-card', href: '/events/' },
-  { name: 'Social Nights', note: 'Out together in Chester.', tile: 'socialNight', color: 'bg-secondary', href: '/gallery/' },
-] as const;
+/** Card colours the design uses, by the plain names the admin offers. */
+export const toneClass: Record<Tone, string> = { lime: 'bg-accent', pale: 'bg-secondary', white: 'bg-card' };
 
-export const mondaySteps = [
-  { title: 'Turn up', text: 'Find the crew at The Architect. Drop your bag, say hello, nobody minds if you are new.', tile: 'bagDrop' },
-  { title: 'Run your way', text: 'Pace groups for every runner. Go steady, go fast, or run and chat. It is a run and social, not a race.', tile: 'friendsRunning' },
-  { title: 'Stay for the social', text: 'Back to The Architect afterwards. Cool down with a drink and the people you just ran with.', tile: 'pintCheers' },
-] as const;
+export const activities = siteContent.home.activities.map((activity) => ({ ...activity, tile: activity.picture, color: toneClass[activity.tone] }));
+
+export const mondaySteps = siteContent.home.mondaySteps.map((step) => ({ ...step, tile: step.picture }));

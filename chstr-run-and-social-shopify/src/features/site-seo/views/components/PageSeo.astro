@@ -1,4 +1,5 @@
 ---
+import { socialLinks } from '@/data/Content/settings';
 import { siteRoot, withBase } from '@/utilities/with-base';
 import { SITE_NAME } from '@/utilities/brand';
 import { buildTitle } from '@/features/site-seo/utilities/meta-text';
@@ -43,9 +44,9 @@ const ogImage = /^https?:\/\//.test(rawImage) ? rawImage : new URL(rawImage, sit
 const ogImageAlt = image && !image.endsWith('.svg') && imageAlt ? imageAlt : `${SITE_NAME}: a free run and social club in Chester`;
 
 const crumbs: Crumb[] = breadcrumbs.length > 0 ? [{ name: 'Home', path: '/' }, ...breadcrumbs] : [];
-const sameAs = [import.meta.env.PUBLIC_INSTAGRAM_URL, import.meta.env.PUBLIC_FACEBOOK_URL].filter((url): url is string => Boolean(url));
+const sameAs = [socialLinks.instagram, socialLinks.facebook].filter((url): url is string => Boolean(url));
 const graph: JsonLdNode[] = [
-  organizationNode({ origin, sameAs, email: import.meta.env.PUBLIC_CONTACT_EMAIL, whatsapp: import.meta.env.PUBLIC_WHATSAPP_NUMBER }),
+  organizationNode({ origin, sameAs, ...(socialLinks.email && { email: socialLinks.email }), ...(socialLinks.whatsappNumber && { whatsapp: socialLinks.whatsappNumber }) }),
   websiteNode(origin),
   webPageNode({ origin, url: canonical, name: fullTitle, description, type: pageType, image: ogImage, hasBreadcrumb: crumbs.length > 0 }),
   ...(crumbs.length > 0 ? [breadcrumbNode(origin, canonical, crumbs)] : []),

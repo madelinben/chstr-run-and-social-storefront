@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { nextSessionStart, SESSIONS, sessionEnd, upcomingStarts } from '@/domain/session/session-schedule';
+import { nextSessionStart, sessionEnd, upcomingStarts } from '@/domain/session/session-schedule';
+import { SESSIONS } from '@/data/Content/sessions';
 
 describe('nextSessionStart', () => {
   it('is later the same Monday before 18:30 (BST)', () => {

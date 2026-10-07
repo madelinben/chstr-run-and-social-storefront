@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SESSIONS } from '@/domain/session/session-schedule';
+import { SESSIONS } from '@/data/Content/sessions';
 import { breadcrumbNode, faqPageNode, organizationNode, productNode, sessionEventNode } from '@/features/site-seo/utilities/schema-nodes';
 
 const origin = 'https://www.example.test';

@@ -1,24 +1,6 @@
 import type { ImageMetadata } from 'astro';
-import type { NonEmpty } from '@/utilities/non-empty';
-import sprintSunrise from '@/assets/gallery/sprint-sunrise.webp';
-import friendsRunning from '@/assets/gallery/friends-running.webp';
-import pintCheers from '@/assets/gallery/pint-cheers.webp';
-import footballKickabout from '@/assets/gallery/football-kickabout.webp';
-import netballHoop from '@/assets/gallery/netball-hoop.webp';
-import trainersLaces from '@/assets/gallery/trainers-laces.webp';
-import chesterRoute from '@/assets/gallery/chester-route.webp';
-import stopwatch from '@/assets/gallery/stopwatch-1830.webp';
-import speechBubbles from '@/assets/gallery/speech-bubbles.webp';
-import finishMedal from '@/assets/gallery/finish-medal.webp';
-import hillSunset from '@/assets/gallery/hill-sunset.webp';
-import wordMondays from '@/assets/gallery/word-mondays.webp';
-import wordFree from '@/assets/gallery/word-free.webp';
-import smileyCrowd from '@/assets/gallery/smiley-crowd.webp';
-import bagDrop from '@/assets/gallery/bag-drop.webp';
-import citySkyline from '@/assets/gallery/city-skyline.webp';
-import socialNight from '@/assets/gallery/social-night.webp';
-import bubbleCluster from '@/assets/gallery/bubble-cluster.webp';
-import nightRun from '@/assets/gallery/night-run.webp';
+import { pictureImages, siteContent } from '@/data/Content/site-content';
+import { toNonEmpty, type NonEmpty } from '@/utilities/non-empty';
 
 export interface GalleryTile {
   image: ImageMetadata;
@@ -26,34 +8,22 @@ export interface GalleryTile {
   alt: string;
 }
 
-/**
- * Every picture the site uses, in one place. To use a real photo: drop it into `src/assets/gallery/`
- * (descriptive hyphenated name, e.g. `monday-run-chester.jpg`), import it above and swap the entry.
- * Astro converts it to AVIF/WebP at build; keep originals under about 3000 px wide.
- */
-export const tiles = {
-  sprintSunrise: { image: sprintSunrise, alt: 'Illustration of a runner sprinting past a big lime sun' },
-  friendsRunning: { image: friendsRunning, alt: 'Illustration of three friends running together' },
-  pintCheers: { image: pintCheers, alt: 'Illustration of two pints clinking cheers' },
-  footballKickabout: { image: footballKickabout, alt: 'Illustration of a football heading for the goal' },
-  netballHoop: { image: netballHoop, alt: 'Illustration of a netball dropping through a hoop' },
-  trainersLaces: { image: trainersLaces, alt: 'Illustration of a running trainer' },
-  chesterRoute: { image: chesterRoute, alt: 'Illustration of a winding run route on a map' },
-  stopwatch: { image: stopwatch, alt: 'Illustration of a stopwatch reading 18:30' },
-  speechBubbles: { image: speechBubbles, alt: 'Illustration of speech bubbles saying pace, chat, lap 2 and pint' },
-  finishMedal: { image: finishMedal, alt: 'Illustration of a first run medal with confetti' },
-  hillSunset: { image: hillSunset, alt: 'Illustration of a runner on hills at sunset' },
-  wordMondays: { image: wordMondays, alt: 'The words Mondays at 18:30' },
-  wordFree: { image: wordFree, alt: 'The words always free, no catch' },
-  smileyCrowd: { image: smileyCrowd, alt: 'Illustration of a crowd of smiling faces' },
-  bagDrop: { image: bagDrop, alt: 'Illustration of a backpack for the bag drop' },
-  citySkyline: { image: citySkyline, alt: 'Illustration of a city skyline with The Architect sign' },
-  socialNight: { image: socialNight, alt: 'Illustration of a cocktail under a disco ball' },
-  bubbleCluster: { image: bubbleCluster, alt: 'Illustration of CHSTR bubbles' },
-  nightRun: { image: nightRun, alt: 'Illustration of two runners out at night' },
-} satisfies Record<string, GalleryTile>;
+/** Every picture in the library, from `src/content/site/pictures.json` plus the image files in `src/assets/gallery` and `src/assets/uploads`. */
+export const tiles: Readonly<Record<string, GalleryTile>> = Object.fromEntries(
+  siteContent.pictures.flatMap((picture) => {
+    const image = pictureImages.get(picture.id);
+    return image ? [[picture.id, { image, alt: picture.alt }]] : [];
+  }),
+);
 
-export type TileId = keyof typeof tiles;
+export type TileId = string;
+
+/** The picture for an id. Content checks guarantee it exists, so a miss is a bug worth failing the build for. */
+export function getTile(id: TileId): GalleryTile {
+  const tile = tiles[id];
+  if (!tile) throw new Error(`No picture with id "${id}" in the library.`);
+  return tile;
+}
 
 export interface HeroColumn {
   tiles: NonEmpty<TileId>;
@@ -63,18 +33,23 @@ export interface HeroColumn {
   reverse: boolean;
 }
 
-/** Six drifting columns of the hero collage. Mixed portrait, square and landscape tiles for a mosaic rhythm. */
-export const heroColumns: readonly HeroColumn[] = [
-  { tiles: ['sprintSunrise', 'wordMondays', 'friendsRunning', 'bagDrop'], seconds: 70, reverse: false },
-  { tiles: ['pintCheers', 'chesterRoute', 'netballHoop', 'smileyCrowd'], seconds: 55, reverse: true },
-  { tiles: ['hillSunset', 'stopwatch', 'socialNight', 'trainersLaces'], seconds: 85, reverse: false },
-  { tiles: ['footballKickabout', 'speechBubbles', 'finishMedal', 'wordFree'], seconds: 62, reverse: true },
-  { tiles: ['nightRun', 'bubbleCluster', 'citySkyline', 'pintCheers'], seconds: 75, reverse: false },
-  { tiles: ['netballHoop', 'wordFree', 'friendsRunning', 'sprintSunrise'], seconds: 58, reverse: true },
-];
+const COLUMN_SECONDS = [70, 55, 85, 62, 75, 58] as const;
+const TILES_PER_COLUMN = 4;
 
-/** Gallery section: nine tiles, shown in a masonry flow. */
-export const galleryTiles: TileId[] = ['hillSunset', 'smileyCrowd', 'sprintSunrise', 'chesterRoute', 'pintCheers', 'finishMedal', 'friendsRunning', 'citySkyline', 'socialNight'];
+const heroIds = siteContent.pictures.filter((picture) => picture.hero).map((picture) => picture.id);
 
-/** Every picture, for the gallery page. */
-export const allTileIds = Object.keys(tiles) as TileId[];
+/** Six drifting columns of the hero collage, filled round-robin from the pictures marked for it. */
+export const heroColumns: readonly HeroColumn[] = COLUMN_SECONDS.map((seconds, column) => {
+  const ids = Array.from({ length: TILES_PER_COLUMN }, (_, row) => heroIds[(column + row * COLUMN_SECONDS.length) % heroIds.length]).filter((id): id is string => id !== undefined);
+  const columnTiles = toNonEmpty(ids);
+  if (!columnTiles) throw new Error('Mark at least one picture for the home collage.');
+  return { tiles: columnTiles, seconds, reverse: column % 2 === 1 };
+});
+
+const galleryIds = siteContent.pictures.filter((picture) => picture.gallery).map((picture) => picture.id);
+
+/** Home page gallery section: the first nine gallery pictures. */
+export const galleryTiles: TileId[] = galleryIds.slice(0, 9);
+
+/** Every gallery picture, for the gallery page. */
+export const allTileIds: TileId[] = galleryIds;

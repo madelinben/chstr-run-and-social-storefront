@@ -1,0 +1,48 @@
+{
+  "leaders": [
+    {
+      "name": "Corey",
+      "role": "Runs the social and the football",
+      "welcome": "Find Corey for the after-run chat at The Architect or a Thursday kickabout.",
+      "kudos": "Social segment leader",
+      "tone": "lime"
+    },
+    {
+      "name": "Emily",
+      "role": "Plans the routes · ASICS FrontRunner",
+      "welcome": "Ask Emily about the route of the week. She plans them with Nathan.",
+      "kudos": "Route planner, FrontRunner",
+      "tone": "pale"
+    },
+    {
+      "name": "Nathan",
+      "role": "Plans the routes",
+      "welcome": "Ask Nathan which way we are heading. A new route most weeks keeps him busy.",
+      "kudos": "Route planner, new loop most weeks",
+      "tone": "white"
+    }
+  ],
+  "legends": [],
+  "glossary": [
+    {
+      "term": "Kudos",
+      "meaning": "A thumbs up for anyone who turned up, whatever the weather or the pace."
+    },
+    {
+      "term": "Fly-by",
+      "meaning": "Spotted someone new at The Architect? Say hello. That is how every regular started."
+    },
+    {
+      "term": "Personal best",
+      "meaning": "Your first run with us counts. So does your first lap of the social."
+    },
+    {
+      "term": "Local Legend",
+      "meaning": "On Strava it goes to whoever shows up most. Here it goes to the people who make Monday what it is."
+    },
+    {
+      "term": "Segment",
+      "meaning": "The stretch between the last hill and the first drink."
+    }
+  ]
+}

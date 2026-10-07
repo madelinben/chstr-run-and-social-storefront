@@ -1,7 +1,8 @@
 ---
+import { socialLinks } from '@/data/Content/settings';
 import { Image } from 'astro:assets';
-import { galleryTiles, tiles } from '@/data/Gallery/gallery-tiles';
-const instagram = import.meta.env.PUBLIC_INSTAGRAM_URL;
+import { galleryTiles, getTile } from '@/data/Gallery/gallery-tiles';
+const instagram = socialLinks.instagram;
 ---
 
 <section class="border-y-4 border-border bg-foreground py-20 text-background">
@@ -11,7 +12,7 @@ const instagram = import.meta.env.PUBLIC_INSTAGRAM_URL;
     <ul class="columns-2 gap-4 md:columns-3">
       {galleryTiles.map((id, index) => (
         <li data-reveal="scale" style={`--reveal-delay:${(index % 3) * 90}ms`} class="tilt mb-4 break-inside-avoid overflow-hidden rounded-3xl border-4 border-card">
-          <Image src={tiles[id].image} alt={tiles[id].alt} widths={[320, 480, 640]} sizes="(min-width: 768px) 30vw, 46vw" class="h-auto w-full" />
+          <Image src={getTile(id).image} alt={getTile(id).alt} widths={[320, 480, 640]} sizes="(min-width: 768px) 30vw, 46vw" class="h-auto w-full" />
         </li>
       ))}
     </ul>

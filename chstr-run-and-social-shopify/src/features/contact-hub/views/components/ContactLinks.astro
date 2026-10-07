@@ -1,12 +1,14 @@
 ---
-const email = import.meta.env.PUBLIC_CONTACT_EMAIL;
-const whatsappNumber = import.meta.env.PUBLIC_WHATSAPP_NUMBER;
+import { socialLinks } from '@/data/Content/settings';
+const email = socialLinks.email;
+const whatsappNumber = socialLinks.whatsappNumber;
 const links = [
+  socialLinks.whatsappGroup && { label: 'WhatsApp group', detail: 'Join the club chat', href: socialLinks.whatsappGroup, color: 'bg-success text-success-foreground' },
   email && { label: 'Email', detail: email, href: `mailto:${email}`, color: 'bg-accent' },
   whatsappNumber && { label: 'WhatsApp', detail: 'Message us', href: `https://wa.me/${whatsappNumber}`, color: 'bg-success text-success-foreground' },
-  import.meta.env.PUBLIC_INSTAGRAM_URL && { label: 'Instagram', detail: 'Follow along', href: import.meta.env.PUBLIC_INSTAGRAM_URL, color: 'bg-primary text-primary-foreground' },
-  import.meta.env.PUBLIC_FACEBOOK_URL && { label: 'Facebook', detail: 'Join the group', href: import.meta.env.PUBLIC_FACEBOOK_URL, color: 'bg-secondary' },
-].filter((link) => link !== undefined && link !== '');
+  socialLinks.instagram && { label: 'Instagram', detail: 'Follow along', href: socialLinks.instagram, color: 'bg-primary text-primary-foreground' },
+  socialLinks.facebook && { label: 'Facebook', detail: 'Join the group', href: socialLinks.facebook, color: 'bg-secondary' },
+].filter((link) => typeof link === 'object');
 ---
 
 {links.length === 0 ? (

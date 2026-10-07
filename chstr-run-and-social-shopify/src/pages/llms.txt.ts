@@ -1,8 +1,9 @@
 import { requireSite } from '@/utilities/require-site';
 import type { APIRoute } from 'astro';
-import { SESSIONS } from '@/domain/session/session-schedule';
+import { SESSIONS } from '@/data/Content/sessions';
 import { locationText } from '@/features/event-browse/utilities/calendar';
-import { ROUTE_NOTE, SITE_MOTTO, SITE_NAME } from '@/utilities/brand';
+import { ROUTE_NOTE, SITE_MOTTO, socialLinks } from '@/data/Content/settings';
+import { SITE_NAME } from '@/utilities/brand';
 import { toAbsolute } from '@/utilities/with-base';
 
 const hhmm = (hour: number, minute: number) => `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
@@ -12,9 +13,9 @@ export const GET: APIRoute = ({ site }) => {
   const page = (path: string) => toAbsolute(requireSite(site), path);
   const { run, football, netball } = SESSIONS;
   const socials = [
-    import.meta.env.PUBLIC_INSTAGRAM_URL && `- [Instagram](${import.meta.env.PUBLIC_INSTAGRAM_URL})`,
-    import.meta.env.PUBLIC_FACEBOOK_URL && `- [Facebook](${import.meta.env.PUBLIC_FACEBOOK_URL})`,
-    import.meta.env.PUBLIC_WHATSAPP_GROUP_URL && `- [WhatsApp group](${import.meta.env.PUBLIC_WHATSAPP_GROUP_URL})`,
+    socialLinks.instagram && `- [Instagram](${socialLinks.instagram})`,
+    socialLinks.facebook && `- [Facebook](${socialLinks.facebook})`,
+    socialLinks.whatsappGroup && `- [WhatsApp group](${socialLinks.whatsappGroup})`,
   ].filter(Boolean);
 
   const body = [

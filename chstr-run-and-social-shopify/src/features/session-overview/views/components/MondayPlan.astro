@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
-import { tiles } from '@/data/Gallery/gallery-tiles';
-import { ROUTE_NOTE } from '@/utilities/brand';
+import { getTile } from '@/data/Gallery/gallery-tiles';
+import { ROUTE_NOTE } from '@/data/Content/settings';
 import { mondaySteps } from '@/features/session-overview/config';
 ---
 
@@ -13,7 +13,7 @@ import { mondaySteps } from '@/features/session-overview/config';
       <li data-reveal={index === 1 ? 'scale' : index === 0 ? 'left' : 'right'} class="tilt group relative rounded-3xl border-4 border-border bg-card p-4 pt-12">
         <span class="absolute -top-6 left-6 grid size-14 place-items-center rounded-full border-4 border-border bg-accent font-display text-2xl font-black" aria-hidden="true">{index + 1}</span>
         <div class="overflow-hidden rounded-2xl border-4 border-border">
-          <Image src={tiles[step.tile].image} alt={tiles[step.tile].alt} widths={[320, 480, 640]} sizes="(min-width: 768px) 30vw, 90vw" class="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+          <Image src={getTile(step.tile).image} alt={getTile(step.tile).alt} widths={[320, 480, 640]} sizes="(min-width: 768px) 30vw, 90vw" class="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105" />
         </div>
         <h3 class="mt-4 text-2xl">{step.title}</h3>
         <p class="mt-2 text-pretty">{step.text}</p>

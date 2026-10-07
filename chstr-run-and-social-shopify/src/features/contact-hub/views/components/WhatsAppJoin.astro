@@ -1,11 +1,12 @@
 ---
+import { socialLinks } from '@/data/Content/settings';
 interface Props {
   /** `solid` on light backgrounds, `outline` on dark ones. */
   tone?: 'solid' | 'outline';
   class?: string;
 }
 const { tone = 'solid', class: className = '' } = Astro.props;
-const groupUrl = import.meta.env.PUBLIC_WHATSAPP_GROUP_URL;
+const groupUrl = socialLinks.whatsappGroup;
 const toneClass = tone === 'solid' ? 'bg-success text-success-foreground border-border' : 'bg-success text-success-foreground border-card';
 ---
 

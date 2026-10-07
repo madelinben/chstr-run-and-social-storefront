@@ -24,7 +24,7 @@ const absolute = (path: string) => toAbsolute(requireSite(Astro.site), path);
   schema={products.length === 0 ? [] : [itemListNode(url, products.map((product) => ({ url: absolute(`/merchandise/${product.handle}/`), name: product.title, image: absolute(shopifyImageUrl(product.featuredImage?.url ?? '/og-default.png', 800, 800)) })))]}
 >
   <CartLauncher slot="actions" client:idle />
-  <PageBanner title="Merchandise" kicker="Wear the crew" tiles={['trainersLaces', 'bubbleCluster', 'wordMondays']} />
+  <PageBanner title="Merchandise" kicker="Wear the crew" tiles={['trainers-laces', 'bubble-cluster', 'word-mondays']} />
   <section class="mx-auto max-w-6xl px-6 py-16">
     <div class="mb-8 flex flex-wrap items-center gap-x-6 gap-y-4">
       <p class="max-w-prose">Pay online, then collect at the next <a class="font-bold underline" href={withBase('/events/')}>Monday run</a>. No delivery, no account needed.</p>

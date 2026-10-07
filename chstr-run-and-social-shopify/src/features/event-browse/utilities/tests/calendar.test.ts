@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SESSIONS } from '@/domain/session/session-schedule';
+import { SESSIONS } from '@/data/Content/sessions';
 import { buildIcs, escapeText, googleCalendarUrl, localBasic } from '@/features/event-browse/utilities/calendar';
 
 const now = new Date('2026-10-07T12:00:00Z');

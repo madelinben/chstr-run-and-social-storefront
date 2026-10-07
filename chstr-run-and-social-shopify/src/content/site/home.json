@@ -1,0 +1,64 @@
+{
+  "mondaySteps": [
+    {
+      "title": "Turn up",
+      "text": "Find the crew at The Architect. Drop your bag, say hello, nobody minds if you are new.",
+      "picture": "bag-drop"
+    },
+    {
+      "title": "Run your way",
+      "text": "Pace groups for every runner. Go steady, go fast, or run and chat. It is a run and social, not a race.",
+      "picture": "friends-running"
+    },
+    {
+      "title": "Stay for the social",
+      "text": "Back to The Architect afterwards. Cool down with a drink and the people you just ran with.",
+      "picture": "pint-cheers"
+    }
+  ],
+  "activities": [
+    {
+      "name": "Running",
+      "note": "Every Monday at 18:30, whatever your pace.",
+      "picture": "sprint-sunrise",
+      "tone": "pale",
+      "href": "/events/"
+    },
+    {
+      "name": "Football",
+      "note": "Thursdays, 8pm to 9pm at Chester University Football Pitches.",
+      "picture": "football-kickabout",
+      "tone": "lime",
+      "href": "/events/"
+    },
+    {
+      "name": "Netball",
+      "note": "Tuesdays, 7:30pm to 8:30pm at The Cheshire County Sports Club. Book online through Back to Netball.",
+      "picture": "netball-hoop",
+      "tone": "white",
+      "href": "/events/"
+    },
+    {
+      "name": "Social Nights",
+      "note": "Out together in Chester.",
+      "picture": "social-night",
+      "tone": "pale",
+      "href": "/gallery/"
+    }
+  ],
+  "tickerTop": [
+    "Run",
+    "Chat",
+    "Football",
+    "Netball",
+    "Social",
+    "Free"
+  ],
+  "tickerBottom": [
+    "Mondays",
+    "18:30",
+    "The Architect",
+    "Chester",
+    "Always free"
+  ]
+}

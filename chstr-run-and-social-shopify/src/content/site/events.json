@@ -1,0 +1,75 @@
+[
+  {
+    "slug": "chester-marathon-sign-making",
+    "title": "Chester Marathon Sign Making",
+    "date": "2026-10-05",
+    "summary": "Popcorn, sign making for the Chester Marathon and bead making, with Life in Chester.",
+    "highlights": [
+      "Popcorn for everyone",
+      "Sign making with Life in Chester, for the Chester Marathon",
+      "Bead making with Life in Chester"
+    ],
+    "partner": "Life in Chester",
+    "where": "",
+    "gallery": [
+      "speech-bubbles",
+      "finish-medal",
+      "smiley-crowd",
+      "bubble-cluster"
+    ]
+  },
+  {
+    "slug": "big-run-fyp-gym-saltney",
+    "title": "The Big Run at FYP Gym Saltney",
+    "date": "2026-09-05",
+    "summary": "The Big Run at FYP Gym in Saltney, with Steazy Wrexham Run Club.",
+    "highlights": [
+      "A run with Steazy Wrexham Run Club",
+      "At FYP Gym, Saltney"
+    ],
+    "partner": "Steazy Wrexham Run Club",
+    "where": "FYP Gym, Saltney",
+    "gallery": [
+      "friends-running",
+      "hill-sunset",
+      "finish-medal",
+      "smiley-crowd"
+    ]
+  },
+  {
+    "slug": "10k-run-wrexham-run-club",
+    "title": "10k Run With Wrexham Run Club",
+    "date": "2026-06-14",
+    "summary": "A 10k run with Wrexham Run Club at The Architect in Chester.",
+    "highlights": [
+      "A 10k run",
+      "Together with Wrexham Run Club",
+      "At The Architect, Chester"
+    ],
+    "partner": "Wrexham Run Club",
+    "where": "The Architect, Chester",
+    "gallery": [
+      "chester-route",
+      "sprint-sunrise",
+      "stopwatch-1830",
+      "friends-running"
+    ]
+  },
+  {
+    "slug": "long-run",
+    "title": "Long Run",
+    "date": "2026-10-18",
+    "summary": "A long run on Sunday 18 October.",
+    "highlights": [
+      "Follow us on Instagram or in the WhatsApp group for the start time and route"
+    ],
+    "partner": "",
+    "where": "",
+    "gallery": [
+      "night-run",
+      "chester-route",
+      "hill-sunset",
+      "stopwatch-1830"
+    ]
+  }
+]

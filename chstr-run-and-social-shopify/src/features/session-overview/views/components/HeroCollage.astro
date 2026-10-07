@@ -2,9 +2,9 @@
 import { withBase } from '@/utilities/with-base';
 import { Image } from 'astro:assets';
 import Logo from '@/features/site-shell/views/components/Logo.astro';
-import { heroColumns, tiles } from '@/data/Gallery/gallery-tiles';
+import { heroColumns, getTile } from '@/data/Gallery/gallery-tiles';
 import WhatsAppJoin from '@/features/contact-hub/views/components/WhatsAppJoin.astro';
-import { SITE_MOTTO } from '@/utilities/brand';
+import { SITE_MOTTO } from '@/data/Content/settings';
 import { sessionFacts } from '@/features/session-overview/config';
 
 const TILTS = ['-3deg', '2deg', '-2deg', '3deg'];
@@ -19,7 +19,7 @@ const tiltFor = (index: number) => TILTS[index % TILTS.length] ?? '0deg';
         <div class="hero-col flex flex-col gap-2" style={`--drift:${column.seconds}s;--dir:${column.reverse ? 'reverse' : 'normal'}`}>
           {[0, 1].flatMap((copy) =>
             column.tiles.map((id, tileIndex) => {
-              const tile = tiles[id];
+              const tile = getTile(id);
               const first = columnIndex === 0 && tileIndex === 0 && copy === 0;
               return (
                 <div

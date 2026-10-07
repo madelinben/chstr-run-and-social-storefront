@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import { tiles } from '@/data/Gallery/gallery-tiles';
+import { getTile } from '@/data/Gallery/gallery-tiles';
 import type { ClubEvent } from '@/data/Event/club-events';
 import { formatEventDateShort } from '@/domain/event/club-event-timing';
 import { withBase } from '@/utilities/with-base';
@@ -14,7 +14,7 @@ interface Props {
   eager?: boolean;
 }
 const { event, upcoming, headingLevel: Heading = 'h3', eager = false } = Astro.props;
-const cover = tiles[event.gallery[0]];
+const cover = getTile(event.gallery[0]);
 ---
 
 <li data-reveal={eager ? undefined : 'scale'} class="tilt group relative flex flex-col overflow-hidden rounded-3xl border-4 border-border bg-card">

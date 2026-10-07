@@ -1,6 +1,6 @@
 ---
 import { withBase } from '@/utilities/with-base';
-import { SITE_MOTTO } from '@/utilities/brand';
+import { SITE_MOTTO, socialLinks } from '@/data/Content/settings';
 import Logo from '@/features/site-shell/views/components/Logo.astro';
 
 const links = [
@@ -14,9 +14,9 @@ const links = [
   { href: withBase('/contact/'), label: 'Contact' },
 ];
 const socials = [
-  import.meta.env.PUBLIC_INSTAGRAM_URL && { label: 'Instagram', href: import.meta.env.PUBLIC_INSTAGRAM_URL },
-  import.meta.env.PUBLIC_FACEBOOK_URL && { label: 'Facebook', href: import.meta.env.PUBLIC_FACEBOOK_URL },
-].filter(Boolean);
+  socialLinks.instagram && { label: 'Instagram', href: socialLinks.instagram },
+  socialLinks.facebook && { label: 'Facebook', href: socialLinks.facebook },
+].filter((link) => typeof link === 'object');
 ---
 
 <footer class="bg-foreground text-background">

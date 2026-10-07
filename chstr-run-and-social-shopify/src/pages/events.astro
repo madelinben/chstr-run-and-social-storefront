@@ -11,7 +11,7 @@ import LightsNotice from '@/features/session-overview/views/components/LightsNot
 import WhatsAppJoin from '@/features/contact-hub/views/components/WhatsAppJoin.astro';
 import { clubEvents } from '@/data/Event/club-events';
 import { splitEvents } from '@/domain/event/club-event-timing';
-import { SESSIONS } from '@/domain/session/session-schedule';
+import { SESSIONS } from '@/data/Content/sessions';
 import { sessionCopy } from '@/features/event-browse/config';
 import { sessionEventNode } from '@/features/site-seo/utilities/schema-nodes';
 import { siteRoot, toAbsolute, withBase } from '@/utilities/with-base';
@@ -30,11 +30,11 @@ const image = toAbsolute(requireSite(Astro.site), '/og-default.png');
   schema={[
     sessionEventNode({ origin: root, now, image, session: SESSIONS.run, id: `${pageUrl}#run`, url: pageUrl, free: true, description: sessionCopy.run.calendar }),
     sessionEventNode({ origin: root, now, image, session: SESSIONS.football, id: `${pageUrl}#football`, url: pageUrl, free: false, description: sessionCopy.football.calendar }),
-    sessionEventNode({ origin: root, now, image, session: SESSIONS.netball, id: `${pageUrl}#netball`, url: SESSIONS.netball.bookingUrl, free: false, description: sessionCopy.netball.calendar }),
+    sessionEventNode({ origin: root, now, image, session: SESSIONS.netball, id: `${pageUrl}#netball`, url: SESSIONS.netball.bookingUrl ?? pageUrl, free: false, description: sessionCopy.netball.calendar }),
   ]}
 >
   <CartLauncher slot="actions" client:idle />
-  <PageBanner title="Events" kicker="What's on" tiles={['stopwatch', 'footballKickabout', 'netballHoop']} />
+  <PageBanner title="Events" kicker="What's on" tiles={['stopwatch-1830', 'football-kickabout', 'netball-hoop']} />
 
   <section class="mx-auto max-w-6xl px-6 py-16">
     <p class="mb-8 max-w-prose text-lg">Run on Mondays, play netball on Tuesdays and football on Thursdays. Come to one or all three: all people, all paces, all welcome.</p>
