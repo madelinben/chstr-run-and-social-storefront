@@ -67,7 +67,7 @@ const description = `${event.summary} ${isUpcoming ? 'Coming up with' : 'A past 
               widths={[320, 480, 640]}
               sizes="(min-width: 768px) 28vw, 46vw"
               class="aspect-square w-full object-cover"
-              loading={index === 0 ? 'eager' : 'lazy'}
+              loading="eager"
               fetchpriority={index === 0 ? 'high' : 'auto'}
               decoding={index === 0 ? 'sync' : 'async'}
             />

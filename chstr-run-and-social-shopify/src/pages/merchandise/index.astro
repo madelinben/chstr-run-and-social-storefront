@@ -37,7 +37,7 @@ const absolute = (path: string) => toAbsolute(requireSite(Astro.site), path);
       </div>
     ) : (
       <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {products.map((product, index) => <ProductCard product={product} eager={index === 0} reveal={index >= 3} />)}
+        {products.map((product, index) => <ProductCard product={product} eager={index < 3} priority={index === 0} reveal={index >= 3} />)}
       </ul>
     )}
   </section>

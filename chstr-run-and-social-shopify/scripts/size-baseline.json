@@ -1,62 +1,62 @@
 {
   "/": {
-    "js": 79880,
-    "css": 7275,
-    "html": 12144
+    "js": 79887,
+    "css": 7322,
+    "html": 12069
   },
   "/404.html": {
     "js": 397,
-    "css": 7209,
-    "html": 2607
+    "css": 7256,
+    "html": 2608
   },
   "/contact/": {
-    "js": 79880,
-    "css": 7275,
-    "html": 5530
+    "js": 79887,
+    "css": 7322,
+    "html": 5515
   },
   "/events/": {
-    "js": 79880,
-    "css": 7275,
-    "html": 8567
+    "js": 79887,
+    "css": 7322,
+    "html": 8526
   },
   "/events/:event/": {
-    "js": 79880,
-    "css": 7275,
-    "html": 6777
+    "js": 79887,
+    "css": 7322,
+    "html": 6728
   },
   "/events/past/": {
-    "js": 79880,
-    "css": 7275,
-    "html": 6810
+    "js": 79887,
+    "css": 7322,
+    "html": 6730
   },
   "/faqs/": {
-    "js": 79880,
-    "css": 7275,
-    "html": 6870
-  },
-  "/gallery/": {
-    "js": 79880,
-    "css": 7275,
-    "html": 7465
-  },
-  "/members/": {
-    "js": 79880,
-    "css": 7275,
-    "html": 6701
-  },
-  "/merchandise/": {
-    "js": 81018,
-    "css": 7275,
-    "html": 7307
-  },
-  "/merchandise/:product/": {
-    "js": 81018,
-    "css": 7275,
+    "js": 79887,
+    "css": 7322,
     "html": 6866
   },
+  "/gallery/": {
+    "js": 79887,
+    "css": 7322,
+    "html": 7414
+  },
+  "/members/": {
+    "js": 79887,
+    "css": 7322,
+    "html": 6668
+  },
+  "/merchandise/": {
+    "js": 81014,
+    "css": 7322,
+    "html": 7278
+  },
+  "/merchandise/:product/": {
+    "js": 81014,
+    "css": 7322,
+    "html": 6860
+  },
   "/waiver/": {
-    "js": 79880,
-    "css": 7275,
-    "html": 6121
+    "js": 79887,
+    "css": 7322,
+    "html": 6095
   }
 }

@@ -31,7 +31,7 @@ const tiltFor = (index: number) => TILTS[index % TILTS.length] ?? '0deg';
                     alt=""
                     width={360}
                     class="size-full object-cover"
-                    loading={first ? 'eager' : 'lazy'}
+                    loading="eager"
                     fetchpriority={first ? 'high' : 'auto'}
                     decoding={first ? 'sync' : 'async'}
                   />
@@ -74,10 +74,10 @@ const tiltFor = (index: number) => TILTS[index % TILTS.length] ?? '0deg';
       ))}
     </dl>
     <div class="hero-rise flex flex-wrap items-center justify-center gap-3" style="--i:6">
-      <a href={withBase('/waiver/')} class="min-h-10 rounded-full border-4 border-border bg-accent px-8 py-3 font-display text-lg font-extrabold uppercase text-accent-foreground shadow-[0_6px_0_rgba(0,0,0,0.4)] transition-transform hover:-translate-y-0.5 active:scale-[0.96]">
+      <a href={withBase('/waiver/')} class="min-h-10 rounded-full border-4 border-border bg-accent px-8 py-3 font-display text-lg font-extrabold uppercase text-accent-foreground shadow-[0_6px_0_rgba(0,0,0,0.4)] press">
         Sign the waiver
       </a>
-      <a href={withBase('/merchandise/')} class="min-h-10 rounded-full border-4 border-border bg-card px-8 py-3 font-display text-lg font-extrabold uppercase shadow-[0_6px_0_rgba(0,0,0,0.4)] transition-transform hover:-translate-y-0.5 active:scale-[0.96]">
+      <a href={withBase('/merchandise/')} class="min-h-10 rounded-full border-4 border-border bg-card px-8 py-3 font-display text-lg font-extrabold uppercase shadow-[0_6px_0_rgba(0,0,0,0.4)] press">
         Shop the merch
       </a>
       <WhatsAppJoin tone="solid" />

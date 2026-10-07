@@ -177,9 +177,13 @@ for (const page of pages) {
     const alt = img.getAttribute('alt');
     if (alt === undefined) fail(route, `${label} has no alt attribute`);
     else if (alt.trim() === '' && !img.closest('[aria-hidden="true"]') && img.getAttribute('role') !== 'presentation') {
-      // An empty alt is right when the image sits in a link or button that already has its own text.
+      // An empty alt is right when the image is part of something that already has a name: a link or button with its own text,
+      // or a card (<li>/<article>) whose title link is named and stretched over the card.
       const labelled = img.closest('a, button');
-      if (!labelled || labelled.text.trim() === '') fail(route, `${label} has empty alt but is not decorative (aria-hidden, role=presentation, or inside a link with text)`);
+      const card = img.closest('li, article');
+      const cardLinkNamed = card?.querySelectorAll('a[href]').some((link) => link.text.trim() !== '') ?? false;
+      const namedBySelf = labelled !== null && labelled.text.trim() !== '';
+      if (!namedBySelf && !cardLinkNamed) fail(route, `${label} has empty alt but is not decorative (aria-hidden, role=presentation, inside a named link, or inside a card with a named link)`);
     }
     if (img.getAttribute('loading') !== 'lazy') nonLazy.push(img);
     if (/^https?:\/\//.test(src)) {
@@ -190,8 +194,11 @@ for (const page of pages) {
       else if (statSync(local).size > BUDGET.imageBytes) fail(route, `${label} is ${kb(statSync(local).size)} (limit ${kb(BUDGET.imageBytes)})`);
     }
   }
-  if (nonLazy.length > 1) fail(route, `${nonLazy.length} images are not lazy; only the LCP image may be eager`);
-  if (nonLazy.length === 1 && nonLazy[0].getAttribute('fetchpriority') !== 'high') fail(route, 'the one eager image must have fetchpriority="high"');
+  // Images in the opening viewport load eagerly; the rest are lazy (the e2e audit checks that no lazy image is on screen at load).
+  // At most one image per page may claim high priority (the LCP candidate), and eager images stay within a sane count.
+  const highPriority = images.filter((img) => img.getAttribute('fetchpriority') === 'high');
+  if (highPriority.length > 1) fail(route, `${highPriority.length} images have fetchpriority="high"; only the LCP image should`);
+  if (nonLazy.length > 64) fail(route, `${nonLazy.length} images are eager; only images in the opening viewport should be`);
 
   // ---- third parties and islands ----
   for (const node of root.querySelectorAll('script[src], link[rel="stylesheet"], link[rel="preload"], link[rel="modulepreload"], iframe')) {

@@ -140,7 +140,6 @@ p {
   .hero-col {
     animation: col-drift var(--drift, 60s) linear infinite;
     animation-direction: var(--dir, normal);
-    will-change: transform;
   }
   @keyframes tile-in {
     from { opacity: 0; transform: scale(0.8) rotate(var(--r, -3deg)); }
@@ -168,4 +167,41 @@ p {
     to { transform: translateY(-18px); }
   }
   .bubble-float { animation: bubble-float 5s ease-in-out infinite alternate; animation-delay: var(--d, 0s); }
+}
+
+/* ---- Button feedback ----
+   Whole-pixel offsets on `top` (not transform): a transformed button is promoted to its own GPU layer on top of the always
+   animating hero collage, and at fractional display scales (Windows 125% or 150%) the layer edges show as dark seams. */
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+.press {
+  position: relative;
+  top: 0;
+  transition: top 120ms cubic-bezier(0.2, 0, 0, 1);
+}
+@media (hover: hover) {
+  .press:hover {
+    top: -2px;
+  }
+}
+.press:active {
+  top: 2px;
+}
+
+/* ---- Vertical rhythm ----
+   One padding for every plain content section. When two sit directly after each other the second drops its top padding,
+   so the gap between them is one step (56px on phones, 80px above) instead of two. Dividers, tickers and banded
+   sections between them keep the full padding on both sides. */
+.section-y {
+  padding-block: 3.5rem;
+}
+.section-y + .section-y {
+  padding-top: 0;
+}
+@media (min-width: 640px) {
+  .section-y {
+    padding-block: 5rem;
+  }
 }

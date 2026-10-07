@@ -190,3 +190,30 @@ for (const width of [768, 1024]) {
     });
   }
 }
+
+test('buttons respond to hover and press with whole-pixel offsets, never a transform', async ({ page }) => {
+  // A transformed button becomes its own GPU layer over the animated collage, which can show dark seams at fractional display scales.
+  await page.goto('/');
+  const button = page.getByRole('link', { name: 'Shop the merch' });
+  await button.hover();
+  await page.waitForTimeout(250);
+  expect(await button.evaluate((node) => getComputedStyle(node).transform)).toBe('none');
+  expect(await button.evaluate((node) => getComputedStyle(node).top)).toBe('-2px');
+  await page.mouse.down();
+  await page.waitForTimeout(250);
+  expect(await button.evaluate((node) => getComputedStyle(node).transform)).toBe('none');
+  expect(await button.evaluate((node) => getComputedStyle(node).top)).toBe('2px');
+  await page.mouse.up();
+});
+
+test('the header cart button stays on one line, and shop cards in a row are the same height', async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 800 });
+  await page.goto('/');
+  const cart = await page.getByRole('button', { name: /^Cart/ }).boundingBox();
+  expect(cart?.height ?? 999).toBeLessThan(60);
+  const cards = page.locator('main section', { has: page.getByRole('heading', { name: 'Wear The Crew' }) }).locator('li');
+  await cards.first().scrollIntoViewIfNeeded();
+  const heights = await cards.evaluateAll((nodes) => nodes.map((node) => Math.round(node.getBoundingClientRect().height)));
+  expect(heights.length).toBeGreaterThan(1);
+  expect(new Set(heights).size).toBe(1);
+});

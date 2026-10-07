@@ -56,8 +56,8 @@ Staff-only routes (`/keystatic`, `/admin`) are exempt from JS budgets but must n
 ## LCP
 
 - The LCP element (hero image, product image) is in the HTML, not injected by JS
-- Exactly one image per page may be eager, and it carries `fetchpriority="high"`. Every other `<img>` is `loading="lazy"` and `decoding="async"`
-- Never lazy-load the LCP image; never use a CSS `background-image` for it
+- Images in the opening viewport are `loading="eager"`; images below it are `loading="lazy"` and `decoding="async"`. At most one image per page (the LCP candidate) carries `fetchpriority="high"`. `e2e/audit.spec.ts` fails if a lazy image is on screen at load, at desktop, tablet and phone sizes
+- Never lazy-load an image that is visible on load (Astro's audit flags it); never lazy-load the LCP image; never use a CSS `background-image` for it
 - Hero collage: only the first tile is eager (`fetchpriority="high"`); every other tile is lazy, `alt=""`, one `width` (no multi-width srcset, to keep HTML small)
 
 ## CLS

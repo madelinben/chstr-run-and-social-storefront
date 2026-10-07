@@ -17,7 +17,7 @@ export default function CartLauncher() {
       <button
         type="button"
         onClick={() => dialogRef.current?.showModal()}
-        className="min-h-10 rounded-full border-4 border-border bg-accent px-4 py-2 font-display font-extrabold uppercase active:scale-[0.96]"
+        className="min-h-10 shrink-0 whitespace-nowrap rounded-full border-4 border-border bg-accent px-4 py-2 font-display font-extrabold uppercase press"
       >
         Cart <span className="tabular-nums">({current?.totalQuantity ?? 0})</span>
       </button>
@@ -58,7 +58,7 @@ export default function CartLauncher() {
             <p className="mt-2 text-sm text-muted-foreground">Collect your order at a Monday run. No delivery.</p>
             <a
               href={current.checkoutUrl}
-              className="mt-6 flex min-h-10 w-full items-center justify-center rounded-full border-4 border-border bg-accent px-6 py-3 font-display text-lg font-extrabold uppercase active:scale-[0.96]"
+              className="mt-6 flex min-h-10 w-full items-center justify-center rounded-full border-4 border-border bg-accent px-6 py-3 font-display text-lg font-extrabold uppercase press"
             >
               Go To Checkout
             </a>

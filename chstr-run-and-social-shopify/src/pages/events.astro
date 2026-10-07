@@ -56,8 +56,8 @@ const image = toAbsolute(requireSite(Astro.site), '/og-default.png');
     <h2 data-reveal class="mb-6 text-4xl sm:text-5xl">Coming Up</h2>
     <UpcomingDates now={now} weeks={6} />
     <div class="mt-8 flex flex-wrap gap-3">
-      <a href={withBase('/chstr-sessions.ics')} download class="min-h-10 rounded-full border-4 border-border bg-accent px-6 py-3 font-display font-extrabold uppercase shadow-[0_6px_0_rgba(0,0,0,0.4)] transition-transform hover:-translate-y-0.5 active:scale-[0.96]">Download calendar file</a>
-      <a href={withBase('/events/past/')} class="min-h-10 rounded-full border-4 border-border bg-card px-6 py-3 font-display font-extrabold uppercase transition-transform hover:-translate-y-0.5 active:scale-[0.96]">See past events</a>
+      <a href={withBase('/chstr-sessions.ics')} download class="min-h-10 rounded-full border-4 border-border bg-accent px-6 py-3 font-display font-extrabold uppercase shadow-[0_6px_0_rgba(0,0,0,0.4)] press">Download calendar file</a>
+      <a href={withBase('/events/past/')} class="min-h-10 rounded-full border-4 border-border bg-card px-6 py-3 font-display font-extrabold uppercase press">See past events</a>
       <WhatsAppJoin />
     </div>
     <p class="mt-4 max-w-prose text-sm text-muted-foreground">The calendar file adds the Monday run, Tuesday netball and Thursday football as weekly events in Apple Calendar, Outlook or any calendar app. Dates refresh every Monday.</p>

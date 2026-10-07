@@ -53,7 +53,7 @@ export default function AddToCartForm({ name, optionLabel, variants, showVariant
         type="button"
         disabled={!selected.availableForSale}
         onClick={add}
-        className="min-h-10 rounded-full border-4 border-border bg-accent px-5 py-2 font-display font-extrabold uppercase active:scale-[0.96] disabled:opacity-60"
+        className="min-h-10 rounded-full border-4 border-border bg-accent px-5 py-2 font-display font-extrabold uppercase press disabled:opacity-60"
       >
         {!selected.availableForSale ? 'Sold Out' : added ? 'Added ✓' : 'Add To Cart'}
       </button>

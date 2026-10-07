@@ -7,11 +7,11 @@ const items = entries.map((entry) => ({ entry, html: withBaseInHtml(entry.render
 ---
 
 {items.length > 0 && (
-  <section class="mx-auto grid max-w-6xl gap-10 px-6 py-20 lg:grid-cols-[1fr_1.4fr]">
+  <section class="mx-auto grid max-w-6xl gap-10 px-6 section-y lg:grid-cols-[1fr_1.4fr]">
     <div>
       <h2 data-reveal class="text-4xl sm:text-6xl">Quick Answers</h2>
       <p data-reveal class="mt-4 max-w-prose text-lg">New here? Start with these, or read them all.</p>
-      <a data-reveal href={withBase('/faqs/')} class="mt-6 inline-flex min-h-10 items-center rounded-full border-4 border-border bg-card px-6 py-2 font-display font-extrabold uppercase transition-transform hover:-translate-y-0.5 active:scale-[0.96]">All FAQs</a>
+      <a data-reveal href={withBase('/faqs/')} class="mt-6 inline-flex min-h-10 items-center rounded-full border-4 border-border bg-card px-6 py-2 font-display font-extrabold uppercase press">All FAQs</a>
     </div>
     <div class="flex flex-col gap-3">
       {items.map(({ entry, html }) => (

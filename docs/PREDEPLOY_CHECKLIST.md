@@ -91,6 +91,14 @@ Last measured (Lighthouse mobile, built site): Performance 99 to 100, Accessibil
 | No runtime errors | e2e visits every page and fails on any console error, exception, failed request or 4xx/5xx | Auto |
 | Empty and odd data | an empty or partly unpriced catalogue builds; products without variants render nothing instead of crashing | Auto (unit tests) |
 
+## 3c. Astro audit rules (also enforced as tests)
+
+| Rule | How | Status |
+|---|---|---|
+| Every link and heading has an accessible name (text, `aria-label`, named image or SVG title) | `e2e/audit.spec.ts`, every page at desktop, tablet and phone widths. Cards use one stretched title link instead of image-only links | Auto |
+| No lazy-loaded image on screen at load (should be eager) | same spec; images in the opening viewport are `loading="eager"`, everything below is lazy | Auto |
+| Run Astro's own audit too | `pnpm dev`, open the dev toolbar Audit app on each page type before a launch, because it also covers rules we have not written tests for | Manual |
+
 ## 4. Mobile first
 
 Every layout is designed for a 360 px phone first and enhanced at `sm` / `md` / `lg`.

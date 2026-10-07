@@ -30,7 +30,7 @@ const url = toAbsolute(requireSite(Astro.site), '/events/past/');
       <p>Past events will appear here once they have happened.</p>
     ) : (
       <ul class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {past.map((event) => <ClubEventCard event={event} upcoming={false} headingLevel="h2" />)}
+        {past.map((event, index) => <ClubEventCard event={event} upcoming={false} headingLevel="h2" eager={index < 3} />)}
       </ul>
     )}
   </section>

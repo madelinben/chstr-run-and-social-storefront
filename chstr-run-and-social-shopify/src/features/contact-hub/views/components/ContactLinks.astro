@@ -15,7 +15,7 @@ const links = [
   <ul class="grid gap-4 sm:grid-cols-2">
     {links.map((link) => (
       <li data-reveal>
-        <a href={link.href} rel="noopener" class={`${link.color} flex min-h-10 flex-col rounded-3xl border-4 border-border p-6 transition-transform active:scale-[0.96]`}>
+        <a href={link.href} rel="noopener" class={`${link.color} flex min-h-10 flex-col rounded-3xl border-4 border-border p-6 press`}>
           <span class="font-display text-2xl font-bold">{link.label}</span>
           <span class="break-words">{link.detail}</span>
         </a>

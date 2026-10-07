@@ -14,10 +14,10 @@ const shown = [...upcoming.map((event) => ({ event, upcoming: true })), ...past.
 ---
 
 {shown.length > 0 && (
-  <section class="mx-auto max-w-6xl px-6 py-20">
+  <section class="mx-auto max-w-6xl px-6 section-y">
     <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
       <h2 data-reveal class="text-4xl sm:text-6xl">What We Have Been Up To</h2>
-      <a data-reveal href={withBase('/events/past/')} class="min-h-10 rounded-full border-4 border-border bg-accent px-6 py-2 font-display font-extrabold uppercase transition-transform hover:-translate-y-0.5 active:scale-[0.96]">All past events</a>
+      <a data-reveal href={withBase('/events/past/')} class="min-h-10 rounded-full border-4 border-border bg-accent px-6 py-2 font-display font-extrabold uppercase press">All past events</a>
     </div>
     <p data-reveal class="mb-8 max-w-prose text-lg">Runs with other clubs, crafts for the Chester Marathon and more. Have a look at what the club gets up to before you join.</p>
     <ul class="grid gap-6 md:grid-cols-3">

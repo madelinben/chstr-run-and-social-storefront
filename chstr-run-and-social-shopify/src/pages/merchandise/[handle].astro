@@ -85,7 +85,7 @@ const relatedItems = await Promise.all(
               alt={view.alt}
               widths={[320, 480, 800]}
               sizes="(min-width: 768px) 25vw, 46vw"
-              loading={index === 0 ? 'eager' : 'lazy'}
+              loading={index < 4 ? 'eager' : 'lazy'}
               fetchpriority={index === 0 ? 'high' : 'auto'}
               decoding={index === 0 ? 'sync' : 'async'}
               class="aspect-square w-full rounded-3xl border-4 border-border bg-white object-cover"
@@ -99,7 +99,7 @@ const relatedItems = await Promise.all(
               alt={image.altText ?? product.title}
               width={image.width ?? 1600}
               height={image.height ?? 900}
-              loading={index === 0 ? undefined : 'lazy'}
+              loading={index < 2 ? undefined : 'lazy'}
               fetchpriority={index === 0 ? 'high' : undefined}
               decoding={index === 0 ? 'sync' : 'async'}
               class="h-auto w-full rounded-3xl border-4 border-border bg-card"
@@ -118,5 +118,5 @@ const relatedItems = await Promise.all(
       </p>
     </div>
   </section>
-  <MerchStrip products={relatedItems} heading="More From The Shop" />
+  <MerchStrip products={relatedItems} heading="More From The Shop" eager />
 </PageLayout>
